@@ -1,0 +1,20 @@
+<RCC>
+  <qresource prefix="/MultiAlarm">
+    <file>application.ico</file>
+	<file>add.ico</file>
+	<file>delete.ico</file>
+	<file>speaker.ico</file>
+	<file>play.ico</file>
+	<file>pause.ico</file>
+	<file>stop.ico</file>
+	<file>0.ico</file>
+	<file>1.ico</file>
+	<file>2.ico</file>
+	<file>3.ico</file>
+	<file>4.ico</file>
+	<file>5.ico</file>	
+	<file>6.ico</file>
+	<file>7.ico</file>
+	<file>8.ico</file>
+  </qresource>
+</RCC>
