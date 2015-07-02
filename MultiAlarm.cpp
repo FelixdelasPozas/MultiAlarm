@@ -19,6 +19,8 @@
 
 // Project
 #include "MultiAlarm.h"
+#include "AboutDialog.h"
+#include "NewAlarmDialog.h"
 
 //-----------------------------------------------------------------
 MultiAlarm::MultiAlarm(QWidget *parent, Qt::WindowFlags flags)
@@ -37,16 +39,32 @@ MultiAlarm::~MultiAlarm()
 //-----------------------------------------------------------------
 void MultiAlarm::createNewAlarm()
 {
+  NewAlarmDialog dialog(this);
+
+  dialog.exec();
 }
 
 //-----------------------------------------------------------------
-void MultiAlarm::onAlarmDialogClosed(NewAlarmDialog* dialog)
+void MultiAlarm::aboutDialog()
 {
+  AboutDialog dialog(this);
+
+  dialog.exec();
 }
+
 
 //-----------------------------------------------------------------
 void MultiAlarm::connectSignals()
 {
   connect(m_quitAction, SIGNAL(triggered()),
           this,         SLOT(close()));
+
+  connect(m_newAction, SIGNAL(triggered()),
+          this,        SLOT(createNewAlarm()));
+
+  connect(m_newButton, SIGNAL(pressed()),
+          this,        SLOT(createNewAlarm()));
+
+  connect(m_aboutAction, SIGNAL(triggered()),
+          this,          SLOT(aboutDialog()));
 }

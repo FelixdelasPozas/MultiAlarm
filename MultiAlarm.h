@@ -21,7 +21,6 @@
 #define MULTIALARM_H_
 
 // Project
-#include "NewAlarmDialog.h"
 #include "ui_MainWindow.h"
 
 // Qt
@@ -53,11 +52,10 @@ class MultiAlarm
      */
     void createNewAlarm();
 
-    /** \brief Manages the creation of a new alarm.
-     * \param[in] dialog recently closed new alarm dialog pointer.
+    /** \brief Launches the about dialog.
      *
      */
-    void onAlarmDialogClosed(NewAlarmDialog *dialog);
+    void aboutDialog();
 
   private:
     /** \brief Makes all the connections between QObjects.
