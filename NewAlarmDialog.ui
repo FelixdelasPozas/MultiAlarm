@@ -136,7 +136,7 @@
        </layout>
       </item>
       <item>
-       <widget class="QCheckBox" name="checkBox">
+       <widget class="QCheckBox" name="m_timerLoop">
         <property name="text">
          <string>Loop Timer</string>
         </property>
@@ -194,7 +194,7 @@
          <widget class="QComboBox" name="m_soundComboBox"/>
         </item>
         <item>
-         <widget class="QToolButton" name="toolButton">
+         <widget class="QToolButton" name="m_playSoundButton">
           <property name="text">
            <string/>
           </property>
@@ -224,7 +224,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
+    <widget class="QDialogButtonBox" name="m_buttons">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -240,7 +240,7 @@
  </resources>
  <connections>
   <connection>
-   <sender>buttonBox</sender>
+   <sender>m_buttons</sender>
    <signal>accepted()</signal>
    <receiver>NewAlarmDialog</receiver>
    <slot>accept()</slot>
@@ -256,7 +256,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>buttonBox</sender>
+   <sender>m_buttons</sender>
    <signal>rejected()</signal>
    <receiver>NewAlarmDialog</receiver>
    <slot>reject()</slot>

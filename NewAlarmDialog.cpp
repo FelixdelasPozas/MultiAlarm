@@ -1,6 +1,6 @@
 /*
- File: Main.cpp
- Created on: 18/5/2015
+ File: NewAlarmDialog.cpp
+ Created on: 02/07/2015
  Author: Felix de las Pozas Alvarez
 
  This program is free software: you can redistribute it and/or modify
@@ -17,38 +17,17 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Project
-#include "MultiAlarm.h"
+#include <NewAlarmDialog.h>
 
-// Qt
-#include <QApplication>
-#include <QSharedMemory>
-#include <QMessageBox>
-#include <QIcon>
-
-int main(int argc, char *argv[])
+//-----------------------------------------------------------------
+NewAlarmDialog::NewAlarmDialog(QWidget * parent, Qt::WindowFlags flags)
+: QDialog(parent)
 {
-	QApplication app(argc, argv);
-
-  // allow only one instance
-  QSharedMemory guard;
-  guard.setKey("MultiAlarm");
-
-  if (!guard.create(1))
-  {
-    QMessageBox msgBox;
-    msgBox.setWindowIcon(QIcon(":/MultiAlarm/application.ico"));
-    msgBox.setIcon(QMessageBox::Warning);
-    msgBox.setText("MultiAlarm is already running!");
-    msgBox.setStandardButtons(QMessageBox::Ok);
-    msgBox.exec();
-    exit(0);
-  }
-
-	MultiAlarm alarm;
-	alarm.show();
-
-	return app.exec();
+  setupUi(this);
 }
 
+//-----------------------------------------------------------------
+NewAlarmDialog::~NewAlarmDialog()
+{
+}
 

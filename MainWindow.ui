@@ -32,7 +32,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="m_newButton">
       <property name="minimumSize">
        <size>
         <width>110</width>
@@ -69,21 +69,21 @@
     <property name="title">
      <string>Menu</string>
     </property>
-    <addaction name="action_New_Alarm"/>
+    <addaction name="m_newAction"/>
     <addaction name="separator"/>
-    <addaction name="action_Quit"/>
+    <addaction name="m_quitAction"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
      <string>About</string>
     </property>
-    <addaction name="actionAbout_MultiAlarm"/>
+    <addaction name="m_aboutAction"/>
    </widget>
    <addaction name="menuMenu"/>
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="action_New_Alarm">
+  <action name="m_newAction">
    <property name="icon">
     <iconset resource="rsc/resources.qrc">
      <normaloff>:/MultiAlarm/add.ico</normaloff>:/MultiAlarm/add.ico</iconset>
@@ -92,12 +92,12 @@
     <string>&amp;New Alarm...</string>
    </property>
   </action>
-  <action name="action_Quit">
+  <action name="m_quitAction">
    <property name="text">
     <string>&amp;Quit</string>
    </property>
   </action>
-  <action name="actionAbout_MultiAlarm">
+  <action name="m_aboutAction">
    <property name="text">
     <string>About &amp;MultiAlarm...</string>
    </property>

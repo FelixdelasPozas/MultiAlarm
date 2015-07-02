@@ -2,10 +2,26 @@ project(MultiAlarm)
 
 cmake_minimum_required (VERSION 2.8.6)
 
+set (CMAKE_PREFIX_PATH "C:\\Qt\\Qt5.0.1\\5.0.1\\msvc2010\\")
+
 # Version Number
 set (MULTIALARM_VERSION_MAJOR 1)
 set (MULTIALARM_VERSION_MINOR 0)
 set (MULTIALARM_VERSION_PATCH 0)
+
+# Find includes in corresponding build directories
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+# Instruct CMake to run moc automatically when needed.
+set(CMAKE_AUTOMOC ON)
+
+# Find the QtWidgets library
+find_package(Qt5 COMPONENTS Widgets)
+
+# We need add -DQT_WIDGETS_LIB when using QtWidgets in Qt 5.
+add_definitions(${Qt5Widgets_DEFINITIONS})
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
   set(CORE_EXTERNAL_LIBS ${CORE_EXTERNAL_LIBS} ${QT_QTTEST_LIBRARY})
@@ -18,32 +34,28 @@ if(DEFINED MULTIALARM_VERSION_MAJOR)
   enable_language(RC)
 endif(DEFINED MULTIALARM_VERSION_MAJOR)
 
-find_package(Qt4 REQUIRED)
-include(${QT_USE_FILE})
-
 include_directories(
   ${CMAKE_SOURCE_DIR}
   ${PROJECT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_BINARY_DIR}          # Generated .h files
   ${CMAKE_CURRENT_BINARY_DIR}  # For wrap/ui files
+  ${Qt5Widgets_INCLUDE_DIRS}
   )
 
 set(CMAKE_CXX_FLAGS " -Wall -Wno-deprecated -std=c++11 -mwindows")
 
 # Add Qt Resource files
-qt4_add_resources(RESOURCES
+qt5_add_resources(RESOURCES
   rsc/resources.qrc
 )
 
-qt4_wrap_ui(CORE_UI
+qt5_wrap_ui(CORE_UI
   # .ui for Qt
+  NewAlarmDialog.ui
+  MainWindow.ui
 )
 	
-qt4_wrap_cpp(CORE_MOC
-  # .h for Qt
-)
-
 set (CORE_SOURCES
   # project files
   ${CORE_SOURCES}
@@ -51,11 +63,14 @@ set (CORE_SOURCES
   ${CORE_MOC}
   ${CORE_UI}
   Main.cpp
+  NewAlarmDialog.cpp
+  MultiAlarm.cpp
 )
 
 set(CORE_EXTERNAL_LIBS
-  ${QT_LIBRARIES}
+  Qt5::Widgets
 )
   
 add_executable(MultiAlarm ${CORE_SOURCES})
 target_link_libraries (MultiAlarm ${CORE_EXTERNAL_LIBS})
+qt5_use_modules(MultiAlarm Widgets)
