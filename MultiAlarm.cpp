@@ -24,9 +24,14 @@
 
 //-----------------------------------------------------------------
 MultiAlarm::MultiAlarm(QWidget *parent, Qt::WindowFlags flags)
-: QMainWindow(parent, flags)
+: QMainWindow{parent, flags}
+, m_icon     {new QSystemTrayIcon(QIcon(":/MultiAlarm/application.ico"), this)}
 {
+  setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
   setupUi(this);
+
+  statusbar->setVisible(false);
+  setFixedHeight(size().height());
 
   connectSignals();
 }
@@ -52,6 +57,29 @@ void MultiAlarm::aboutDialog()
   dialog.exec();
 }
 
+//-----------------------------------------------------------------
+void MultiAlarm::changeEvent(QEvent* e)
+{
+  if (e->type() == QEvent::WindowStateChange)
+  {
+    if (isMinimized())
+    {
+      hide();
+      m_icon->show();
+      e->ignore();
+    }
+  }
+}
+
+//-----------------------------------------------------------------
+void MultiAlarm::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason)
+{
+  if(reason == QSystemTrayIcon::DoubleClick)
+  {
+    m_icon->hide();
+    show();
+  }
+}
 
 //-----------------------------------------------------------------
 void MultiAlarm::connectSignals()
@@ -67,4 +95,7 @@ void MultiAlarm::connectSignals()
 
   connect(m_aboutAction, SIGNAL(triggered()),
           this,          SLOT(aboutDialog()));
+
+  connect(m_icon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+          this,   SLOT(onTrayIconActivated(QSystemTrayIcon::ActivationReason)));
 }

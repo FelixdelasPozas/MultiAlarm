@@ -91,15 +91,24 @@
    <property name="text">
     <string>&amp;New Alarm...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="m_quitAction">
    <property name="text">
     <string>&amp;Quit</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
   </action>
   <action name="m_aboutAction">
    <property name="text">
     <string>About &amp;MultiAlarm...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
    </property>
   </action>
  </widget>

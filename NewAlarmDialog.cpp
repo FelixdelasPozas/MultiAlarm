@@ -23,6 +23,7 @@
 NewAlarmDialog::NewAlarmDialog(QWidget * parent, Qt::WindowFlags flags)
 : QDialog(parent)
 {
+  setWindowFlags(windowFlags() & ~Qt::WindowMinMaxButtonsHint & ~Qt::WindowContextHelpButtonHint);
   setupUi(this);
 }
 

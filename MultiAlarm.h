@@ -25,6 +25,9 @@
 
 // Qt
 #include <QMainWindow>
+#include <QSystemTrayIcon>
+
+class QEvent;
 
 /** \class MultiAlarm
  * \brief Application main window.
@@ -57,11 +60,21 @@ class MultiAlarm
      */
     void aboutDialog();
 
+    /** \brief Handles the icon tray activation.
+     * \param[in] reason reason for activation.
+     *
+     */
+    void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
+
   private:
+    void changeEvent(QEvent *e);
+
     /** \brief Makes all the connections between QObjects.
      *
      */
     void connectSignals();
+
+    QSystemTrayIcon *m_icon;
 };
 
 #endif // MULTIALARM_H_
