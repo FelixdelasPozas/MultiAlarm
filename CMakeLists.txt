@@ -2,7 +2,7 @@ project(MultiAlarm)
 
 cmake_minimum_required (VERSION 2.8.6)
 
-set (CMAKE_PREFIX_PATH "C:\\Qt\\Qt5.0.1\\5.0.1\\msvc2010\\")
+cmake_policy(SET CMP0020 OLD)
 
 # Version Number
 set (MULTIALARM_VERSION_MAJOR 1)
@@ -19,7 +19,7 @@ set(CMAKE_AUTOMOC ON)
 find_package(Qt5 COMPONENTS Widgets)
 
 # We need add -DQT_WIDGETS_LIB when using QtWidgets in Qt 5.
-add_definitions(${Qt5Widgets_DEFINITIONS})
+#add_definitions(${Qt5Widgets_DEFINITIONS})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
@@ -67,6 +67,7 @@ set (CORE_SOURCES
   NewAlarmDialog.cpp
   MultiAlarm.cpp
   AboutDialog.cpp
+  Alarm.cpp
 )
 
 set(CORE_EXTERNAL_LIBS

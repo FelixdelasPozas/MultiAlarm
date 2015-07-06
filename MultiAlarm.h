@@ -28,6 +28,7 @@
 #include <QSystemTrayIcon>
 
 class QEvent;
+class QCloseEvent;
 
 /** \class MultiAlarm
  * \brief Application main window.
@@ -49,7 +50,7 @@ class MultiAlarm
      */
     virtual ~MultiAlarm();
 
-  private slots:
+  public slots:
     /** \brief Launches the alarm creation dialog.
      *
      */
@@ -66,8 +67,33 @@ class MultiAlarm
      */
     void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
+    /** \brief Restores the main dialog and hides the tray icon.
+     *
+     */
+    void onRestoreActionActivated();
+
+    /** \brief Cancels all alamrs and exits the application.
+     *
+     */
+    void onQuitActionActivated();
+
   private:
-    void changeEvent(QEvent *e);
+    virtual void changeEvent(QEvent *e);
+
+    /** \brief Restores application settings from ini file.
+     *
+     */
+    void restoreSettings();
+
+    /** \brief Saves application settings to ini file.
+     *
+     */
+    void saveSettings();
+
+    /** \brief Helper method to setup the tray icon.
+     *
+     */
+    void setupTrayIcon();
 
     /** \brief Makes all the connections between QObjects.
      *
@@ -75,6 +101,7 @@ class MultiAlarm
     void connectSignals();
 
     QSystemTrayIcon *m_icon;
+    QAction *m_restoreMenuAction, *m_quitMenuAction;
 };
 
 #endif // MULTIALARM_H_

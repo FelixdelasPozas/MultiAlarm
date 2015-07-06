@@ -22,6 +22,19 @@
 #include "AboutDialog.h"
 #include "NewAlarmDialog.h"
 
+// Qt
+#include <QCloseEvent>
+#include <QSettings>
+#include <QAction>
+#include <QMenu>
+#include <QDebug>
+
+// C++
+#include <iostream>
+
+const QString STATE = "State";
+const QString GEOMETRY = "Geometry";
+
 //-----------------------------------------------------------------
 MultiAlarm::MultiAlarm(QWidget *parent, Qt::WindowFlags flags)
 : QMainWindow{parent, flags}
@@ -33,12 +46,17 @@ MultiAlarm::MultiAlarm(QWidget *parent, Qt::WindowFlags flags)
   statusbar->setVisible(false);
   setFixedHeight(size().height());
 
+  restoreSettings();
+
+  setupTrayIcon();
+
   connectSignals();
 }
 
 //-----------------------------------------------------------------
 MultiAlarm::~MultiAlarm()
 {
+  saveSettings();
 }
 
 //-----------------------------------------------------------------
@@ -65,6 +83,7 @@ void MultiAlarm::changeEvent(QEvent* e)
     if (isMinimized())
     {
       hide();
+
       m_icon->show();
       e->ignore();
     }
@@ -77,8 +96,71 @@ void MultiAlarm::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason)
   if(reason == QSystemTrayIcon::DoubleClick)
   {
     m_icon->hide();
-    show();
+    showNormal();
   }
+}
+
+//-----------------------------------------------------------------
+void MultiAlarm::setupTrayIcon()
+{
+  auto menu = new QMenu();
+  auto restore = new QAction(tr("Restore"), this);
+  auto quit = new QAction(tr("Quit"), this);
+
+  menu->addAction(restore);
+  menu->addSeparator();
+  menu->addAction(quit);
+
+  connect(restore, SIGNAL(triggered()),
+          this,    SLOT(onRestoreActionActivated()));
+
+  connect(quit, SIGNAL(triggered()),
+          this, SLOT(onQuitActionActivated()));
+
+  m_icon->setContextMenu(menu);
+  m_icon->setToolTip(tr("MultiAlarm"));
+  m_icon->hide();
+}
+
+//-----------------------------------------------------------------
+void MultiAlarm::onRestoreActionActivated()
+{
+  m_icon->hide();
+  showNormal();
+}
+
+//-----------------------------------------------------------------
+void MultiAlarm::onQuitActionActivated()
+{
+  m_icon->hide();
+  close();
+}
+
+//-----------------------------------------------------------------
+void MultiAlarm::restoreSettings()
+{
+  QSettings settings("MultiAlarm.ini", QSettings::IniFormat);
+
+  if(settings.contains(STATE))
+  {
+    auto state = settings.value(STATE).toByteArray();
+    restoreState(state);
+  }
+
+  if(settings.contains(GEOMETRY))
+  {
+    auto geometry = settings.value(GEOMETRY).toByteArray();
+    restoreGeometry(geometry);
+  }
+}
+
+//-----------------------------------------------------------------
+void MultiAlarm::saveSettings()
+{
+  QSettings settings("MultiAlarm.ini", QSettings::IniFormat);
+
+  settings.setValue(STATE, saveState());
+  settings.setValue(GEOMETRY, saveGeometry());
 }
 
 //-----------------------------------------------------------------

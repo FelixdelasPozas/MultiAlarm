@@ -17,7 +17,16 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Project
 #include <NewAlarmDialog.h>
+
+// Qt
+#include <QImage>
+#include <QPainter>
+#include <QIcon>
+#include <QPixmap>
+
+const QStringList sounds{ "Buzz", "Smoke alarm", "Desk bell"};
 
 //-----------------------------------------------------------------
 NewAlarmDialog::NewAlarmDialog(QWidget * parent, Qt::WindowFlags flags)
@@ -25,6 +34,29 @@ NewAlarmDialog::NewAlarmDialog(QWidget * parent, Qt::WindowFlags flags)
 {
   setWindowFlags(windowFlags() & ~Qt::WindowMinMaxButtonsHint & ~Qt::WindowContextHelpButtonHint);
   setupUi(this);
+
+  auto dateTime = QDateTime::currentDateTime();
+  m_clock->setDate(dateTime.date());
+  m_clock->setTime(dateTime.time());
+
+  m_timerRadio->setChecked(true);
+  m_timerRadio->setAutoExclusive(true);
+
+  auto colors = QColor::colorNames();
+  colors.sort();
+
+  for(auto color: colors)
+  {
+    auto pixmap = new QImage(32, 32, QImage::Format_RGB32);
+    QPainter painter(pixmap);
+    painter.fillRect(0,0,31,31, QColor(color));
+    painter.end();
+    m_colorComboBox->insertItem(colors.indexOf(color), QIcon(QPixmap::fromImage(*pixmap)), color);
+  }
+  m_colorComboBox->setCurrentIndex(0);
+
+  m_soundComboBox->insertItems(0, sounds);
+  m_soundComboBox->setCurrentIndex(0);
 }
 
 //-----------------------------------------------------------------
