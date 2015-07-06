@@ -9,9 +9,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>358</width>
-    <height>346</height>
+    <width>399</width>
+    <height>321</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>399</width>
+    <height>321</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>399</width>
+    <height>321</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Create Alarm</string>
@@ -28,119 +40,86 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
-     <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item row="0" column="0">
       <widget class="QLabel" name="label">
-       <property name="maximumSize">
-        <size>
-         <width>42</width>
-         <height>20</height>
-        </size>
-       </property>
        <property name="text">
         <string>Name</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QLineEdit" name="m_name">
-       <property name="maximumSize">
-        <size>
-         <width>290</width>
-         <height>20</height>
-        </size>
-       </property>
-      </widget>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="m_name"/>
      </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,1">
-     <property name="topMargin">
-      <number>0</number>
-     </property>
-     <item>
+     <item row="1" column="0">
       <widget class="QLabel" name="label_4">
-       <property name="maximumSize">
-        <size>
-         <width>42</width>
-         <height>20</height>
-        </size>
-       </property>
        <property name="text">
         <string>Message</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QLineEdit" name="m_message">
-       <property name="maximumSize">
-        <size>
-         <width>290</width>
-         <height>20</height>
-        </size>
-       </property>
-      </widget>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="m_message"/>
      </item>
     </layout>
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Alarm Type</string>
+      <string>Type</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,1">
         <property name="topMargin">
          <number>0</number>
         </property>
-        <item>
+        <item row="0" column="0">
          <widget class="QRadioButton" name="m_timerRadio">
           <property name="text">
            <string>Timer</string>
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QTimeEdit" name="m_timer">
-          <property name="displayFormat">
-           <string>HH:mm:ss</string>
-          </property>
-          <property name="calendarPopup">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QRadioButton" name="m_clockRadio">
-          <property name="text">
-           <string>Clock</string>
-          </property>
-         </widget>
-        </item>
-        <item>
+        <item row="1" column="1">
          <widget class="QDateTimeEdit" name="m_clock">
           <property name="calendarPopup">
            <bool>true</bool>
           </property>
          </widget>
         </item>
+        <item row="1" column="0">
+         <widget class="QRadioButton" name="m_clockRadio">
+          <property name="text">
+           <string>Clock</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
+          <item>
+           <widget class="QTimeEdit" name="m_timer">
+            <property name="displayFormat">
+             <string>HH:mm:ss</string>
+            </property>
+            <property name="calendarPopup">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="m_timerLoop">
+            <property name="text">
+             <string>Loop</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
        </layout>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="m_timerLoop">
-        <property name="text">
-         <string>Loop Timer</string>
-        </property>
-       </widget>
       </item>
      </layout>
     </widget>
@@ -148,61 +127,48 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Progress Notification</string>
+      <string>Notification</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,0">
         <property name="topMargin">
          <number>0</number>
         </property>
-        <item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="m_colorComboBox"/>
+        </item>
+        <item row="0" column="0">
          <widget class="QLabel" name="label_3">
           <property name="text">
            <string>Color</string>
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QComboBox" name="m_colorComboBox">
-          <property name="minimumSize">
-           <size>
-            <width>170</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>170</width>
-            <height>16777215</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
+        <item row="1" column="0">
          <widget class="QLabel" name="label_2">
           <property name="text">
            <string>Alarm sound</string>
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QComboBox" name="m_soundComboBox"/>
-        </item>
-        <item>
-         <widget class="QToolButton" name="m_playSoundButton">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="rsc/resources.qrc">
-            <normaloff>:/MultiAlarm/play.ico</normaloff>:/MultiAlarm/play.ico</iconset>
-          </property>
-         </widget>
+        <item row="1" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QComboBox" name="m_soundComboBox"/>
+          </item>
+          <item>
+           <widget class="QToolButton" name="m_playSoundButton">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="rsc/resources.qrc">
+              <normaloff>:/MultiAlarm/play.ico</normaloff>:/MultiAlarm/play.ico</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>

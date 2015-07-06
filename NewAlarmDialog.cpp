@@ -43,13 +43,11 @@ NewAlarmDialog::NewAlarmDialog(QWidget * parent, Qt::WindowFlags flags)
   m_timerRadio->setAutoExclusive(true);
 
   auto colors = QColor::colorNames();
-  colors.sort();
-
   for(auto color: colors)
   {
     auto pixmap = new QImage(32, 32, QImage::Format_RGB32);
     QPainter painter(pixmap);
-    painter.fillRect(0,0,31,31, QColor(color));
+    painter.fillRect(0,0,31,31, color);
     painter.end();
     m_colorComboBox->insertItem(colors.indexOf(color), QIcon(QPixmap::fromImage(*pixmap)), color);
   }
