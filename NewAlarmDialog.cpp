@@ -25,6 +25,8 @@
 #include <QPainter>
 #include <QIcon>
 #include <QPixmap>
+#include <QPushButton>
+#include <QDebug>
 
 const QStringList sounds{ "Buzz", "Smoke alarm", "Desk bell"};
 
@@ -38,6 +40,7 @@ NewAlarmDialog::NewAlarmDialog(QWidget * parent, Qt::WindowFlags flags)
   auto dateTime = QDateTime::currentDateTime();
   m_clock->setDate(dateTime.date());
   m_clock->setTime(dateTime.time());
+  m_clock->setEnabled(false);
 
   m_timerRadio->setChecked(true);
   m_timerRadio->setAutoExclusive(true);
@@ -55,6 +58,10 @@ NewAlarmDialog::NewAlarmDialog(QWidget * parent, Qt::WindowFlags flags)
 
   m_soundComboBox->insertItems(0, sounds);
   m_soundComboBox->setCurrentIndex(0);
+
+  connectSignals();
+
+  m_buttons->button(QDialogButtonBox::Ok)->setEnabled(false);
 }
 
 //-----------------------------------------------------------------
@@ -62,3 +69,47 @@ NewAlarmDialog::~NewAlarmDialog()
 {
 }
 
+//-----------------------------------------------------------------
+void NewAlarmDialog::onTimerRadioToggled(bool value)
+{
+  m_timerLoop->setEnabled(value);
+  m_timer->setEnabled(value);
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::onClockRadioToggled(bool value)
+{
+  m_clock->setEnabled(value);
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::checkOkButtonRequirements()
+{
+  auto enable = !m_name->text().isEmpty() && !m_message->text().isEmpty();
+  m_buttons->button(QDialogButtonBox::Ok)->setEnabled(enable);
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::playSound()
+{
+  // TODO
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::connectSignals()
+{
+  connect(m_timerRadio, SIGNAL(toggled(bool)),
+          this,         SLOT(onTimerRadioToggled(bool)));
+
+  connect(m_clockRadio, SIGNAL(toggled(bool)),
+          this,         SLOT(onClockRadioToggled(bool)));
+
+  connect(m_name, SIGNAL(textChanged(const QString &)),
+          this,   SLOT(checkOkButtonRequirements()));
+
+  connect(m_message, SIGNAL(textChanged(const QString &)),
+          this,      SLOT(checkOkButtonRequirements()));
+
+  connect(m_playSoundButton, SIGNAL(pressed()),
+          this,              SLOT(playSound()));
+}

@@ -25,6 +25,7 @@
 
 // Qt
 #include <QDialog>
+#include <QSound>
 
 /** \class NewAlarmDialog
  * \brief Dialog for the creation of an alarm.
@@ -49,8 +50,35 @@ class NewAlarmDialog
     virtual ~NewAlarmDialog();
 
   private slots:
+    /** \brief Updates UI elements when the timer radio button changes state.
+     * \param[in] value true if it's checked and false otherwise.
+     *
+     */
+    void onTimerRadioToggled(bool value);
+
+    /** \brief Updates UI elements when the clock radio button changes state.
+     * \param[in] value true if it's checked and false otherwise.
+     *
+     */
+    void onClockRadioToggled(bool value);
+
+    /** \brief Updates the accept button state depending on the state of the name and message fields.
+     *
+     */
+    void checkOkButtonRequirements();
+
+    /** \brief Plays the sound specified by the sound combo box index.
+     *
+     */
+    void playSound();
 
   private:
+    /** \brief Helper methods to connect the signals for UI elements.
+     *
+     */
+    void connectSignals();
+
+    QVector<QSound *> m_sounds;
 };
 
 #endif // NEWALARMDIALOG_H_

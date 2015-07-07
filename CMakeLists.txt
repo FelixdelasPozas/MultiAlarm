@@ -16,12 +16,14 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 # Find the QtWidgets library
-find_package(Qt5 COMPONENTS Widgets)
+find_package(Qt5 COMPONENTS Widgets Multimedia)
 
 # We need add -DQT_WIDGETS_LIB when using QtWidgets in Qt 5.
 #add_definitions(${Qt5Widgets_DEFINITIONS})
+#add_definitions(${Qt5Multimedia_DEFINITIONS})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Multimedia_EXECUTABLE_COMPILE_FLAGS}")
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
   set(CORE_EXTERNAL_LIBS ${CORE_EXTERNAL_LIBS} ${QT_QTTEST_LIBRARY})
@@ -41,9 +43,10 @@ include_directories(
   ${CMAKE_BINARY_DIR}          # Generated .h files
   ${CMAKE_CURRENT_BINARY_DIR}  # For wrap/ui files
   ${Qt5Widgets_INCLUDE_DIRS}
+  ${Qt5Multimedia_INCLUDE_DIRS}
   )
 
-set(CMAKE_CXX_FLAGS " -Wall -Wno-deprecated -std=c++11 -mwindows")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-deprecated -std=c++11 -mwindows")
 
 # Add Qt Resource files
 qt5_add_resources(RESOURCES
@@ -72,6 +75,7 @@ set (CORE_SOURCES
 
 set(CORE_EXTERNAL_LIBS
   Qt5::Widgets
+  Qt5::Multimedia
 )
   
 add_executable(MultiAlarm ${CORE_SOURCES})
