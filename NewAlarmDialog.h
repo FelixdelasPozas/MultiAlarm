@@ -25,7 +25,9 @@
 
 // Qt
 #include <QDialog>
-#include <QSound>
+
+class QSoundEffect;
+class QTemporaryFile;
 
 /** \class NewAlarmDialog
  * \brief Dialog for the creation of an alarm.
@@ -72,13 +74,24 @@ class NewAlarmDialog
      */
     void playSound();
 
+    /** \brief Restores the icon of the play button when a sound finishes playing.
+     *
+     */
+    void setPlayButtonIcon();
+
   private:
     /** \brief Helper methods to connect the signals for UI elements.
      *
      */
     void connectSignals();
 
-    QVector<QSound *> m_sounds;
+    /** \brief Loads the sounds into the sounds vector.
+     *
+     */
+    void loadSounds();
+
+    QVector<QSoundEffect *> m_sounds;
+    QList<QTemporaryFile *> m_temporaryFiles;
 };
 
 #endif // NEWALARMDIALOG_H_

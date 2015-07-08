@@ -26,6 +26,8 @@
 #include <QIcon>
 #include <QPixmap>
 #include <QPushButton>
+#include <QTemporaryFile>
+#include <QSoundEffect>
 #include <QDebug>
 
 const QStringList sounds{ "Buzz", "Smoke alarm", "Desk bell"};
@@ -61,12 +63,25 @@ NewAlarmDialog::NewAlarmDialog(QWidget * parent, Qt::WindowFlags flags)
 
   connectSignals();
 
+  loadSounds();
+
   m_buttons->button(QDialogButtonBox::Ok)->setEnabled(false);
 }
 
 //-----------------------------------------------------------------
 NewAlarmDialog::~NewAlarmDialog()
 {
+  for(auto sound: m_sounds)
+  {
+    delete sound;
+  }
+  m_sounds.clear();
+
+  for(auto file: m_temporaryFiles)
+  {
+    delete file;
+  }
+  m_temporaryFiles.clear();
 }
 
 //-----------------------------------------------------------------
@@ -92,7 +107,16 @@ void NewAlarmDialog::checkOkButtonRequirements()
 //-----------------------------------------------------------------
 void NewAlarmDialog::playSound()
 {
-  // TODO
+  for(auto i: {0,1,2})
+  {
+    if(m_sounds[i]->isPlaying())
+    {
+      m_sounds[i]->stop();
+      return;
+    }
+  }
+
+  m_sounds[m_soundComboBox->currentIndex()]->play();
 }
 
 //-----------------------------------------------------------------
@@ -112,4 +136,45 @@ void NewAlarmDialog::connectSignals()
 
   connect(m_playSoundButton, SIGNAL(pressed()),
           this,              SLOT(playSound()));
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::setPlayButtonIcon()
+{
+  auto sound = qobject_cast<QSoundEffect *>(sender());
+  if(sound->isPlaying())
+  {
+    m_playSoundButton->setIcon(QIcon(":/MultiAlarm/stop.ico"));
+  }
+  else
+  {
+    m_playSoundButton->setIcon(QIcon(":/MultiAlarm/play.ico"));
+  }
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::loadSounds()
+{
+  // NOTE: Load sound files. QSound can't play a file from the qt resource file
+  // so we will dump them first to the temporal directory, then load the resources
+  // and delete them.
+  auto buzz = QTemporaryFile::createLocalFile(":/MultiAlarm/sounds/buzz.wav");
+  m_sounds.insert(0, new QSoundEffect(this));
+  m_sounds[0]->setSource(QUrl::fromLocalFile(buzz->fileName()));
+
+  auto smokeAlarm = QTemporaryFile::createLocalFile(":/MultiAlarm/sounds/smokealarm.wav");
+  m_sounds.insert(1, new QSoundEffect(this));
+  m_sounds[1]->setSource(QUrl::fromLocalFile(smokeAlarm->fileName()));
+
+  auto deskBell = QTemporaryFile::createLocalFile(":/MultiAlarm/sounds/deskbell.wav");
+  m_sounds.insert(2, new QSoundEffect(this));
+  m_sounds[2]->setSource(QUrl::fromLocalFile(deskBell->fileName()));
+
+  m_temporaryFiles << buzz << smokeAlarm << deskBell;
+
+  for(auto i: {0,1,2})
+  {
+    connect(m_sounds[i], SIGNAL(playingChanged()),
+            this,        SLOT(setPlayButtonIcon()));
+  }
 }

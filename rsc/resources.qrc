@@ -17,5 +17,8 @@
 	<file>7.ico</file>
 	<file>8.ico</file>
 	<file>Qt.ico</file>
+	<file>sounds/buzz.wav</file>
+	<file>sounds/deskbell.wav</file>
+	<file>sounds/smokealarm.wav</file>
   </qresource>
 </RCC>
