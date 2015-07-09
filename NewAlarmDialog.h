@@ -51,6 +51,104 @@ class NewAlarmDialog
      */
     virtual ~NewAlarmDialog();
 
+    /** \brief Sets the name/identificator of the alarm.
+     *
+     */
+    void setName(const QString &name);
+
+    /** \brief Returns the name/identificator of the alarm.
+     *
+     */
+    const QString name() const;
+
+    /** \brief Sets the message to show when the alarm finishes.
+     * \param[in] message text message.
+     *
+     */
+    void setMessage(const QString &message);
+
+    /** \brief Returns the message to show when the alarm finishes.
+     *
+     */
+    const QString message() const;
+
+    /** \brief Sets the time of the timer alarm.
+     * \param[in] time QTime object.
+     *
+     */
+    void setTimerTime(const QTime &time);
+
+    /** \brief Returns the time of the timer alarm.
+     *
+     */
+    const QTime timerTime() const;
+
+    /** \brief Enables/disables the timer looping.
+     * \param[in] value true to loop forever and false otherwise.
+     *
+     */
+    void setTimerLoop(bool value);
+
+    /** \brief Returns true if the timer loops.
+     *
+     */
+    bool timerLoop() const;
+
+    /** \brief Sets the date and time of the clock alarm.
+     * \param[in] time QDateTime object.
+     *
+     */
+    void setClockDateTime(const QDateTime &time);
+
+    /** \brief Retuns the date and time of the clock alarm.
+     *
+     */
+    const QDateTime clockDateTime() const;
+
+    /** \brief Sets the color for the tray and desktop notifications.
+     * \param[in] colorName color name string.
+     *
+     */
+    void setColor(const QString &colorname);
+
+    /** \brief Returns the color for the tray and desktop notifications.
+     *
+     */
+    const QString color() const;
+
+    /** \brief Sets the index of the sound to be played when the alarm finishes.
+     * \param[in] soundIndex index of sound combo box.
+     *
+     */
+    void setSound(int soundIndex);
+
+    /** \brief Returns the index of the selected sound for the alarm.
+     *
+     */
+    int sound() const;
+
+    /** \brief Enables/disables the alarm tray icon.
+     * \param[in] value true to enable and false otherwise.
+     *
+     */
+    void setShowInTray(bool value);
+
+    /** \brief Returns true if the alarm will show an icon in the system tray while running.
+     *
+     */
+    bool showInTray() const;
+
+    /** \brief Enables/disables the alarm desktop widget.
+     * \param[in] value true to enable and false otherwise.
+     *
+     */
+    void setShowInDesktop(bool value);
+
+    /** \brief Returns true if the alarm will show a widget in the desktop while running.
+     *
+     */
+    bool showInDesktop() const;
+
   private slots:
     /** \brief Updates UI elements when the timer radio button changes state.
      * \param[in] value true if it's checked and false otherwise.

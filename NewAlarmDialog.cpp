@@ -28,7 +28,6 @@
 #include <QPushButton>
 #include <QTemporaryFile>
 #include <QSoundEffect>
-#include <QDebug>
 
 const QStringList sounds{ "Buzz", "Smoke alarm", "Desk bell"};
 
@@ -150,6 +149,120 @@ void NewAlarmDialog::setPlayButtonIcon()
   {
     m_playSoundButton->setIcon(QIcon(":/MultiAlarm/play.ico"));
   }
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::setName(const QString& name)
+{
+  m_name->setText(name);
+}
+
+//-----------------------------------------------------------------
+const QString NewAlarmDialog::name() const
+{
+  return m_name->text();
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::setMessage(const QString& message)
+{
+  m_message->setText(message);
+}
+
+//-----------------------------------------------------------------
+const QString NewAlarmDialog::message() const
+{
+  return m_message->text();
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::setTimerTime(const QTime& time)
+{
+  m_timer->setTime(time);
+}
+
+//-----------------------------------------------------------------
+const QTime NewAlarmDialog::timerTime() const
+{
+  return m_timer->time();
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::setTimerLoop(bool value)
+{
+  m_timerLoop->setChecked(value);
+}
+
+//-----------------------------------------------------------------
+bool NewAlarmDialog::timerLoop() const
+{
+  return m_timerLoop->isChecked();
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::setClockDateTime(const QDateTime& time)
+{
+  m_clock->setDateTime(time);
+}
+
+//-----------------------------------------------------------------
+const QDateTime NewAlarmDialog::clockDateTime() const
+{
+  return m_clock->dateTime();
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::setColor(const QString& colorname)
+{
+  auto index = QColor::colorNames().indexOf(colorname);
+  m_colorComboBox->setCurrentIndex(index);
+}
+
+//-----------------------------------------------------------------
+const QString NewAlarmDialog::color() const
+{
+  return QColor::colorNames().at(m_colorComboBox->currentIndex());
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::setSound(int soundIndex)
+{
+  if((soundIndex < 0) || (soundIndex > m_soundComboBox->count()))
+  {
+    soundIndex = 0;
+  }
+
+  m_soundComboBox->setCurrentIndex(soundIndex);
+}
+
+//-----------------------------------------------------------------
+int NewAlarmDialog::sound() const
+{
+  return m_soundComboBox->currentIndex();
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::setShowInTray(bool value)
+{
+  m_showTray->setChecked(value);
+}
+
+//-----------------------------------------------------------------
+bool NewAlarmDialog::showInTray() const
+{
+  return m_showTray->isChecked();
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::setShowInDesktop(bool value)
+{
+  m_showDesktop->setChecked(value);
+}
+
+//-----------------------------------------------------------------
+bool NewAlarmDialog::showInDesktop() const
+{
+  return m_showDesktop->isChecked();
 }
 
 //-----------------------------------------------------------------
