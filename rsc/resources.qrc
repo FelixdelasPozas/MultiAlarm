@@ -4,9 +4,9 @@
 	<file>add.ico</file>
 	<file>delete.ico</file>
 	<file>speaker.ico</file>
-	<file>play.ico</file>
-	<file>pause.ico</file>
-	<file>stop.ico</file>
+	<file>play.svg</file>
+	<file>stop.svg</file>
+	<file>pause.svg</file>
 	<file>0.ico</file>
 	<file>1.ico</file>
 	<file>2.ico</file>
