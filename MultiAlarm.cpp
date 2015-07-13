@@ -44,7 +44,10 @@ MultiAlarm::MultiAlarm(QWidget *parent, Qt::WindowFlags flags)
   setupUi(this);
 
   statusbar->setVisible(false);
-  setFixedHeight(size().height());
+  setFixedHeight(m_newButton->height() + menubar->height());
+  centralWidget()->layout()->setContentsMargins(0,0,0,0);
+  centralWidget()->layout()->setSpacing(0);
+  centralWidget()->layout()->setMargin(0);
 
   restoreSettings();
 
@@ -62,9 +65,54 @@ MultiAlarm::~MultiAlarm()
 //-----------------------------------------------------------------
 void MultiAlarm::createNewAlarm()
 {
-  NewAlarmDialog dialog(this);
+  QStringList invalidNames, invalidColors;
+  for(auto alarm: m_alarms.keys())
+  {
+    invalidNames << alarm->name();
+    invalidColors << alarm->color();
+  }
+  qDebug() << invalidNames << invalidColors;
+
+  NewAlarmDialog dialog(invalidNames, invalidColors, this);
 
   dialog.exec();
+
+  if(dialog.result() == QDialog::Accepted)
+  {
+    Alarm *alarm = nullptr;
+    auto time = QTime(0,0,0);
+    auto dateTime = QDateTime::currentDateTime();
+
+    auto alarmWidget = new AlarmWidget();
+
+    initWidget(alarmWidget, dialog);
+
+    if(dialog.isTimer())
+    {
+      auto seconds = time.secsTo(dialog.timerTime());
+      time = time.addSecs(seconds);
+
+      alarm = new Alarm(seconds, dialog.timerLoop());
+    }
+    else
+    {
+      auto seconds = dateTime.secsTo(dialog.clockDateTime());
+      time = time.addSecs(seconds);
+
+      alarm = new Alarm(seconds, false);
+    }
+
+    manageAlarmSignals(alarm);
+
+    alarmWidget->setTime(time);
+
+    m_alarms.insert(alarmWidget, alarm);
+
+    if(!dialog.isTimer())
+    {
+      alarm->start();
+    }
+  }
 }
 
 //-----------------------------------------------------------------
@@ -161,6 +209,120 @@ void MultiAlarm::saveSettings()
 
   settings.setValue(STATE, saveState());
   settings.setValue(GEOMETRY, saveGeometry());
+
+  // TODO: save alarms
+}
+
+//-----------------------------------------------------------------
+void MultiAlarm::onAlarmTic(unsigned long long seconds)
+{
+  auto alarm = qobject_cast<Alarm *>(sender());
+  auto widget = m_alarms.key(alarm);
+
+  QTime time(0,0,0);
+  time = time.addSecs(seconds);
+
+  widget->setTime(time);
+
+  // TODO: update dekstop widget.
+}
+
+//-----------------------------------------------------------------
+void MultiAlarm::onAlarmInterval()
+{
+  auto alarm = qobject_cast<Alarm *>(sender());
+  auto widget = m_alarms.key(alarm);
+
+
+  // TODO: update tray widget of the sender alarm.
+}
+
+//-----------------------------------------------------------------
+void MultiAlarm::onAlarmTimeout()
+{
+  // TODO: show message dialog and hide desktop/tray if necessary of the sender alarm.
+}
+
+//-----------------------------------------------------------------
+void MultiAlarm::manageAlarmSignals(Alarm *alarm)
+{
+  if(alarm->remainingTime() == QTime(0,0,0))
+  {
+    disconnect(alarm, SIGNAL(tic(unsigned long long)),
+               this,  SLOT(onAlarmTic(unsigned long long)));
+
+    disconnect(alarm, SIGNAL(interval()),
+               this,  SLOT(onAlarmInterval()));
+
+    disconnect(alarm, SIGNAL(timeout()),
+               this,  SLOT(onAlarmTimeout()));
+  }
+  else
+  {
+    connect(alarm, SIGNAL(tic(unsigned long long)),
+            this,  SLOT(onAlarmTic(unsigned long long)));
+
+    connect(alarm, SIGNAL(interval()),
+            this,  SLOT(onAlarmInterval()));
+
+    connect(alarm, SIGNAL(timeout()),
+            this,  SLOT(onAlarmTimeout()));
+  }
+}
+
+//-----------------------------------------------------------------
+void MultiAlarm::initWidget(AlarmWidget *widget, const NewAlarmDialog& dialog)
+{
+  centralWidget()->layout()->addWidget(widget);
+  setFixedHeight(size().height() + widget->size().height());
+
+  widget->setColor(dialog.color());
+  widget->setName(dialog.name());
+  widget->setToolTip(dialog.name() + QString(" Alarm"));
+
+  connect(widget, SIGNAL(startAlarm()),
+          this,   SLOT(onAlarmStarted()));
+
+  connect(widget, SIGNAL(stopAlarm()),
+          this,   SLOT(onAlarmStopped()));
+
+  connect(widget, SIGNAL(deleteAlarm()),
+          this,   SLOT(onAlarmDeleted()));
+}
+
+//-----------------------------------------------------------------
+void MultiAlarm::onAlarmStarted()
+{
+  auto widget = qobject_cast<AlarmWidget *>(sender());
+
+  m_alarms[widget]->start();
+}
+
+//-----------------------------------------------------------------
+void MultiAlarm::onAlarmStopped()
+{
+  auto widget = qobject_cast<AlarmWidget *>(sender());
+
+  auto alarm = m_alarms[widget];
+
+  alarm->stop();
+  widget->setTime(alarm->remainingTime());
+}
+
+//-----------------------------------------------------------------
+void MultiAlarm::onAlarmDeleted()
+{
+  auto widget = qobject_cast<AlarmWidget *>(sender());
+
+  centralWidget()->layout()->removeWidget(widget);
+  setFixedHeight(size().height() - widget->size().height());
+
+  auto alarm = m_alarms[widget];
+
+  m_alarms.remove(widget);
+
+  delete widget;
+  delete alarm;
 }
 
 //-----------------------------------------------------------------
@@ -172,7 +334,7 @@ void MultiAlarm::connectSignals()
   connect(m_newAction, SIGNAL(triggered()),
           this,        SLOT(createNewAlarm()));
 
-  connect(m_newButton, SIGNAL(pressed()),
+  connect(m_newButton, SIGNAL(clicked(bool)),
           this,        SLOT(createNewAlarm()));
 
   connect(m_aboutAction, SIGNAL(triggered()),

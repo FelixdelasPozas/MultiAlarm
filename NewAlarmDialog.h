@@ -44,7 +44,7 @@ class NewAlarmDialog
      * \param[in] flags window flags.
      *
      */
-    NewAlarmDialog(QWidget * parent = nullptr, Qt::WindowFlags f = 0);
+    NewAlarmDialog(QStringList invalidNames, QStringList invalidColors, QWidget * parent = nullptr, Qt::WindowFlags f = 0);
 
     /** \brief NewAlarmDialog class virtual destructor.
      *
@@ -71,6 +71,11 @@ class NewAlarmDialog
      *
      */
     const QString message() const;
+
+    /** \brief Returns true if the alarm is a timer, otherwise is a clock.
+     *
+     */
+    bool isTimer() const;
 
     /** \brief Sets the time of the timer alarm.
      * \param[in] time QTime object.
@@ -190,6 +195,8 @@ class NewAlarmDialog
 
     QVector<QSoundEffect *> m_sounds;
     QList<QTemporaryFile *> m_temporaryFiles;
+    QStringList             m_invalidNames;
+    QStringList             m_colors;
 };
 
 #endif // NEWALARMDIALOG_H_

@@ -22,15 +22,22 @@
 
 // Qt
 #include <QTime>
+#include <QDebug>
+
+const QString COLOR_QSTRING = "<font color='%1'>%2</font>";
 
 //-----------------------------------------------------------------
-AlarmWidget::AlarmWidget()
-: m_started{false}
+AlarmWidget::AlarmWidget(QWidget * parent, Qt::WindowFlags flags)
+: QWidget  {parent, flags}
+, m_started{false}
+, m_color  {"black"}
 {
-  connect(m_start, SIGNAL(toggled(bool)),
+  setupUi(this);
+
+  connect(m_start, SIGNAL(clicked(bool)),
           this,    SLOT(onPlayPressed()));
 
-  connect(m_delete, SIGNAL(toggled(bool)),
+  connect(m_delete, SIGNAL(clicked(bool)),
           this,     SLOT(onDeletePressed()));
 
   m_status->setText("Stopped");
@@ -44,47 +51,69 @@ AlarmWidget::~AlarmWidget()
 //-----------------------------------------------------------------
 void AlarmWidget::setName(const QString& name)
 {
-  m_name->setText(name);
+  m_alarmName = name;
+  m_name->setText(COLOR_QSTRING.arg(m_color).arg(name));
+}
+
+//-----------------------------------------------------------------
+const QString AlarmWidget::name() const
+{
+  return m_alarmName;
 }
 
 //-----------------------------------------------------------------
 void AlarmWidget::setTime(const QTime& time)
 {
-  m_time->setText(time.toString());
+  m_time->setText(COLOR_QSTRING.arg(m_color).arg(time.toString()));
 }
 
 //-----------------------------------------------------------------
 void AlarmWidget::setColor(const QString& colorName)
 {
+  m_alarmColor = colorName;
   auto color = QColor(colorName);
 
   auto blackDistance = color.red() + color.green() + color.blue();
   auto whiteDistance = (254 * 3) - blackDistance;
 
-  auto otherColor = (blackDistance < whiteDistance ? "white" : "black");
+  m_color = (blackDistance < whiteDistance ? "white" : "black");
+  auto otherColor = (blackDistance > whiteDistance ? "white" : "black");
+  auto oColor = QColor(otherColor);
+  auto mix = QColor((color.red()+ 2*oColor.red())/3, (color.green()+ 2*oColor.green())/3, (color.blue()+ 2*oColor.blue())/3);
 
-  auto style = QString("QWidget#AlarmWidget { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 %1, stop:0.5 %2, stop:1 %1) }").arg(colorName).arg(otherColor);
+  m_name->setText(COLOR_QSTRING.arg(m_color).arg(m_name->text()));
+  m_time->setText(COLOR_QSTRING.arg(m_color).arg(m_time->text()));
+  m_status->setText(COLOR_QSTRING.arg(m_color).arg(m_status->text()));
+
+  auto style = QString("QFrame#m_frame { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 %1, stop:0.5 %2, stop:1 %1) }").arg(colorName).arg(mix.name(QColor::NameFormat::HexRgb));
   setStyleSheet(style);
-  repaint();
+  update();
+}
+
+//-----------------------------------------------------------------
+const QString AlarmWidget::color() const
+{
+  return m_alarmColor;
 }
 
 //-----------------------------------------------------------------
 void AlarmWidget::onPlayPressed()
 {
   m_started = !m_started;
+
   m_delete->setEnabled(!m_started);
 
   if(m_started)
   {
-    m_start->setIcon(QIcon(":/MultiAlarm/play.ico"));
-    m_status->setText("Stopped");
-    emit stopAlarm();
+    m_start->setIcon(QIcon(":/MultiAlarm/stop.ico"));
+    m_status->setText(COLOR_QSTRING.arg(m_color).arg("Running"));
+    emit startAlarm();
   }
   else
   {
-    m_start->setIcon(QIcon(":/MultiAlarm/stop.ico"));
-    m_status->setText("Running");
-    emit startAlarm();
+    m_start->setIcon(QIcon(":/MultiAlarm/play.ico"));
+    m_status->setText(COLOR_QSTRING.arg(m_color).arg("Stopped"));
+    emit stopAlarm();
   }
 }
 

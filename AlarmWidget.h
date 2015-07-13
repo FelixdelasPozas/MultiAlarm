@@ -35,9 +35,11 @@ class AlarmWidget
     Q_OBJECT
   public:
     /** \brief AlarmWidget class constructor.
+     * \param[in] parent pointer of the QWidget parent of this one.
+     * \param[in] flags window flags.
      *
      */
-    explicit AlarmWidget();
+    explicit AlarmWidget(QWidget * parent = nullptr, Qt::WindowFlags flags = 0);
 
     /** \brief AlarmWidget class virtual destructor.
      *
@@ -50,6 +52,11 @@ class AlarmWidget
      */
     void setName(const QString &name);
 
+    /** \brief Returns the name of the alarm.
+     *
+     */
+    const QString name() const;
+
     /** \brief Sets the duration of the alarm's timer.
      * \param[in] time alarm's timer duration.
      *
@@ -61,6 +68,11 @@ class AlarmWidget
      *
      */
     void setColor(const QString &colorName);
+
+    /** \brief Returns the name of the color of the alarm.
+     *
+     */
+    const QString color() const;
 
   signals:
     void startAlarm();
@@ -79,7 +91,10 @@ class AlarmWidget
     void onDeletePressed();
 
   private:
-    bool m_started; /** true if the alarm has been started and false otherwise. */
+    bool    m_started;    /** true if the alarm has been started and false otherwise. */
+    QString m_color;      /** color of the text of the widget (always black or white) */
+    QString m_alarmName;  /** name of the alarm.                                      */
+    QString m_alarmColor; /** name of the color of the alarm.                         */
 };
 
 #endif // ALARMWIDGET_H_

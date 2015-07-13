@@ -61,7 +61,11 @@ int main(int argc, char *argv[])
 	MultiAlarm alarm;
 	alarm.show();
 
-	return app.exec();
+	auto resultValue = app.exec();
+
+	qDebug() << "application exited with value" << resultValue;
+
+	return resultValue;
 }
 
 

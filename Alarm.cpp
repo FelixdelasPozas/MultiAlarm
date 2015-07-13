@@ -27,6 +27,7 @@ Alarm::Alarm(unsigned long long seconds, bool loop)
 , m_interval           {seconds/8.0}
 , m_completed_intervals{0}
 , m_completed_seconds  {0}
+, m_remaining_seconds  {seconds}
 {
   m_timer.setInterval(1000);
   m_timer.setSingleShot(false);
@@ -49,6 +50,10 @@ void Alarm::start()
 void Alarm::stop()
 {
   m_timer.stop();
+
+  m_completed_intervals = 0;
+  m_completed_seconds = 0;
+  m_remaining_seconds = m_seconds;
 }
 
 //-----------------------------------------------------------------
@@ -105,8 +110,9 @@ const QTime Alarm::remainingTime() const
 void Alarm::second()
 {
   ++m_completed_seconds;
+  --m_remaining_seconds;
 
-  emit tic();
+  emit tic(m_remaining_seconds);
 
   if((m_interval * (m_completed_intervals + 1)) <= m_completed_seconds)
   {

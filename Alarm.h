@@ -89,9 +89,10 @@ class Alarm
 
   signals:
     /** \brief Signal launched every second.
+     * \param[out] seconds remaining alarm seconds.
      *
      */
-    void tic();
+    void tic(unsigned long long seconds);
 
     /** \brief Signal launched every completed interval. (1/8 th of the duration of the alarm).
      *
@@ -115,6 +116,7 @@ class Alarm
     double             m_interval;            /** duration of an interval.                    */
     unsigned int       m_completed_intervals; /** number of completed intervals.              */
     unsigned long long m_completed_seconds;   /** number of completed seconds.                */
+    unsigned long long m_remaining_seconds;   /** number of remaining seconds.                */
     QTimer             m_timer;               /** timer object.                               */
 };
 

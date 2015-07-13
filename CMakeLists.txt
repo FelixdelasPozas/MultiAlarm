@@ -58,6 +58,7 @@ qt5_wrap_ui(CORE_UI
   NewAlarmDialog.ui
   MainWindow.ui
   AboutDialog.ui
+  AlarmWidget.ui
 )
 	
 set (CORE_SOURCES
@@ -70,6 +71,7 @@ set (CORE_SOURCES
   NewAlarmDialog.cpp
   MultiAlarm.cpp
   AboutDialog.cpp
+  AlarmWidget.cpp
   Alarm.cpp
 )
 

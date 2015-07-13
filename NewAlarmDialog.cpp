@@ -32,8 +32,9 @@
 const QStringList sounds{ "Buzz", "Smoke alarm", "Desk bell"};
 
 //-----------------------------------------------------------------
-NewAlarmDialog::NewAlarmDialog(QWidget * parent, Qt::WindowFlags flags)
-: QDialog(parent)
+NewAlarmDialog::NewAlarmDialog(QStringList invalidNames, QStringList invalidColors, QWidget * parent, Qt::WindowFlags flags)
+: QDialog       {parent}
+, m_invalidNames{invalidNames}
 {
   setWindowFlags(windowFlags() & ~Qt::WindowMinMaxButtonsHint & ~Qt::WindowContextHelpButtonHint);
   setupUi(this);
@@ -46,14 +47,19 @@ NewAlarmDialog::NewAlarmDialog(QWidget * parent, Qt::WindowFlags flags)
   m_timerRadio->setChecked(true);
   m_timerRadio->setAutoExclusive(true);
 
-  auto colors = QColor::colorNames();
-  for(auto color: colors)
+  m_colors = QColor::colorNames();
+  for(auto color: invalidColors)
+  {
+    m_colors.removeAll(color);
+  }
+
+  for(auto color: m_colors)
   {
     auto pixmap = new QImage(32, 32, QImage::Format_RGB32);
     QPainter painter(pixmap);
     painter.fillRect(0,0,31,31, color);
     painter.end();
-    m_colorComboBox->insertItem(colors.indexOf(color), QIcon(QPixmap::fromImage(*pixmap)), color);
+    m_colorComboBox->insertItem(m_colors.indexOf(color), QIcon(QPixmap::fromImage(*pixmap)), color);
   }
   m_colorComboBox->setCurrentIndex(0);
 
@@ -63,6 +69,9 @@ NewAlarmDialog::NewAlarmDialog(QWidget * parent, Qt::WindowFlags flags)
   connectSignals();
 
   loadSounds();
+
+  m_timer->setMinimumTime(QTime(0,1,0));
+  m_clock->setMinimumTime(QTime(0,1,0));
 
   m_buttons->button(QDialogButtonBox::Ok)->setEnabled(false);
 }
@@ -88,19 +97,29 @@ void NewAlarmDialog::onTimerRadioToggled(bool value)
 {
   m_timerLoop->setEnabled(value);
   m_timer->setEnabled(value);
+
+  checkOkButtonRequirements();
 }
 
 //-----------------------------------------------------------------
 void NewAlarmDialog::onClockRadioToggled(bool value)
 {
   m_clock->setEnabled(value);
+
+  checkOkButtonRequirements();
 }
 
 //-----------------------------------------------------------------
 void NewAlarmDialog::checkOkButtonRequirements()
 {
-  auto enable = !m_name->text().isEmpty() && !m_message->text().isEmpty();
-  m_buttons->button(QDialogButtonBox::Ok)->setEnabled(enable);
+  auto validName = !m_name->text().isEmpty() && !m_invalidNames.contains(m_name->text());
+  auto validMessage = !m_message->text().isEmpty();
+  auto validClock = m_clockRadio->isChecked() && (m_clock->dateTime() > QDateTime::currentDateTime());
+  auto validTime = m_timerRadio->isChecked() && (m_timer->time() >= QTime(0,1,0));
+
+  auto valid = validName && validMessage && (validTime || validClock);
+
+  m_buttons->button(QDialogButtonBox::Ok)->setEnabled(valid);
 }
 
 //-----------------------------------------------------------------
@@ -132,6 +151,9 @@ void NewAlarmDialog::connectSignals()
 
   connect(m_message, SIGNAL(textChanged(const QString &)),
           this,      SLOT(checkOkButtonRequirements()));
+
+  connect(m_clock, SIGNAL(dateTimeChanged(const QDateTime &)),
+          this,    SLOT(checkOkButtonRequirements()));
 
   connect(m_playSoundButton, SIGNAL(pressed()),
           this,              SLOT(playSound()));
@@ -176,6 +198,12 @@ const QString NewAlarmDialog::message() const
 }
 
 //-----------------------------------------------------------------
+bool NewAlarmDialog::isTimer() const
+{
+  return m_timerRadio->isChecked();
+}
+
+//-----------------------------------------------------------------
 void NewAlarmDialog::setTimerTime(const QTime& time)
 {
   m_timer->setTime(time);
@@ -214,14 +242,19 @@ const QDateTime NewAlarmDialog::clockDateTime() const
 //-----------------------------------------------------------------
 void NewAlarmDialog::setColor(const QString& colorname)
 {
-  auto index = QColor::colorNames().indexOf(colorname);
+  int index = 0;
+  if(m_colors.contains(colorname))
+  {
+    index = m_colors.indexOf(colorname);
+  }
+
   m_colorComboBox->setCurrentIndex(index);
 }
 
 //-----------------------------------------------------------------
 const QString NewAlarmDialog::color() const
 {
-  return QColor::colorNames().at(m_colorComboBox->currentIndex());
+  return m_colors.at(m_colorComboBox->currentIndex());
 }
 
 //-----------------------------------------------------------------
