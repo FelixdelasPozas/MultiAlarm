@@ -52,7 +52,7 @@
      <property name="midLineWidth">
       <number>0</number>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,0">
+     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,1,0">
       <property name="spacing">
        <number>6</number>
       </property>
@@ -97,6 +97,9 @@
           <width>32</width>
           <height>32</height>
          </size>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -172,13 +175,16 @@
         </property>
         <property name="icon">
          <iconset resource="rsc/resources.qrc">
-          <normaloff>:/MultiAlarm/play.ico</normaloff>:/MultiAlarm/play.ico</iconset>
+          <normaloff>:/MultiAlarm/play.svg</normaloff>:/MultiAlarm/play.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
           <width>32</width>
           <height>32</height>
          </size>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
         </property>
        </widget>
       </item>

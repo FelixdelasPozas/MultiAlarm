@@ -165,11 +165,11 @@ void NewAlarmDialog::setPlayButtonIcon()
   auto sound = qobject_cast<QSoundEffect *>(sender());
   if(sound->isPlaying())
   {
-    m_playSoundButton->setIcon(QIcon(":/MultiAlarm/stop.ico"));
+    m_playSoundButton->setIcon(QIcon(":/MultiAlarm/stop.svg"));
   }
   else
   {
-    m_playSoundButton->setIcon(QIcon(":/MultiAlarm/play.ico"));
+    m_playSoundButton->setIcon(QIcon(":/MultiAlarm/play.svg"));
   }
 }
 

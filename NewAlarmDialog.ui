@@ -164,7 +164,7 @@
             </property>
             <property name="icon">
              <iconset resource="rsc/resources.qrc">
-              <normaloff>:/MultiAlarm/play.ico</normaloff>:/MultiAlarm/play.ico</iconset>
+              <normaloff>:/MultiAlarm/play.svg</normaloff>:/MultiAlarm/play.svg</iconset>
             </property>
            </widget>
           </item>

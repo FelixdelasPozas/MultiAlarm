@@ -74,12 +74,31 @@ class AlarmWidget
      */
     const QString color() const;
 
+    /** \brief Sets the alarm.
+     *
+     */
+    void setAlarm(Alarm *alarm);
+
   signals:
-    void startAlarm();
-    void stopAlarm();
     void deleteAlarm();
 
   private slots:
+    /** \brief Modifies the UI and desktop widget time.
+     * \param[in] seconds.
+     *
+     */
+    void onAlarmTic(unsigned long long seconds);
+
+    /** \brief Modifies the tray icon.
+     *
+     */
+    void onAlarmInterval();
+
+    /** \brief Shows the timeout dialog.
+     *
+     */
+    void onAlarmTimeout();
+
     /** \brief Modifies the UI and signals the start of the alarm.
      *
      */
@@ -95,6 +114,8 @@ class AlarmWidget
     QString m_color;      /** color of the text of the widget (always black or white) */
     QString m_alarmName;  /** name of the alarm.                                      */
     QString m_alarmColor; /** name of the color of the alarm.                         */
+    Alarm  *m_alarm;
+
 };
 
 #endif // ALARMWIDGET_H_

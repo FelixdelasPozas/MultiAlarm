@@ -105,16 +105,47 @@ void AlarmWidget::onPlayPressed()
 
   if(m_started)
   {
-    m_start->setIcon(QIcon(":/MultiAlarm/stop.ico"));
+    m_start->setIcon(QIcon(":/MultiAlarm/stop.svg"));
     m_status->setText(COLOR_QSTRING.arg(m_color).arg("Running"));
-    emit startAlarm();
   }
   else
   {
-    m_start->setIcon(QIcon(":/MultiAlarm/play.ico"));
+    m_start->setIcon(QIcon(":/MultiAlarm/play.svg"));
     m_status->setText(COLOR_QSTRING.arg(m_color).arg("Stopped"));
-    emit stopAlarm();
   }
+}
+
+//-----------------------------------------------------------------
+void AlarmWidget::setAlarm(Alarm* alarm)
+{
+  m_alarm = alarm;
+
+  connect(alarm, SIGNAL(tic(unsigned long long)),
+          this,  SLOT(onAlarmTic(unsigned long long)));
+
+  connect(alarm, SIGNAL(interval()),
+          this,  SLOT(onAlarmInterval()));
+
+  connect(alarm, SIGNAL(timeout()),
+          this,  SLOT(onAlarmTimeout()));
+}
+
+//-----------------------------------------------------------------
+void AlarmWidget::onAlarmTic(unsigned long long seconds)
+{
+  // TODO: update ui and desktop widget.
+}
+
+//-----------------------------------------------------------------
+void AlarmWidget::onAlarmInterval()
+{
+  // TODO: update tray icon.
+}
+
+//-----------------------------------------------------------------
+void AlarmWidget::onAlarmTimeout()
+{
+  // TODO: show timeout dialog.
 }
 
 //-----------------------------------------------------------------
