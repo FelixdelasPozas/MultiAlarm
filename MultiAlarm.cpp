@@ -255,6 +255,8 @@ void MultiAlarm::configureWidget(AlarmWidget *widget, const NewAlarmDialog& dial
     alarm = new Alarm(alarmTime, false);
   }
 
+  widget->useTrayIcon(dialog.showInTray());
+  widget->useDesktopWidget(dialog.showInDesktop());
   widget->setAlarm(alarm);
 
   if(!dialog.isTimer())

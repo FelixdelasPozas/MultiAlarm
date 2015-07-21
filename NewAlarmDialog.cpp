@@ -28,6 +28,7 @@
 #include <QPushButton>
 #include <QTemporaryFile>
 #include <QSoundEffect>
+#include <QSystemTrayIcon>
 
 const QStringList sounds{ "Buzz", "Smoke alarm", "Desk bell"};
 
@@ -46,6 +47,8 @@ NewAlarmDialog::NewAlarmDialog(QStringList invalidNames, QStringList invalidColo
 
   m_timerRadio->setChecked(true);
   m_timerRadio->setAutoExclusive(true);
+
+  m_showTray->setVisible(QSystemTrayIcon::isSystemTrayAvailable());
 
   m_colors = QColor::colorNames();
   for(auto color: invalidColors)

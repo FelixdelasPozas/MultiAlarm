@@ -80,12 +80,17 @@ class Alarm
     /** \brief Returns the number of completed 1/8th intervals of the alarm completed.
      *
      */
-    unsigned int intervals() const;
+    unsigned int completedIntervals() const;
 
     /** \brief Returns the remaining time of the alarm.
      *
      */
     const AlarmTime remainingTime() const;
+
+    /** \brief Returns the duration of the alarm.
+     *
+     */
+    const AlarmTime time() const;
 
   signals:
     /** \brief Signal launched every second.
@@ -94,14 +99,21 @@ class Alarm
     void tic();
 
     /** \brief Signal launched every completed interval. (1/8 th of the duration of the alarm).
+     * \param[out] value completed intervals.
      *
      */
-    void interval();
+    void interval(int value);
 
     /** \brief Signal launched at the end of the alarm.
      *
      */
     void timeout();
+
+    /** \brief Signals the progress of the alarm in a range [0-100]
+     * \param[out] value progress value.
+     *
+     */
+    void progress(int value);
 
   private slots:
     /** \brief Updates the alarm internal values.
@@ -110,10 +122,16 @@ class Alarm
     void second();
 
   private:
+    /** \brief computes progress and completed intervals.
+     *
+     */
+    void computeProgressValues();
+
     AlarmTime          m_time;          /** duration of the timer/clock.                */
     AlarmTime          m_remainingTime; /** remaining time of the timer/clock           */
     bool               m_loop;          /** true to restart the alarm once it finishes. */
     unsigned int       m_intervals;     /** number of completed intervals.              */
+    int                m_progress;      /** completed time of the alarm.                */
     QTimer             m_timer;         /** timer object.                               */
 };
 

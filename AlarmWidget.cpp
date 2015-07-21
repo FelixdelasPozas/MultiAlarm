@@ -24,6 +24,9 @@
 // Qt
 #include <QTime>
 #include <QDebug>
+#include <QBitmap>
+#include <QPixmap>
+#include <QPainter>
 
 const QString COLOR_QSTRING = "<font color='%1'>%2</font>";
 
@@ -33,6 +36,7 @@ AlarmWidget::AlarmWidget(QWidget * parent, Qt::WindowFlags flags)
 , m_started{false}
 , m_color  {"black"}
 , m_alarm  {nullptr}
+, m_icon   {nullptr}
 {
   setupUi(this);
 
@@ -42,13 +46,18 @@ AlarmWidget::AlarmWidget(QWidget * parent, Qt::WindowFlags flags)
   connect(m_delete, SIGNAL(clicked(bool)),
           this,     SLOT(onDeletePressed()));
 
-  m_status->setText("Stopped");
+  m_status->setText(COLOR_QSTRING.arg(m_color).arg("Stopped"));
 }
 
 //-----------------------------------------------------------------
 AlarmWidget::~AlarmWidget()
 {
   delete m_alarm;
+
+  if(m_icon)
+  {
+    delete m_icon;
+  }
 }
 
 //-----------------------------------------------------------------
@@ -65,6 +74,31 @@ const QString AlarmWidget::name() const
 }
 
 //-----------------------------------------------------------------
+void AlarmWidget::useTrayIcon(bool value)
+{
+  if(value && QSystemTrayIcon::isSystemTrayAvailable() && m_icon == nullptr)
+  {
+    m_icon = new QSystemTrayIcon(QIcon(":/MultiAlarm/0.ico"), this);
+    modifyIconColor();
+    m_icon->show();
+  }
+  else
+  {
+    if (m_icon)
+    {
+      m_icon->hide();
+      delete m_icon;
+    }
+  }
+}
+
+//-----------------------------------------------------------------
+void AlarmWidget::useDesktopWidget(bool value)
+{
+  // TODO
+}
+
+//-----------------------------------------------------------------
 void AlarmWidget::setTime(const Alarm::AlarmTime& time)
 {
   QString timeString;
@@ -73,7 +107,7 @@ void AlarmWidget::setTime(const Alarm::AlarmTime& time)
     timeString += QString("%1 Day").arg(time.days);
     if(time.days > 1)
     {
-      timeString += QString("s");
+      timeString += "s";
     }
   }
   timeString += " ";
@@ -103,7 +137,7 @@ void AlarmWidget::setColor(const QString& colorName)
   m_color = (blackDistance < whiteDistance ? "white" : "black");
   auto otherColor = (blackDistance > whiteDistance ? "white" : "black");
   auto oColor = QColor(otherColor);
-  auto mix = QColor((color.red()+ 2*oColor.red())/3, (color.green()+ 2*oColor.green())/3, (color.blue()+ 2*oColor.blue())/3);
+  auto mix = QColor((color.red()+ 3*oColor.red())/4, (color.green()+ 3*oColor.green())/4, (color.blue()+ 3*oColor.blue())/4);
 
   m_name->setText(COLOR_QSTRING.arg(m_color).arg(m_name->text()));
   m_time->setText(COLOR_QSTRING.arg(m_color).arg(m_time->text()));
@@ -153,8 +187,8 @@ void AlarmWidget::setAlarm(Alarm* alarm)
   connect(alarm, SIGNAL(tic()),
           this,  SLOT(onAlarmTic()));
 
-  connect(alarm, SIGNAL(interval()),
-          this,  SLOT(onAlarmInterval()));
+  connect(alarm, SIGNAL(interval(int)),
+          this,  SLOT(onAlarmInterval(int)));
 
   connect(alarm, SIGNAL(timeout()),
           this,  SLOT(onAlarmTimeout()));
@@ -176,9 +210,13 @@ void AlarmWidget::onAlarmTic()
 }
 
 //-----------------------------------------------------------------
-void AlarmWidget::onAlarmInterval()
+void AlarmWidget::onAlarmInterval(int value)
 {
-  // TODO: update tray icon.
+  if(!m_icon) return;
+
+  auto icon = QIcon(QString(":/MultiAlarm/%1.ico").arg(value));
+  m_icon->setIcon(icon);
+  modifyIconColor();
 }
 
 //-----------------------------------------------------------------
@@ -191,4 +229,27 @@ void AlarmWidget::onAlarmTimeout()
 void AlarmWidget::onDeletePressed()
 {
   emit deleteAlarm();
+}
+
+//-----------------------------------------------------------------
+void AlarmWidget::modifyIconColor()
+{
+  auto qpixmap = m_icon->icon().pixmap(128,128);
+  auto qimage  = qpixmap.toImage();
+  auto mask = qpixmap.createMaskFromColor(Qt::black).toImage();
+  auto color = QColor(m_alarmColor);
+  auto qrgb = qRgb(color.red(), color.green(), color.blue());
+
+  for(int y = 0; y < mask.height(); ++y)
+  {
+    for(int x = 0; x < mask.width(); ++x)
+    {
+      if(mask.pixel(x,y) == 0xffffffff)
+      {
+        qimage.setPixel(x,y,qrgb);
+      }
+    }
+  }
+
+  m_icon->setIcon(QIcon(QPixmap::fromImage(qimage)));
 }

@@ -26,6 +26,7 @@
 
 // Qt
 #include <QWidget>
+#include <QSystemTrayIcon>
 
 class QTime;
 
@@ -79,6 +80,23 @@ class AlarmWidget
      */
     void hideStartButton();
 
+    /** \brief Enables/disables the tray icon indicator.
+     * \param[in] value true to enable and false otherwise.
+     *
+     */
+    void useTrayIcon(bool value);
+
+    /** \brief Enables/disables the desktop widget indicator.
+     * \param[in] value true to enable and false otherwise.
+     *
+     */
+    void useDesktopWidget(bool value);
+
+    /** \brief Starts the alarm.
+     *
+     */
+    void start();
+
   signals:
     void deleteAlarm();
 
@@ -89,9 +107,10 @@ class AlarmWidget
     void onAlarmTic();
 
     /** \brief Modifies the tray icon.
+     * \param[in] value completed intervals.
      *
      */
-    void onAlarmInterval();
+    void onAlarmInterval(int value);
 
     /** \brief Shows the timeout dialog.
      *
@@ -115,11 +134,18 @@ class AlarmWidget
      */
     void setTime(const Alarm::AlarmTime& time);
 
+    /** \brief Modifies the color of the tray icon to match the color of the alarm.
+     *
+     */
+    void modifyIconColor();
+
     bool    m_started;    /** true if the alarm has been started and false otherwise. */
     QString m_color;      /** color of the text of the widget (always black or white) */
     QString m_alarmName;  /** name of the alarm.                                      */
     QString m_alarmColor; /** name of the color of the alarm.                         */
     Alarm  *m_alarm;      /** alarm class object.                                     */
+
+    QSystemTrayIcon *m_icon; /** system tray icon */
 
 };
 

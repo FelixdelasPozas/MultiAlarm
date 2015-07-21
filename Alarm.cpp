@@ -26,6 +26,7 @@ Alarm::Alarm(AlarmTime time, bool loop)
 , m_remainingTime{time}
 , m_loop         {loop}
 , m_intervals    {0}
+, m_progress     {0}
 {
   m_timer.setInterval(1000);
   m_timer.setSingleShot(false);
@@ -55,6 +56,7 @@ void Alarm::stop()
     m_timer.stop();
 
     m_intervals = 0;
+    m_progress = 0;
     m_remainingTime = m_time;
   }
 }
@@ -64,34 +66,20 @@ void Alarm::pause(bool paused)
 {
   if(paused == m_timer.isActive())
   {
-    switch (paused)
-    {
-      case true:
-        m_timer.stop();
-        break;
-      case false:
-      default:
-        m_timer.start();
-        break;
-    }
+    paused ? m_timer.stop() : m_timer.start();
   }
 }
 
 //-----------------------------------------------------------------
 unsigned int Alarm::progress() const
 {
-  unsigned long long totalTime = (m_time.days * 24*60*60) + (m_time.hours * 60*60) + (m_time.minutes * 60) + m_time.seconds;
-  unsigned long long remaining = (m_remainingTime.days * 24*60*60) + (m_remainingTime.hours *60*60) + (m_remainingTime.minutes * 60) + m_remainingTime.seconds;
-
-  return 100 - static_cast<int>(remaining/static_cast<double>(totalTime));
+  return m_progress;
 }
 
 //-----------------------------------------------------------------
-unsigned int Alarm::intervals() const
+unsigned int Alarm::completedIntervals() const
 {
-  auto currentProgress = progress();
-
-  return static_cast<int>(currentProgress/static_cast<double>(100/8.0));
+  return m_intervals;
 }
 
 //-----------------------------------------------------------------
@@ -101,9 +89,16 @@ const Alarm::AlarmTime Alarm::remainingTime() const
 }
 
 //-----------------------------------------------------------------
+const Alarm::AlarmTime Alarm::time() const
+{
+  return m_time;
+}
+
+//-----------------------------------------------------------------
 void Alarm::second()
 {
-  auto currentIntervals = intervals();
+  auto beforeIntervals = m_intervals;
+  auto beforeProgress  = m_progress;
 
   --m_remainingTime.seconds;
 
@@ -146,8 +141,25 @@ void Alarm::second()
 
   emit tic();
 
-  if(currentIntervals != intervals())
+  computeProgressValues();
+
+  if(beforeIntervals != m_intervals)
   {
-    emit interval();
+    emit interval(m_intervals);
   }
+
+  if(beforeProgress != m_progress)
+  {
+    emit progress(m_progress);
+  }
+}
+
+//-----------------------------------------------------------------
+void Alarm::computeProgressValues()
+{
+  unsigned long long totalTime = (m_time.days * 24*60*60) + (m_time.hours * 60*60) + (m_time.minutes * 60) + m_time.seconds;
+  unsigned long long remaining = (m_remainingTime.days * 24*60*60) + (m_remainingTime.hours *60*60) + (m_remainingTime.minutes * 60) + m_remainingTime.seconds;
+
+  m_progress = 100 - static_cast<int>((100*remaining)/static_cast<double>(totalTime));
+  m_intervals = static_cast<int>(m_progress/static_cast<double>(100/8.0));
 }
