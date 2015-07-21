@@ -21,7 +21,6 @@
 #define MULTIALARM_H_
 
 // Project
-#include "Alarm.h"
 #include "AlarmWidget.h"
 #include "ui_MainWindow.h"
 
@@ -36,7 +35,6 @@ class QEvent;
 class QCloseEvent;
 
 class NewAlarmDialog;
-
 
 /** \class MultiAlarm
  * \brief Application main window.
@@ -80,37 +78,12 @@ class MultiAlarm
      */
     void onRestoreActionActivated();
 
-    /** \brief Cancels all alamrs and exits the application.
+    /** \brief Cancels all alarms and exits the application.
      *
      */
     void onQuitActionActivated();
 
   private slots:
-    /** \brief Updates the widgets for the sender() alarm.
-     *
-     */
-    void onAlarmTic(unsigned long long seconds);
-
-    /** \brief Updates the tray icon of the sender() alarm.
-     *
-     */
-    void onAlarmInterval();
-
-    /** \brief Shows the message dialog and hides the desktop/tray widgets if necessary.
-     *
-     */
-    void onAlarmTimeout();
-
-    /** \brief Starts the alarm.
-     *
-     */
-    void onAlarmStarted();
-
-    /** \brief Stops the alarm.
-     *
-     */
-    void onAlarmStopped();
-
     /** \brief Deletes the alarm and widget.
      *
      */
@@ -124,13 +97,7 @@ class MultiAlarm
      * \param[in] dialog finished dialog with the alarm properties.
      *
      */
-    void initWidget(AlarmWidget *widget, const NewAlarmDialog &dialog);
-
-    /** \brief Connects/disconnects the alarm signals.
-     * \param[in] alarm alarm to connect.
-     *
-     */
-    void manageAlarmSignals(Alarm *alarm);
+    void configureWidget(AlarmWidget *widget, const NewAlarmDialog &dialog);
 
     /** \brief Restores application settings from ini file.
      *
@@ -156,7 +123,7 @@ class MultiAlarm
     QSystemTrayIcon *m_icon;
     QAction *m_restoreMenuAction, *m_quitMenuAction;
 
-    QMap<AlarmWidget *, Alarm *> m_alarms;
+    QList<AlarmWidget *> m_alarms;
 };
 
 #endif // MULTIALARM_H_

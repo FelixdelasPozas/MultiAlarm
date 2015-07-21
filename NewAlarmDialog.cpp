@@ -115,7 +115,7 @@ void NewAlarmDialog::checkOkButtonRequirements()
   auto validName = !m_name->text().isEmpty() && !m_invalidNames.contains(m_name->text());
   auto validMessage = !m_message->text().isEmpty();
   auto validClock = m_clockRadio->isChecked() && (m_clock->dateTime() > QDateTime::currentDateTime());
-  auto validTime = m_timerRadio->isChecked() && (m_timer->time() >= QTime(0,1,0));
+  auto validTime = m_timerRadio->isChecked();
 
   auto valid = validName && validMessage && (validTime || validClock);
 
@@ -260,10 +260,7 @@ const QString NewAlarmDialog::color() const
 //-----------------------------------------------------------------
 void NewAlarmDialog::setSound(int soundIndex)
 {
-  if((soundIndex < 0) || (soundIndex > m_soundComboBox->count()))
-  {
-    soundIndex = 0;
-  }
+  soundIndex = soundIndex % m_soundComboBox->count();
 
   m_soundComboBox->setCurrentIndex(soundIndex);
 }
@@ -302,8 +299,7 @@ bool NewAlarmDialog::showInDesktop() const
 void NewAlarmDialog::loadSounds()
 {
   // NOTE: Load sound files. QSound can't play a file from the qt resource file
-  // so we will dump them first to the temporal directory, then load the resources
-  // and delete them.
+  // so we will dump them first to the temporal directory, then load the resources.
   auto buzz = QTemporaryFile::createLocalFile(":/MultiAlarm/sounds/buzz.wav");
   m_sounds.insert(0, new QSoundEffect(this));
   m_sounds[0]->setSource(QUrl::fromLocalFile(buzz->fileName()));

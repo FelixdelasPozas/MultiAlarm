@@ -33,8 +33,10 @@
 // C++
 #include <iostream>
 
-const QString STATE = "State";
+const QString STATE    = "State";
 const QString GEOMETRY = "Geometry";
+const QString ALARMS   = "Alarms";
+const QString COLOR    = "Color";
 
 //-----------------------------------------------------------------
 MultiAlarm::MultiAlarm(QWidget *parent, Qt::WindowFlags flags)
@@ -81,12 +83,15 @@ void MultiAlarm::createNewAlarm()
   {
     auto alarmWidget = new AlarmWidget();
 
-    initWidget(alarmWidget, dialog);
+    connect(alarmWidget, SIGNAL(deleteAlarm()),
+            this,        SLOT(onAlarmDeleted()));
+
+    m_alarms << alarmWidget;
+
+    configureWidget(alarmWidget, dialog);
 
     centralWidget()->layout()->addWidget(alarmWidget);
     setFixedHeight(size().height() + alarmWidget->size().height());
-
-    m_alarms << alarmWidget;
   }
 }
 
@@ -185,41 +190,72 @@ void MultiAlarm::saveSettings()
   settings.setValue(STATE, saveState());
   settings.setValue(GEOMETRY, saveGeometry());
 
-  // TODO: save alarms
+//  if(!m_alarms.empty())
+//  {
+//    settings.beginGroup(ALARMS);
+//
+//    for(auto alarm: m_alarms)
+//    {
+//      settings.beginGroup(alarm->name());
+//      settings.setValue(COLOR, alarm->color());
+//      settings.endGroup();
+//    }
+//
+//    settings.endGroup();
+//  }
 }
 
 //-----------------------------------------------------------------
-void MultiAlarm::initWidget(AlarmWidget *widget, const NewAlarmDialog& dialog)
+void MultiAlarm::configureWidget(AlarmWidget *widget, const NewAlarmDialog& dialog)
 {
   Alarm *alarm = nullptr;
-  auto time = QTime(0,0,0);
-  auto dateTime = QDateTime::currentDateTime();
 
   widget->setColor(dialog.color());
   widget->setName(dialog.name());
   widget->setToolTip(dialog.name() + QString(" Alarm"));
 
-  connect(widget, SIGNAL(deleteAlarm()),
-          this,   SLOT(onAlarmDeleted()));
-
   if(dialog.isTimer())
   {
-    auto seconds = time.secsTo(dialog.timerTime());
-    time = time.addSecs(seconds);
+    auto time = dialog.timerTime();
+    Alarm::AlarmTime alarmTime(0, time.hour(), time.minute(), time.second());
 
-    alarm = new Alarm(seconds, dialog.timerLoop());
+    alarm = new Alarm(alarmTime, dialog.timerLoop());
   }
   else
   {
-    auto seconds = dateTime.secsTo(dialog.clockDateTime());
-    time = time.addSecs(seconds);
+    widget->hideStartButton();
+    auto now = QDateTime::currentDateTime();
+    constexpr long int secondsInDay = 24*60*60;
+    int days = 0;
+    int hours = 0;
+    int minutes = 0;
+    int seconds = 0;
 
-    QTime prueba(0,0,0);
-    qDebug() << "seconds" << seconds << "entered" << prueba.secsTo(time);
-    alarm = new Alarm(seconds, false);
+    days = now.daysTo(dialog.clockDateTime()) - 1;
+    if(days > 1)
+    {
+      now = now.addDays(days);
+    }
+
+    if(now.secsTo(dialog.clockDateTime()) > secondsInDay)
+    {
+      ++days;
+      now = now.addSecs(secondsInDay);
+    }
+
+    auto remaining = now.secsTo(dialog.clockDateTime());
+    hours = remaining / 3600;
+    remaining -= hours * 3600;
+    minutes = remaining / 60;
+    remaining -= minutes * 60;
+    seconds = remaining;
+
+    Alarm::AlarmTime alarmTime(days, hours, minutes, seconds);
+
+    alarm = new Alarm(alarmTime, false);
   }
 
-  widget->setTime(time);
+  widget->setAlarm(alarm);
 
   if(!dialog.isTimer())
   {

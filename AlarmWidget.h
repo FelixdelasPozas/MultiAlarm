@@ -21,6 +21,7 @@
 #define ALARMWIDGET_H_
 
 // Project
+#include <Alarm.h>
 #include "ui_AlarmWidget.h"
 
 // Qt
@@ -57,12 +58,6 @@ class AlarmWidget
      */
     const QString name() const;
 
-    /** \brief Sets the duration of the alarm's timer.
-     * \param[in] time alarm's timer duration.
-     *
-     */
-    void setTime(const QTime &time);
-
     /** \brief Sets the color of the alarm.
      * \param[in] colorName color name belonging to QColor::colorNames();
      *
@@ -79,15 +74,19 @@ class AlarmWidget
      */
     void setAlarm(Alarm *alarm);
 
+    /** \brief Hides the start/stop button, used only in clock alarms.
+     *
+     */
+    void hideStartButton();
+
   signals:
     void deleteAlarm();
 
   private slots:
     /** \brief Modifies the UI and desktop widget time.
-     * \param[in] seconds.
      *
      */
-    void onAlarmTic(unsigned long long seconds);
+    void onAlarmTic();
 
     /** \brief Modifies the tray icon.
      *
@@ -110,11 +109,17 @@ class AlarmWidget
     void onDeletePressed();
 
   private:
+    /** \brief Sets the duration of the alarm's timer.
+     * \param[in] time alarm's timer duration.
+     *
+     */
+    void setTime(const Alarm::AlarmTime& time);
+
     bool    m_started;    /** true if the alarm has been started and false otherwise. */
     QString m_color;      /** color of the text of the widget (always black or white) */
     QString m_alarmName;  /** name of the alarm.                                      */
     QString m_alarmColor; /** name of the color of the alarm.                         */
-    Alarm  *m_alarm;
+    Alarm  *m_alarm;      /** alarm class object.                                     */
 
 };
 

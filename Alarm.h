@@ -33,13 +33,23 @@ class Alarm
 {
     Q_OBJECT
   public:
+    struct AlarmTime
+    {
+      int days;
+      int hours;
+      int minutes;
+      int seconds;
+
+      explicit AlarmTime(int d, int h, int m, int s): days{d}, hours{h}, minutes{m}, seconds{s} {};
+    };
+
     /** \brief Alarm class constructor.
      * \param[in] seconds duration of the alarm in seconds.
      * \param[in] loop true to loop the alarm.
      * \param[in] parent raw pointer of the QObject parent of this one.
      *
      */
-    explicit Alarm(unsigned long long seconds, bool loop);
+    explicit Alarm(AlarmTime time, bool loop);
 
     /** \brief Alarm class virtual destructor.
      *
@@ -72,27 +82,16 @@ class Alarm
      */
     unsigned int intervals() const;
 
-    /** \brief Returns the number of completed seconds of the alarm.
-     *
-     */
-    unsigned long long seconds() const;
-
-    /** \brief Returns the completed time of the alarm.
-     *
-     */
-    const QTime time() const;
-
     /** \brief Returns the remaining time of the alarm.
      *
      */
-    const QTime remainingTime() const;
+    const AlarmTime remainingTime() const;
 
   signals:
     /** \brief Signal launched every second.
-     * \param[out] seconds remaining alarm seconds.
      *
      */
-    void tic(unsigned long long seconds);
+    void tic();
 
     /** \brief Signal launched every completed interval. (1/8 th of the duration of the alarm).
      *
@@ -111,13 +110,11 @@ class Alarm
     void second();
 
   private:
-    unsigned long long m_seconds;             /** duration of the alarm in seconds.           */
-    bool               m_loop;                /** true to restart the alarm once it finishes. */
-    double             m_interval;            /** duration of an interval.                    */
-    unsigned int       m_completed_intervals; /** number of completed intervals.              */
-    unsigned long long m_completed_seconds;   /** number of completed seconds.                */
-    unsigned long long m_remaining_seconds;   /** number of remaining seconds.                */
-    QTimer             m_timer;               /** timer object.                               */
+    AlarmTime          m_time;          /** duration of the timer/clock.                */
+    AlarmTime          m_remainingTime; /** remaining time of the timer/clock           */
+    bool               m_loop;          /** true to restart the alarm once it finishes. */
+    unsigned int       m_intervals;     /** number of completed intervals.              */
+    QTimer             m_timer;         /** timer object.                               */
 };
 
 #endif // ALARM_H_

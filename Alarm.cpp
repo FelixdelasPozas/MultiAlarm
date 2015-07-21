@@ -21,13 +21,11 @@
 #include "Alarm.h"
 
 //-----------------------------------------------------------------
-Alarm::Alarm(unsigned long long seconds, bool loop)
-: m_seconds            {seconds}
-, m_loop               {loop}
-, m_interval           {seconds/8.0}
-, m_completed_intervals{0}
-, m_completed_seconds  {0}
-, m_remaining_seconds  {seconds}
+Alarm::Alarm(AlarmTime time, bool loop)
+: m_time         {time}
+, m_remainingTime{time}
+, m_loop         {loop}
+, m_intervals    {0}
 {
   m_timer.setInterval(1000);
   m_timer.setSingleShot(false);
@@ -44,16 +42,21 @@ Alarm::~Alarm()
 //-----------------------------------------------------------------
 void Alarm::start()
 {
-  m_timer.start();
+  if(!m_timer.isActive())
+  {
+    m_timer.start();
+  }
 }
 //-----------------------------------------------------------------
 void Alarm::stop()
 {
-  m_timer.stop();
+  if(m_timer.isActive())
+  {
+    m_timer.stop();
 
-  m_completed_intervals = 0;
-  m_completed_seconds = 0;
-  m_remaining_seconds = m_seconds;
+    m_intervals = 0;
+    m_remainingTime = m_time;
+  }
 }
 
 //-----------------------------------------------------------------
@@ -64,11 +67,11 @@ void Alarm::pause(bool paused)
     switch (paused)
     {
       case true:
-        stop();
+        m_timer.stop();
         break;
       case false:
       default:
-        start();
+        m_timer.start();
         break;
     }
   }
@@ -77,51 +80,34 @@ void Alarm::pause(bool paused)
 //-----------------------------------------------------------------
 unsigned int Alarm::progress() const
 {
-  return 100 * (m_completed_seconds/static_cast<double>(m_seconds));
+  unsigned long long totalTime = (m_time.days * 24*60*60) + (m_time.hours * 60*60) + (m_time.minutes * 60) + m_time.seconds;
+  unsigned long long remaining = (m_remainingTime.days * 24*60*60) + (m_remainingTime.hours *60*60) + (m_remainingTime.minutes * 60) + m_remainingTime.seconds;
+
+  return 100 - static_cast<int>(remaining/static_cast<double>(totalTime));
 }
 
 //-----------------------------------------------------------------
 unsigned int Alarm::intervals() const
 {
-  return m_completed_intervals;
+  auto currentProgress = progress();
+
+  return static_cast<int>(currentProgress/static_cast<double>(100/8.0));
 }
 
 //-----------------------------------------------------------------
-unsigned long long Alarm::seconds() const
+const Alarm::AlarmTime Alarm::remainingTime() const
 {
-  return m_completed_seconds;
-}
-
-//-----------------------------------------------------------------
-const QTime Alarm::time() const
-{
-  QTime time(0,0,0);
-  return time.addSecs(m_completed_seconds);
-}
-
-//-----------------------------------------------------------------
-const QTime Alarm::remainingTime() const
-{
-  QTime time(0,0,0);
-  return time.addSecs(m_seconds - m_completed_seconds);
+  return m_remainingTime;
 }
 
 //-----------------------------------------------------------------
 void Alarm::second()
 {
-  ++m_completed_seconds;
-  --m_remaining_seconds;
+  auto currentIntervals = intervals();
 
-  emit tic(m_remaining_seconds);
+  --m_remainingTime.seconds;
 
-  if((m_interval * (m_completed_intervals + 1)) <= m_completed_seconds)
-  {
-    ++m_completed_intervals;
-
-    emit interval();
-  }
-
-  if(m_completed_seconds == m_seconds)
+  if((m_remainingTime.seconds == 0 ) && (m_remainingTime.minutes == 0) && (m_remainingTime.hours == 0) && (m_remainingTime.days == 0))
   {
     emit timeout();
 
@@ -134,8 +120,34 @@ void Alarm::second()
     }
     else
     {
-      m_completed_seconds = 0;
-      m_completed_intervals = 0;
+      m_remainingTime = m_time;
     }
+  }
+  else
+  {
+    if(m_remainingTime.seconds == -1)
+    {
+      --m_remainingTime.minutes;
+      m_remainingTime.seconds = 59;
+
+      if(m_remainingTime.minutes == -1)
+      {
+        --m_remainingTime.hours;
+        m_remainingTime.minutes = 59;
+
+        if(m_remainingTime.hours == -1)
+        {
+          --m_remainingTime.days;
+          m_remainingTime.hours = 23;
+        }
+      }
+    }
+  }
+
+  emit tic();
+
+  if(currentIntervals != intervals())
+  {
+    emit interval();
   }
 }

@@ -19,6 +19,7 @@
 
 // Project
 #include <AlarmWidget.h>
+#include <Alarm.h>
 
 // Qt
 #include <QTime>
@@ -31,6 +32,7 @@ AlarmWidget::AlarmWidget(QWidget * parent, Qt::WindowFlags flags)
 : QWidget  {parent, flags}
 , m_started{false}
 , m_color  {"black"}
+, m_alarm  {nullptr}
 {
   setupUi(this);
 
@@ -46,6 +48,7 @@ AlarmWidget::AlarmWidget(QWidget * parent, Qt::WindowFlags flags)
 //-----------------------------------------------------------------
 AlarmWidget::~AlarmWidget()
 {
+  delete m_alarm;
 }
 
 //-----------------------------------------------------------------
@@ -62,9 +65,30 @@ const QString AlarmWidget::name() const
 }
 
 //-----------------------------------------------------------------
-void AlarmWidget::setTime(const QTime& time)
+void AlarmWidget::setTime(const Alarm::AlarmTime& time)
 {
-  m_time->setText(COLOR_QSTRING.arg(m_color).arg(time.toString()));
+  QString timeString;
+  if(time.days != 0)
+  {
+    timeString += QString("%1 Day").arg(time.days);
+    if(time.days > 1)
+    {
+      timeString += QString("s");
+    }
+  }
+  timeString += " ";
+
+  for(auto part: {time.hours, time.minutes, time.seconds})
+  {
+    if(part < 10)
+    {
+      timeString += "0";
+    }
+    timeString += QString("%1:").arg(part);
+  }
+  timeString.remove(timeString.length()-1, 1);
+
+  m_time->setText(COLOR_QSTRING.arg(m_color).arg(timeString));
 }
 
 //-----------------------------------------------------------------
@@ -107,11 +131,15 @@ void AlarmWidget::onPlayPressed()
   {
     m_start->setIcon(QIcon(":/MultiAlarm/stop.svg"));
     m_status->setText(COLOR_QSTRING.arg(m_color).arg("Running"));
+    m_alarm->start();
   }
   else
   {
     m_start->setIcon(QIcon(":/MultiAlarm/play.svg"));
     m_status->setText(COLOR_QSTRING.arg(m_color).arg("Stopped"));
+    m_alarm->stop();
+
+    setTime(m_alarm->remainingTime());
   }
 }
 
@@ -120,8 +148,10 @@ void AlarmWidget::setAlarm(Alarm* alarm)
 {
   m_alarm = alarm;
 
-  connect(alarm, SIGNAL(tic(unsigned long long)),
-          this,  SLOT(onAlarmTic(unsigned long long)));
+  setTime(m_alarm->remainingTime());
+
+  connect(alarm, SIGNAL(tic()),
+          this,  SLOT(onAlarmTic()));
 
   connect(alarm, SIGNAL(interval()),
           this,  SLOT(onAlarmInterval()));
@@ -131,9 +161,18 @@ void AlarmWidget::setAlarm(Alarm* alarm)
 }
 
 //-----------------------------------------------------------------
-void AlarmWidget::onAlarmTic(unsigned long long seconds)
+void AlarmWidget::hideStartButton()
 {
-  // TODO: update ui and desktop widget.
+  m_start->hide();
+  m_status->setText(COLOR_QSTRING.arg(m_color).arg("Running"));
+}
+
+//-----------------------------------------------------------------
+void AlarmWidget::onAlarmTic()
+{
+  setTime(m_alarm->remainingTime());
+
+  // TODO: update desktop widget.
 }
 
 //-----------------------------------------------------------------
