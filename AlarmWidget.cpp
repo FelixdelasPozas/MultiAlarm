@@ -236,17 +236,27 @@ void AlarmWidget::modifyIconColor()
 {
   auto qpixmap = m_icon->icon().pixmap(128,128);
   auto qimage  = qpixmap.toImage();
-  auto mask = qpixmap.createMaskFromColor(Qt::black).toImage();
+  auto blackMask = qpixmap.createMaskFromColor(Qt::black).toImage();
+  auto whiteMask = qpixmap.createMaskFromColor(Qt::white).toImage();
   auto color = QColor(m_alarmColor);
-  auto qrgb = qRgb(color.red(), color.green(), color.blue());
+  auto colorqrgb = qRgb(color.red(), color.green(), color.blue());
+  auto otherColor = QColor(m_color);
+  auto otherColorqrgb = qRgb(otherColor.red(), otherColor.green(), otherColor.blue());
 
-  for(int y = 0; y < mask.height(); ++y)
+  for(int y = 0; y < blackMask.height(); ++y)
   {
-    for(int x = 0; x < mask.width(); ++x)
+    for(int x = 0; x < blackMask.width(); ++x)
     {
-      if(mask.pixel(x,y) == 0xffffffff)
+      if(blackMask.pixel(x,y) == 0xffffffff)
       {
-        qimage.setPixel(x,y,qrgb);
+        qimage.setPixel(x,y,colorqrgb);
+      }
+      else
+      {
+        if(whiteMask.pixel(x,y) == 0xffffffff)
+        {
+          qimage.setPixel(x,y, otherColorqrgb);
+        }
       }
     }
   }
