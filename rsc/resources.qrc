@@ -2,7 +2,9 @@
   <qresource prefix="/MultiAlarm">
     <file>application.ico</file>
 	<file>add.ico</file>
+	<file>add-disabled.ico</file>
 	<file>delete.ico</file>
+	<file>delete-disabled.ico</file>
 	<file>speaker.ico</file>
 	<file>play.svg</file>
 	<file>stop.svg</file>

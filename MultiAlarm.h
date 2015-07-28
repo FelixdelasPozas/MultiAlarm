@@ -22,6 +22,7 @@
 
 // Project
 #include "AlarmWidget.h"
+#include "NewAlarmDialog.h"
 #include "ui_MainWindow.h"
 
 // Qt
@@ -33,8 +34,7 @@
 
 class QEvent;
 class QCloseEvent;
-
-class NewAlarmDialog;
+class QSettings;
 
 /** \class MultiAlarm
  * \brief Application main window.
@@ -92,12 +92,18 @@ class MultiAlarm
   private:
     virtual void changeEvent(QEvent *e);
 
-    /** \brief Configures the AlarmWidget class with the properties of the alarm dialog.
-     * \param[in] widget alarm widget dialog.
+    /** \brief Creates a widget using the data from the dialog.
+     * \param[in] settings settings object containinf the alarm properties.
+     * \param[in] name alarm identificator.
+     *
+     */
+    AlarmWidget *createAlarmWidget(QSettings &settings, const QString &name);
+
+    /** \brief Creates a widget using the data from the dialog.
      * \param[in] dialog finished dialog with the alarm properties.
      *
      */
-    void configureWidget(AlarmWidget *widget, const NewAlarmDialog &dialog);
+    AlarmWidget *createAlarmWidget(const NewAlarmDialog &dialog);
 
     /** \brief Restores application settings from ini file.
      *
@@ -118,6 +124,12 @@ class MultiAlarm
      *
      */
     void connectSignals();
+
+    /** \brief Adds an alarm to the list of alarms and configures the signals and UI.
+     * \param[in] widget widget to add.
+     *
+     */
+    void addAlarmWidget(AlarmWidget *widget);
 
   private:
     QSystemTrayIcon *m_icon;

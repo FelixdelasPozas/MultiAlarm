@@ -32,11 +32,11 @@ const QString COLOR_QSTRING = "<font color='%1'>%2</font>";
 
 //-----------------------------------------------------------------
 AlarmWidget::AlarmWidget(QWidget * parent, Qt::WindowFlags flags)
-: QWidget  {parent, flags}
-, m_started{false}
-, m_color  {"black"}
-, m_alarm  {nullptr}
-, m_icon   {nullptr}
+: QWidget           {parent, flags}
+, m_started         {false}
+, m_contrastColor   {"black"}
+, m_alarm           {nullptr}
+, m_icon            {nullptr}
 {
   setupUi(this);
 
@@ -45,8 +45,6 @@ AlarmWidget::AlarmWidget(QWidget * parent, Qt::WindowFlags flags)
 
   connect(m_delete, SIGNAL(clicked(bool)),
           this,     SLOT(onDeletePressed()));
-
-  m_status->setText(COLOR_QSTRING.arg(m_color).arg("Stopped"));
 }
 
 //-----------------------------------------------------------------
@@ -61,42 +59,65 @@ AlarmWidget::~AlarmWidget()
 }
 
 //-----------------------------------------------------------------
-void AlarmWidget::setName(const QString& name)
+void AlarmWidget::start()
 {
-  m_alarmName = name;
-  m_name->setText(COLOR_QSTRING.arg(m_color).arg(name));
+  m_start->setIcon(QIcon(":/MultiAlarm/stop.svg"));
+
+  if(m_icon)
+  {
+    setTrayIcon(":/MultiAlarm/0.ico");
+    m_icon->show();
+  }
+
+  m_alarm->start();
+}
+
+//-----------------------------------------------------------------
+void AlarmWidget::stop()
+{
+  m_alarm->stop();
+
+  m_start->setIcon(QIcon(":/MultiAlarm/play.svg"));
+
+  if(m_icon)
+  {
+    m_icon->hide();
+  }
+
+  setTime(m_alarm->remainingTime());
 }
 
 //-----------------------------------------------------------------
 const QString AlarmWidget::name() const
 {
-  return m_alarmName;
+  return m_configuration.name;
 }
 
 //-----------------------------------------------------------------
-void AlarmWidget::useTrayIcon(bool value)
+const QString AlarmWidget::color() const
 {
-  if(value && QSystemTrayIcon::isSystemTrayAvailable() && m_icon == nullptr)
-  {
-    m_icon = new QSystemTrayIcon(QIcon(":/MultiAlarm/0.ico"), this);
-    modifyIconColor();
-    m_icon->show();
-  }
-  else
-  {
-    if (m_icon)
-    {
-      m_icon->hide();
-      delete m_icon;
-    }
-  }
+  return m_configuration.color;
 }
 
-//-----------------------------------------------------------------
-void AlarmWidget::useDesktopWidget(bool value)
-{
-  // TODO
-}
+////-----------------------------------------------------------------
+//void AlarmWidget::useTrayIcon(bool value)
+//{
+//  if(value && QSystemTrayIcon::isSystemTrayAvailable() && !m_icon)
+//  {
+//    m_icon = new QSystemTrayIcon(this);
+//
+//    // TODO: icon menu
+//
+//    setTrayIcon(":/MultiAlarm/0.ico");
+//  }
+//  else
+//  {
+//    if (m_icon)
+//    {
+//      delete m_icon;
+//    }
+//  }
+//}
 
 //-----------------------------------------------------------------
 void AlarmWidget::setTime(const Alarm::AlarmTime& time)
@@ -122,36 +143,28 @@ void AlarmWidget::setTime(const Alarm::AlarmTime& time)
   }
   timeString.remove(timeString.length()-1, 1);
 
-  m_time->setText(COLOR_QSTRING.arg(m_color).arg(timeString));
+  m_time->setText(COLOR_QSTRING.arg(m_contrastColor).arg(timeString));
 }
 
 //-----------------------------------------------------------------
 void AlarmWidget::setColor(const QString& colorName)
 {
-  m_alarmColor = colorName;
   auto color = QColor(colorName);
 
   auto blackDistance = color.red() + color.green() + color.blue();
   auto whiteDistance = (254 * 3) - blackDistance;
 
-  m_color = (blackDistance < whiteDistance ? "white" : "black");
+  m_contrastColor = (blackDistance < whiteDistance ? "white" : "black");
   auto otherColor = (blackDistance > whiteDistance ? "white" : "black");
-  auto oColor = QColor(otherColor);
-  auto mix = QColor((color.red()+ 3*oColor.red())/4, (color.green()+ 3*oColor.green())/4, (color.blue()+ 3*oColor.blue())/4);
+  auto shineColor = QColor(otherColor);
+  auto mix = QColor((color.red()+ 3*shineColor.red())/4, (color.green()+ 3*shineColor.green())/4, (color.blue()+ 3*shineColor.blue())/4);
 
-  m_name->setText(COLOR_QSTRING.arg(m_color).arg(m_name->text()));
-  m_time->setText(COLOR_QSTRING.arg(m_color).arg(m_time->text()));
-  m_status->setText(COLOR_QSTRING.arg(m_color).arg(m_status->text()));
+  m_name->setText(COLOR_QSTRING.arg(m_contrastColor).arg(m_name->text()));
+  m_time->setText(COLOR_QSTRING.arg(m_contrastColor).arg(m_time->text()));
 
-  auto style = QString("QFrame#m_frame { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 %1, stop:0.5 %2, stop:1 %1) }").arg(colorName).arg(mix.name(QColor::NameFormat::HexRgb));
+  auto style = QString("QFrame#m_frame { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 %1, stop:0.4 %2, stop:0.6 %2, stop:1 %1) }").arg(colorName).arg(mix.name(QColor::NameFormat::HexRgb));
   setStyleSheet(style);
   update();
-}
-
-//-----------------------------------------------------------------
-const QString AlarmWidget::color() const
-{
-  return m_alarmColor;
 }
 
 //-----------------------------------------------------------------
@@ -163,17 +176,13 @@ void AlarmWidget::onPlayPressed()
 
   if(m_started)
   {
-    m_start->setIcon(QIcon(":/MultiAlarm/stop.svg"));
-    m_status->setText(COLOR_QSTRING.arg(m_color).arg("Running"));
-    m_alarm->start();
+    m_delete->setIcon(QIcon(":/MultiAlarm/delete-disabled.ico"));
+    start();
   }
   else
   {
-    m_start->setIcon(QIcon(":/MultiAlarm/play.svg"));
-    m_status->setText(COLOR_QSTRING.arg(m_color).arg("Stopped"));
-    m_alarm->stop();
-
-    setTime(m_alarm->remainingTime());
+    m_delete->setIcon(QIcon(":/MultiAlarm/delete.ico"));
+    stop();
   }
 }
 
@@ -195,13 +204,6 @@ void AlarmWidget::setAlarm(Alarm* alarm)
 }
 
 //-----------------------------------------------------------------
-void AlarmWidget::hideStartButton()
-{
-  m_start->hide();
-  m_status->setText(COLOR_QSTRING.arg(m_color).arg("Running"));
-}
-
-//-----------------------------------------------------------------
 void AlarmWidget::onAlarmTic()
 {
   setTime(m_alarm->remainingTime());
@@ -212,11 +214,10 @@ void AlarmWidget::onAlarmTic()
 //-----------------------------------------------------------------
 void AlarmWidget::onAlarmInterval(int value)
 {
-  if(!m_icon) return;
-
-  auto icon = QIcon(QString(":/MultiAlarm/%1.ico").arg(value));
-  m_icon->setIcon(icon);
-  modifyIconColor();
+  if(m_icon)
+  {
+    setTrayIcon(QString(":/MultiAlarm/%1.ico").arg(value));
+  }
 }
 
 //-----------------------------------------------------------------
@@ -232,15 +233,86 @@ void AlarmWidget::onDeletePressed()
 }
 
 //-----------------------------------------------------------------
-void AlarmWidget::modifyIconColor()
+void AlarmWidget::setConfiguration(const AlarmConfiguration conf)
 {
-  auto qpixmap = m_icon->icon().pixmap(128,128);
-  auto qimage  = qpixmap.toImage();
-  auto blackMask = qpixmap.createMaskFromColor(Qt::black).toImage();
-  auto whiteMask = qpixmap.createMaskFromColor(Qt::white).toImage();
-  auto color = QColor(m_alarmColor);
+  m_configuration = conf;
+
+  setColor(m_configuration.color);
+  m_name->setText(COLOR_QSTRING.arg(m_contrastColor).arg(conf.name));
+  setToolTip(conf.name + QString(" Alarm"));
+
+  Alarm *alarm = nullptr;
+
+  if(conf.isTimer)
+  {
+    Alarm::AlarmTime alarmTime(0, conf.timerTime.hour(), conf.timerTime.minute(), conf.timerTime.second());
+    alarm = new Alarm(alarmTime, conf.timerLoops);
+  }
+  else
+  {
+    m_start->hide();
+
+    auto now = QDateTime::currentDateTime();
+    constexpr long int secondsInDay = 24*60*60;
+    int days = 0;
+    int hours = 0;
+    int minutes = 0;
+    int seconds = 0;
+
+    days = now.daysTo(conf.clockDateTime);
+    if(days > 1)
+    {
+      now = now.addDays(days - 1);
+
+      if(now.secsTo(conf.clockDateTime) > secondsInDay)
+      {
+        ++days;
+        now = now.addSecs(secondsInDay);
+      }
+    }
+
+    auto remaining = now.secsTo(conf.clockDateTime);
+    hours = remaining / 3600;
+    remaining -= hours * 3600;
+    minutes = remaining / 60;
+    remaining -= minutes * 60;
+    seconds = remaining;
+
+    Alarm::AlarmTime alarmTime(days, hours, minutes, seconds);
+    alarm = new Alarm(alarmTime, false);
+  }
+
+  setAlarm(alarm);
+
+  if (conf.useTray && QSystemTrayIcon::isSystemTrayAvailable() && !m_icon)
+  {
+    m_icon = new QSystemTrayIcon(this);
+
+    // TODO: icon menu
+
+    setTrayIcon(":/MultiAlarm/0.ico");
+  }
+}
+
+//-----------------------------------------------------------------
+const struct AlarmConfiguration AlarmWidget::alarmConfiguration() const
+{
+  return m_configuration;
+}
+
+//-----------------------------------------------------------------
+void AlarmWidget::setTrayIcon(const QString &icon)
+{
+  auto qIcon = QIcon(icon);
+
+  auto qPixmap = qIcon.pixmap(128,128);
+  auto qimage  = qPixmap.toImage();
+  auto blackMask = qPixmap.createMaskFromColor(Qt::black).toImage();
+  auto whiteMask = qPixmap.createMaskFromColor(Qt::white).toImage();
+
+  auto color = QColor(m_configuration.color);
   auto colorqrgb = qRgb(color.red(), color.green(), color.blue());
-  auto otherColor = QColor(m_color);
+  auto otherColor = QColor(m_contrastColor);
   auto otherColorqrgb = qRgb(otherColor.red(), otherColor.green(), otherColor.blue());
 
   for(int y = 0; y < blackMask.height(); ++y)

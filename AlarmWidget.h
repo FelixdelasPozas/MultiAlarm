@@ -30,6 +30,20 @@
 
 class QTime;
 
+struct AlarmConfiguration
+{
+    QString   name;             /** name of the alarm.                                         */
+    QString   message;          /** message of the alarm to show on completion.                */
+    QString   color;            /** name of the color of the alarm.                            */
+    bool      isTimer;          /** true if the alarm is a timer.                              */
+    QTime     timerTime;        /** duration of the timer alarm.                               */
+    bool      timerLoops;       /** true if the timer loops.                                   */
+    QDateTime clockDateTime;    /** date and timer of the clock alarm.                         */
+    int       sound;            /** sound used for the finished alarm notification.            */
+    bool      useTray;          /** true if the alarm uses the tray for notifications.         */
+    bool      useDesktopWidget; /** true if the alarm uses a desktop widget for notifications. */
+};
+
 class AlarmWidget
 : public QWidget
 , public Ui_AlarmWidget
@@ -48,54 +62,26 @@ class AlarmWidget
      */
     virtual ~AlarmWidget();
 
-    /** \brief Sets the name of the alarm.
-     * \param[in] name alarm's name.
+    /** \brief Configures the widget.
+     * \param[in] configuration AlarmConfiguration containing the details of the alarm.
      *
      */
-    void setName(const QString &name);
+    void setConfiguration(const AlarmConfiguration conf);
+
+    /** \brief Returns the configuration of the alarm.
+     *
+     */
+    const struct AlarmConfiguration alarmConfiguration() const;
 
     /** \brief Returns the name of the alarm.
      *
      */
     const QString name() const;
 
-    /** \brief Sets the color of the alarm.
-     * \param[in] colorName color name belonging to QColor::colorNames();
-     *
-     */
-    void setColor(const QString &colorName);
-
-    /** \brief Returns the name of the color of the alarm.
+    /** \brief Returns the color of the alarm.
      *
      */
     const QString color() const;
-
-    /** \brief Sets the alarm.
-     *
-     */
-    void setAlarm(Alarm *alarm);
-
-    /** \brief Hides the start/stop button, used only in clock alarms.
-     *
-     */
-    void hideStartButton();
-
-    /** \brief Enables/disables the tray icon indicator.
-     * \param[in] value true to enable and false otherwise.
-     *
-     */
-    void useTrayIcon(bool value);
-
-    /** \brief Enables/disables the desktop widget indicator.
-     * \param[in] value true to enable and false otherwise.
-     *
-     */
-    void useDesktopWidget(bool value);
-
-    /** \brief Starts the alarm.
-     *
-     */
-    void start();
 
   signals:
     void deleteAlarm();
@@ -128,24 +114,43 @@ class AlarmWidget
     void onDeletePressed();
 
   private:
+    /** \brief Starts the alarm and updates the UI.
+     *
+     */
+    void start();
+
+    /** \brief Stops the alarm and updates the UI.
+     *
+     */
+    void stop();
+
+    /** \brief Sets the color of the alarm.
+     * \param[in] colorName color name belonging to QColor::colorNames();
+     *
+     */
+    void setColor(const QString &colorName);
+
+    /** \brief Sets the alarm.
+     *
+     */
+    void setAlarm(Alarm *alarm);
+
     /** \brief Sets the duration of the alarm's timer.
      * \param[in] time alarm's timer duration.
      *
      */
     void setTime(const Alarm::AlarmTime& time);
 
-    /** \brief Modifies the color of the tray icon to match the color of the alarm.
+    /** \brief Modifies the color of the tray icon to match the color of the alarm and sets it.
      *
      */
-    void modifyIconColor();
+    void setTrayIcon(const QString &icon);
 
-    bool    m_started;    /** true if the alarm has been started and false otherwise. */
-    QString m_color;      /** color of the text of the widget (always black or white) */
-    QString m_alarmName;  /** name of the alarm.                                      */
-    QString m_alarmColor; /** name of the color of the alarm.                         */
-    Alarm  *m_alarm;      /** alarm class object.                                     */
-
-    QSystemTrayIcon *m_icon; /** system tray icon */
+    bool      m_started;                /** true if the alarm has been started and false otherwise.  */
+    QString   m_contrastColor;          /** color of the text of the widget (always black or white). */
+    Alarm    *m_alarm;                  /** alarm class object.                                      */
+    AlarmConfiguration m_configuration; /** alarm configuration.                                     */
+    QSystemTrayIcon   *m_icon;          /** system tray icon                                         */
 
 };
 

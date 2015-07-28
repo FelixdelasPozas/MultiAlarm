@@ -36,7 +36,17 @@
 const QString STATE    = "State";
 const QString GEOMETRY = "Geometry";
 const QString ALARMS   = "Alarms";
-const QString COLOR    = "Color";
+
+const QString ALARM_NAME           = "Name";
+const QString ALARM_MESSAGE        = "Message";
+const QString ALARM_COLOR          = "Color";
+const QString ALARM_IS_TIMER       = "Timer";
+const QString ALARM_TIMER_LOOP     = "Loops";
+const QString ALARM_TIMER_TIME     = "TimerTime";
+const QString ALARM_CLOCK_DATETIME = "ClockDateTime";
+const QString ALARM_SOUND          = "Sound";
+const QString ALARM_USE_TRAY       = "UseTray";
+const QString ALARM_USE_DESKTOP    = "UseDesktop";
 
 //-----------------------------------------------------------------
 MultiAlarm::MultiAlarm(QWidget *parent, Qt::WindowFlags flags)
@@ -81,17 +91,8 @@ void MultiAlarm::createNewAlarm()
 
   if(dialog.result() == QDialog::Accepted)
   {
-    auto alarmWidget = new AlarmWidget();
-
-    connect(alarmWidget, SIGNAL(deleteAlarm()),
-            this,        SLOT(onAlarmDeleted()));
-
-    m_alarms << alarmWidget;
-
-    configureWidget(alarmWidget, dialog);
-
-    centralWidget()->layout()->addWidget(alarmWidget);
-    setFixedHeight(size().height() + alarmWidget->size().height());
+    auto alarmWidget = createAlarmWidget(dialog);
+    addAlarmWidget(alarmWidget);
   }
 }
 
@@ -180,6 +181,26 @@ void MultiAlarm::restoreSettings()
     auto geometry = settings.value(GEOMETRY).toByteArray();
     restoreGeometry(geometry);
   }
+
+  settings.beginGroup(ALARMS);
+  for(auto alarmName : settings.childGroups())
+  {
+    auto alarmWidget = createAlarmWidget(settings, alarmName);
+    addAlarmWidget(alarmWidget);
+  }
+  settings.endGroup();
+}
+
+//-----------------------------------------------------------------
+void MultiAlarm::addAlarmWidget(AlarmWidget *widget)
+{
+  connect(widget, SIGNAL(deleteAlarm()),
+          this,   SLOT(onAlarmDeleted()));
+
+  m_alarms << widget;
+
+  centralWidget()->layout()->addWidget(widget);
+  setFixedHeight(size().height() + widget->size().height());
 }
 
 //-----------------------------------------------------------------
@@ -190,80 +211,39 @@ void MultiAlarm::saveSettings()
   settings.setValue(STATE, saveState());
   settings.setValue(GEOMETRY, saveGeometry());
 
-//  if(!m_alarms.empty())
-//  {
-//    settings.beginGroup(ALARMS);
-//
-//    for(auto alarm: m_alarms)
-//    {
-//      settings.beginGroup(alarm->name());
-//      settings.setValue(COLOR, alarm->color());
-//      settings.endGroup();
-//    }
-//
-//    settings.endGroup();
-//  }
-}
-
-//-----------------------------------------------------------------
-void MultiAlarm::configureWidget(AlarmWidget *widget, const NewAlarmDialog& dialog)
-{
-  Alarm *alarm = nullptr;
-
-  widget->setColor(dialog.color());
-  widget->setName(dialog.name());
-  widget->setToolTip(dialog.name() + QString(" Alarm"));
-
-  if(dialog.isTimer())
+  if(!m_alarms.empty())
   {
-    auto time = dialog.timerTime();
-    Alarm::AlarmTime alarmTime(0, time.hour(), time.minute(), time.second());
+    settings.beginGroup(ALARMS);
 
-    alarm = new Alarm(alarmTime, dialog.timerLoop());
-  }
-  else
-  {
-    widget->hideStartButton();
-    auto now = QDateTime::currentDateTime();
-    constexpr long int secondsInDay = 24*60*60;
-    int days = 0;
-    int hours = 0;
-    int minutes = 0;
-    int seconds = 0;
-
-    days = now.daysTo(dialog.clockDateTime()) - 1;
-    if(days > 1)
+    for(auto widget: m_alarms)
     {
-      now = now.addDays(days);
+      auto conf = widget->alarmConfiguration();
+
+      settings.beginGroup(widget->name());
+
+      settings.setValue(ALARM_MESSAGE, conf.message);
+      settings.setValue(ALARM_COLOR, widget->color());
+      settings.setValue(ALARM_IS_TIMER, conf.isTimer);
+
+      if(conf.isTimer)
+      {
+        settings.setValue(ALARM_TIMER_LOOP, conf.timerLoops);
+        settings.setValue(ALARM_TIMER_TIME, conf.timerTime);
+      }
+      else
+      {
+        settings.setValue(ALARM_CLOCK_DATETIME, conf.clockDateTime);
+      }
+
+      settings.setValue(ALARM_SOUND, conf.sound);
+      settings.setValue(ALARM_USE_TRAY, conf.useTray);
+      settings.setValue(ALARM_USE_DESKTOP, conf.useDesktopWidget);
+
+      settings.endGroup();
     }
 
-    if(now.secsTo(dialog.clockDateTime()) > secondsInDay)
-    {
-      ++days;
-      now = now.addSecs(secondsInDay);
-    }
-
-    auto remaining = now.secsTo(dialog.clockDateTime());
-    hours = remaining / 3600;
-    remaining -= hours * 3600;
-    minutes = remaining / 60;
-    remaining -= minutes * 60;
-    seconds = remaining;
-
-    Alarm::AlarmTime alarmTime(days, hours, minutes, seconds);
-
-    alarm = new Alarm(alarmTime, false);
+    settings.endGroup();
   }
-
-  widget->useTrayIcon(dialog.showInTray());
-  widget->useDesktopWidget(dialog.showInDesktop());
-  widget->setAlarm(alarm);
-
-  if(!dialog.isTimer())
-  {
-    alarm->start();
-  }
-
 }
 
 //-----------------------------------------------------------------
@@ -277,6 +257,66 @@ void MultiAlarm::onAlarmDeleted()
   m_alarms.removeOne(widget);
 
   delete widget;
+}
+
+//-----------------------------------------------------------------
+AlarmWidget* MultiAlarm::createAlarmWidget(const NewAlarmDialog& dialog)
+{
+  AlarmConfiguration conf;
+  conf.name    = dialog.name();
+  conf.message = dialog.message();
+  conf.color   = dialog.color();
+  conf.isTimer = dialog.isTimer();
+
+  if(conf.isTimer)
+  {
+    conf.timerTime  = dialog.timerTime();
+    conf.timerLoops = dialog.timerLoop();
+  }
+  else
+  {
+    conf.clockDateTime = dialog.clockDateTime();
+  }
+
+  conf.sound            = dialog.sound();
+  conf.useTray          = dialog.showInTray();
+  conf.useDesktopWidget = dialog.showInDesktop();
+
+  auto widget = new AlarmWidget(this);
+  widget->setConfiguration(conf);
+
+  return widget;
+}
+
+//-----------------------------------------------------------------
+AlarmWidget* MultiAlarm::createAlarmWidget(QSettings &settings, const QString &name)
+{
+  settings.beginGroup(name);
+
+  AlarmConfiguration conf;
+  conf.name    = name;
+  conf.message = settings.value(ALARM_MESSAGE, QString()).toString();
+  conf.color   = settings.value(ALARM_COLOR, QString("white")).toString();
+  conf.isTimer = settings.value(ALARM_IS_TIMER, false).toBool();
+
+  if(conf.isTimer)
+  {
+    conf.timerTime  = settings.value(ALARM_TIMER_TIME, QTime(0,1,0)).toTime();
+    conf.timerLoops = settings.value(ALARM_TIMER_LOOP, false).toBool();
+  }
+  else
+  {
+    conf.clockDateTime = settings.value(ALARM_CLOCK_DATETIME, QDateTime()).toDateTime();
+  }
+
+  conf.sound            = settings.value(ALARM_SOUND, 0).toInt();
+  conf.useTray          = settings.value(ALARM_USE_TRAY, false).toBool();
+  conf.useDesktopWidget = settings.value(ALARM_USE_DESKTOP, false).toBool();
+
+  auto widget = new AlarmWidget(this);
+  widget->setConfiguration(conf);
+
+  return widget;
 }
 
 //-----------------------------------------------------------------
