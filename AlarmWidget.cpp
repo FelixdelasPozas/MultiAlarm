@@ -99,26 +99,6 @@ const QString AlarmWidget::color() const
   return m_configuration.color;
 }
 
-////-----------------------------------------------------------------
-//void AlarmWidget::useTrayIcon(bool value)
-//{
-//  if(value && QSystemTrayIcon::isSystemTrayAvailable() && !m_icon)
-//  {
-//    m_icon = new QSystemTrayIcon(this);
-//
-//    // TODO: icon menu
-//
-//    setTrayIcon(":/MultiAlarm/0.ico");
-//  }
-//  else
-//  {
-//    if (m_icon)
-//    {
-//      delete m_icon;
-//    }
-//  }
-//}
-
 //-----------------------------------------------------------------
 void AlarmWidget::setTime(const Alarm::AlarmTime& time)
 {
@@ -291,6 +271,11 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration conf)
     // TODO: icon menu
 
     setTrayIcon(":/MultiAlarm/0.ico");
+  }
+
+  if(!conf.isTimer)
+  {
+    start();
   }
 }
 

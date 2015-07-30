@@ -28,6 +28,7 @@
 #include <QSettings>
 #include <QAction>
 #include <QMenu>
+#include <QMessageBox>
 #include <QDebug>
 
 // C++
@@ -182,13 +183,38 @@ void MultiAlarm::restoreSettings()
     restoreGeometry(geometry);
   }
 
+  QStringList expired;
+
   settings.beginGroup(ALARMS);
   for(auto alarmName : settings.childGroups())
   {
     auto alarmWidget = createAlarmWidget(settings, alarmName);
-    addAlarmWidget(alarmWidget);
+
+    if(alarmWidget)
+    {
+      addAlarmWidget(alarmWidget);
+    }
+    else
+    {
+      expired << alarmName;
+    }
   }
   settings.endGroup();
+
+  if(!expired.empty())
+  {
+    auto message = QString("The following clock alarms have expired:\n");
+    for(auto alarm: expired)
+    {
+      message += alarm + QString("\n");
+    }
+
+    QMessageBox mb;
+    mb.setWindowTitle("Expired Clock Alarms");
+    mb.setWindowIcon(QIcon(":/MultiAlarm/application.ico"));
+    mb.setText(message);
+    mb.exec();
+  }
 }
 
 //-----------------------------------------------------------------
@@ -210,6 +236,13 @@ void MultiAlarm::saveSettings()
 
   settings.setValue(STATE, saveState());
   settings.setValue(GEOMETRY, saveGeometry());
+
+  settings.beginGroup(ALARMS);
+  for(auto alarm: settings.childGroups())
+  {
+    settings.remove(alarm);
+  }
+  settings.endGroup();
 
   if(!m_alarms.empty())
   {
@@ -312,6 +345,13 @@ AlarmWidget* MultiAlarm::createAlarmWidget(QSettings &settings, const QString &n
   conf.sound            = settings.value(ALARM_SOUND, 0).toInt();
   conf.useTray          = settings.value(ALARM_USE_TRAY, false).toBool();
   conf.useDesktopWidget = settings.value(ALARM_USE_DESKTOP, false).toBool();
+
+  settings.endGroup();
+
+  if(!conf.isTimer && conf.clockDateTime < QDateTime::currentDateTime())
+  {
+    return nullptr;
+  }
 
   auto widget = new AlarmWidget(this);
   widget->setConfiguration(conf);
