@@ -167,6 +167,18 @@ void MultiAlarm::onQuitActionActivated()
 }
 
 //-----------------------------------------------------------------
+void MultiAlarm::addAlarmWidget(AlarmWidget *widget)
+{
+  connect(widget, SIGNAL(deleteAlarm()),
+          this,   SLOT(onAlarmDeleted()));
+
+  m_alarms << widget;
+
+  centralWidget()->layout()->addWidget(widget);
+  setFixedHeight(size().height() + widget->size().height());
+}
+
+//-----------------------------------------------------------------
 void MultiAlarm::restoreSettings()
 {
   QSettings settings("MultiAlarm.ini", QSettings::IniFormat);
@@ -203,7 +215,7 @@ void MultiAlarm::restoreSettings()
 
   if(!expired.empty())
   {
-    auto message = QString("The following clock alarms have expired:\n");
+    auto message = QString("The following clock alarms will be deleted because they have expired:\n");
     for(auto alarm: expired)
     {
       message += alarm + QString("\n");
@@ -218,18 +230,6 @@ void MultiAlarm::restoreSettings()
 }
 
 //-----------------------------------------------------------------
-void MultiAlarm::addAlarmWidget(AlarmWidget *widget)
-{
-  connect(widget, SIGNAL(deleteAlarm()),
-          this,   SLOT(onAlarmDeleted()));
-
-  m_alarms << widget;
-
-  centralWidget()->layout()->addWidget(widget);
-  setFixedHeight(size().height() + widget->size().height());
-}
-
-//-----------------------------------------------------------------
 void MultiAlarm::saveSettings()
 {
   QSettings settings("MultiAlarm.ini", QSettings::IniFormat);
@@ -238,16 +238,14 @@ void MultiAlarm::saveSettings()
   settings.setValue(GEOMETRY, saveGeometry());
 
   settings.beginGroup(ALARMS);
+
   for(auto alarm: settings.childGroups())
   {
     settings.remove(alarm);
   }
-  settings.endGroup();
 
   if(!m_alarms.empty())
   {
-    settings.beginGroup(ALARMS);
-
     for(auto widget: m_alarms)
     {
       auto conf = widget->alarmConfiguration();
@@ -274,9 +272,9 @@ void MultiAlarm::saveSettings()
 
       settings.endGroup();
     }
-
-    settings.endGroup();
   }
+
+  settings.endGroup();
 }
 
 //-----------------------------------------------------------------

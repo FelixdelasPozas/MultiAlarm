@@ -56,7 +56,7 @@ class MultiAlarm
      */
     virtual ~MultiAlarm();
 
-  public slots:
+  private slots:
     /** \brief Launches the alarm creation dialog.
      *
      */
@@ -83,7 +83,6 @@ class MultiAlarm
      */
     void onQuitActionActivated();
 
-  private slots:
     /** \brief Deletes the alarm and widget.
      *
      */
@@ -132,10 +131,11 @@ class MultiAlarm
     void addAlarmWidget(AlarmWidget *widget);
 
   private:
-    QSystemTrayIcon *m_icon;
-    QAction *m_restoreMenuAction, *m_quitMenuAction;
+    QSystemTrayIcon *m_icon;              /** application icon when minimized.      */
+    QAction         *m_restoreMenuAction; /** restore application tray icon action. */
+    QAction         *m_quitMenuAction;    /** quit application tray icon action.    */
 
-    QList<AlarmWidget *> m_alarms;
+    QList<AlarmWidget *> m_alarms;        /** alarms widgets.                       */
 };
 
 #endif // MULTIALARM_H_

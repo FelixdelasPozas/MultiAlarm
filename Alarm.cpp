@@ -109,9 +109,6 @@ void Alarm::second()
     if (!m_loop)
     {
       m_timer.stop();
-
-      disconnect(&m_timer, SIGNAL(timeout()),
-                 this,     SLOT(second()));
     }
     else
     {

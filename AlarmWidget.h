@@ -29,6 +29,7 @@
 #include <QSystemTrayIcon>
 
 class QTime;
+class QSoundEffect;
 
 struct AlarmConfiguration
 {
@@ -73,12 +74,12 @@ class AlarmWidget
      */
     const struct AlarmConfiguration alarmConfiguration() const;
 
-    /** \brief Returns the name of the alarm.
+    /** \brief Returns the name of the alarm, needed to avoid duplicated names.
      *
      */
     const QString name() const;
 
-    /** \brief Returns the color of the alarm.
+    /** \brief Returns the color of the alarm, needed to avoid duplicated colors.
      *
      */
     const QString color() const;
@@ -112,6 +113,11 @@ class AlarmWidget
      *
      */
     void onDeletePressed();
+
+    /** \brief Deletes the dialog and stops the sound if needed.
+     *
+     */
+    void onDialogFinished();
 
   private:
     /** \brief Starts the alarm and updates the UI.
@@ -150,8 +156,8 @@ class AlarmWidget
     QString   m_contrastColor;          /** color of the text of the widget (always black or white). */
     Alarm    *m_alarm;                  /** alarm class object.                                      */
     AlarmConfiguration m_configuration; /** alarm configuration.                                     */
-    QSystemTrayIcon   *m_icon;          /** system tray icon                                         */
-
+    QSystemTrayIcon   *m_icon;          /** system tray icon.                                        */
+    QSoundEffect      *m_sound;         /** alarm sound.                                             */
 };
 
 #endif // ALARMWIDGET_H_

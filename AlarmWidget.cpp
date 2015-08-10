@@ -27,16 +27,24 @@
 #include <QBitmap>
 #include <QPixmap>
 #include <QPainter>
+#include <QMessageBox>
+#include <QSoundEffect>
+#include <QTemporaryFile>
 
 const QString COLOR_QSTRING = "<font color='%1'>%2</font>";
 
+const QStringList soundNames = { ":/MultiAlarm/sounds/buzz.wav",
+                                 ":/MultiAlarm/sounds/smokealarm.wav",
+                                 ":/MultiAlarm/sounds/deskbell.wav" };
+
 //-----------------------------------------------------------------
 AlarmWidget::AlarmWidget(QWidget * parent, Qt::WindowFlags flags)
-: QWidget           {parent, flags}
-, m_started         {false}
-, m_contrastColor   {"black"}
-, m_alarm           {nullptr}
-, m_icon            {nullptr}
+: QWidget        {parent, flags}
+, m_started      {false}
+, m_contrastColor{"black"}
+, m_alarm        {nullptr}
+, m_icon         {nullptr}
+, m_sound        {nullptr}
 {
   setupUi(this);
 
@@ -56,6 +64,11 @@ AlarmWidget::~AlarmWidget()
   {
     delete m_icon;
   }
+
+//  if(m_desktopWidget)
+//  {
+//    delete m_desktopWidget;
+//  }
 }
 
 //-----------------------------------------------------------------
@@ -68,6 +81,11 @@ void AlarmWidget::start()
     setTrayIcon(":/MultiAlarm/0.ico");
     m_icon->show();
   }
+
+//  if(m_desktopWidget)
+//  {
+//    m_desktopWidget->show();
+//  }
 
   m_alarm->start();
 }
@@ -83,6 +101,11 @@ void AlarmWidget::stop()
   {
     m_icon->hide();
   }
+
+//  if(m_desktopWidget)
+//  {
+//    m_desktopWidget->hide();
+//  }
 
   setTime(m_alarm->remainingTime());
 }
@@ -105,21 +128,16 @@ void AlarmWidget::setTime(const Alarm::AlarmTime& time)
   QString timeString;
   if(time.days != 0)
   {
-    timeString += QString("%1 Day").arg(time.days);
-    if(time.days > 1)
-    {
-      timeString += "s";
-    }
+    timeString += QString("%1 Day%2 ").arg(time.days).arg((time.days > 1 ? "s": ""));
   }
-  timeString += " ";
 
-  for(auto part: {time.hours, time.minutes, time.seconds})
+  for(auto unit: {time.hours, time.minutes, time.seconds})
   {
-    if(part < 10)
+    if(unit < 10)
     {
       timeString += "0";
     }
-    timeString += QString("%1:").arg(part);
+    timeString += QString("%1:").arg(unit);
   }
   timeString.remove(timeString.length()-1, 1);
 
@@ -203,7 +221,46 @@ void AlarmWidget::onAlarmInterval(int value)
 //-----------------------------------------------------------------
 void AlarmWidget::onAlarmTimeout()
 {
-  // TODO: show timeout dialog.
+  if(m_configuration.isTimer && !m_configuration.timerLoops)
+  {
+    onPlayPressed();
+  }
+
+  auto dialog = new QMessageBox(this);
+  dialog->setWindowIcon(QIcon(":MultiAlarm/2.ico"));
+  dialog->setWindowTitle(m_configuration.name);
+  dialog->setText(m_configuration.message);
+  dialog->setStandardButtons(QMessageBox::Ok);
+  dialog->setIcon(QMessageBox::Information);
+
+  connect(dialog, SIGNAL(finished(int)),
+          this,   SLOT(onDialogFinished()));
+
+  Q_ASSERT(m_sound == nullptr);
+
+  m_sound = new QSoundEffect(this);
+  auto file = QTemporaryFile::createLocalFile(soundNames[m_configuration.sound]);
+  m_sound->setSource(QUrl::fromLocalFile(file->fileName()));
+  m_sound->setLoopCount(QSoundEffect::Infinite);
+
+  m_sound->play();
+  dialog->open();
+}
+
+//-----------------------------------------------------------------
+void AlarmWidget::onDialogFinished()
+{
+  m_sound->stop();
+  delete m_sound;
+  m_sound = nullptr;
+
+  auto dialog = qobject_cast<QMessageBox *>(sender());
+  dialog->deleteLater();
+
+  if(!m_configuration.isTimer)
+  {
+    emit deleteAlarm();
+  }
 }
 
 //-----------------------------------------------------------------
@@ -267,6 +324,7 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration conf)
   if (conf.useTray && QSystemTrayIcon::isSystemTrayAvailable() && !m_icon)
   {
     m_icon = new QSystemTrayIcon(this);
+    m_icon->setToolTip(m_configuration.name);
 
     // TODO: icon menu
 

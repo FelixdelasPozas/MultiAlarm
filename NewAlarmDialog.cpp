@@ -32,6 +32,10 @@
 
 const QStringList sounds{ "Buzz", "Smoke alarm", "Desk bell"};
 
+const QStringList soundNames = { ":/MultiAlarm/sounds/buzz.wav",
+                                 ":/MultiAlarm/sounds/smokealarm.wav",
+                                 ":/MultiAlarm/sounds/deskbell.wav" };
+
 //-----------------------------------------------------------------
 NewAlarmDialog::NewAlarmDialog(QStringList invalidNames, QStringList invalidColors, QWidget * parent, Qt::WindowFlags flags)
 : QDialog       {parent}
@@ -303,22 +307,14 @@ void NewAlarmDialog::loadSounds()
 {
   // NOTE: Load sound files. QSound can't play a file from the qt resource file
   // so we will dump them first to the temporal directory, then load the resources.
-  auto buzz = QTemporaryFile::createLocalFile(":/MultiAlarm/sounds/buzz.wav");
-  m_sounds.insert(0, new QSoundEffect(this));
-  m_sounds[0]->setSource(QUrl::fromLocalFile(buzz->fileName()));
-
-  auto smokeAlarm = QTemporaryFile::createLocalFile(":/MultiAlarm/sounds/smokealarm.wav");
-  m_sounds.insert(1, new QSoundEffect(this));
-  m_sounds[1]->setSource(QUrl::fromLocalFile(smokeAlarm->fileName()));
-
-  auto deskBell = QTemporaryFile::createLocalFile(":/MultiAlarm/sounds/deskbell.wav");
-  m_sounds.insert(2, new QSoundEffect(this));
-  m_sounds[2]->setSource(QUrl::fromLocalFile(deskBell->fileName()));
-
-  m_temporaryFiles << buzz << smokeAlarm << deskBell;
-
   for(auto i: {0,1,2})
   {
+    auto file = QTemporaryFile::createLocalFile(soundNames[i]);
+    m_sounds.insert(i, new QSoundEffect(this));
+    m_sounds[i]->setSource(QUrl::fromLocalFile(file->fileName()));
+
+    m_temporaryFiles << file;
+
     connect(m_sounds[i], SIGNAL(playingChanged()),
             this,        SLOT(setPlayButtonIcon()));
   }
