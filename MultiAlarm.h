@@ -90,6 +90,7 @@ class MultiAlarm
 
   private:
     virtual void changeEvent(QEvent *e);
+    virtual void closeEvent(QCloseEvent *e);
 
     /** \brief Creates a widget using the data from the dialog.
      * \param[in] settings settings object containinf the alarm properties.

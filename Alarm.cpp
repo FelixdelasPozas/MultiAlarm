@@ -21,6 +21,29 @@
 #include "Alarm.h"
 
 //-----------------------------------------------------------------
+QString Alarm::AlarmTime::text() const
+{
+  QString text;
+
+  if(days != 0)
+  {
+    text += QString("%1 Day%2 ").arg(days).arg((days > 1 ? "s": ""));
+  }
+
+  for(auto unit: {hours, minutes, seconds})
+  {
+    if(unit < 10)
+    {
+      text += "0";
+    }
+    text += QString("%1:").arg(unit);
+  }
+  text.remove(text.length()-1, 1);
+
+  return text;
+}
+
+//-----------------------------------------------------------------
 Alarm::Alarm(AlarmTime time, bool loop)
 : m_time         {time}
 , m_remainingTime{time}
@@ -149,6 +172,18 @@ void Alarm::second()
   {
     emit progress(m_progress);
   }
+}
+
+//-----------------------------------------------------------------
+QString Alarm::timeText() const
+{
+  return m_time.text();
+}
+
+//-----------------------------------------------------------------
+QString Alarm::remainingTimeText() const
+{
+  return m_remainingTime.text();
 }
 
 //-----------------------------------------------------------------

@@ -30,6 +30,7 @@
 #include <QMessageBox>
 #include <QSoundEffect>
 #include <QTemporaryFile>
+#include <QMenu>
 
 const QString COLOR_QSTRING = "<font color='%1'>%2</font>";
 
@@ -75,6 +76,7 @@ AlarmWidget::~AlarmWidget()
 void AlarmWidget::start()
 {
   m_start->setIcon(QIcon(":/MultiAlarm/stop.svg"));
+  m_start->setToolTip(tr("Stop alarm"));
 
   if(m_icon)
   {
@@ -96,6 +98,7 @@ void AlarmWidget::stop()
   m_alarm->stop();
 
   m_start->setIcon(QIcon(":/MultiAlarm/play.svg"));
+  m_start->setToolTip(tr("Start alarm"));
 
   if(m_icon)
   {
@@ -125,21 +128,7 @@ const QString AlarmWidget::color() const
 //-----------------------------------------------------------------
 void AlarmWidget::setTime(const Alarm::AlarmTime& time)
 {
-  QString timeString;
-  if(time.days != 0)
-  {
-    timeString += QString("%1 Day%2 ").arg(time.days).arg((time.days > 1 ? "s": ""));
-  }
-
-  for(auto unit: {time.hours, time.minutes, time.seconds})
-  {
-    if(unit < 10)
-    {
-      timeString += "0";
-    }
-    timeString += QString("%1:").arg(unit);
-  }
-  timeString.remove(timeString.length()-1, 1);
+  auto timeString = time.text();
 
   m_time->setText(COLOR_QSTRING.arg(m_contrastColor).arg(timeString));
 }
@@ -206,6 +195,11 @@ void AlarmWidget::onAlarmTic()
 {
   setTime(m_alarm->remainingTime());
 
+  if(m_icon)
+  {
+    m_icon->setToolTip(QString("%1\nRemaining time: %2\nCompleted: %3%").arg(m_configuration.name).arg(m_alarm->remainingTimeText()).arg(m_alarm->progress()));
+  }
+
   // TODO: update desktop widget.
 }
 
@@ -270,7 +264,7 @@ void AlarmWidget::onDeletePressed()
 }
 
 //-----------------------------------------------------------------
-void AlarmWidget::setConfiguration(const AlarmConfiguration conf)
+void AlarmWidget::setConfiguration(const AlarmConfiguration &conf)
 {
   m_configuration = conf;
 
@@ -290,7 +284,6 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration conf)
     m_start->hide();
 
     auto now = QDateTime::currentDateTime();
-    constexpr long int secondsInDay = 24*60*60;
     int days = 0;
     int hours = 0;
     int minutes = 0;
@@ -299,6 +292,7 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration conf)
     days = now.daysTo(conf.clockDateTime);
     if(days > 1)
     {
+      constexpr long int secondsInDay = 24*60*60;
       now = now.addDays(days - 1);
 
       if(now.secsTo(conf.clockDateTime) > secondsInDay)
@@ -324,9 +318,17 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration conf)
   if (conf.useTray && QSystemTrayIcon::isSystemTrayAvailable() && !m_icon)
   {
     m_icon = new QSystemTrayIcon(this);
-    m_icon->setToolTip(m_configuration.name);
+    m_icon->setToolTip(QString("%1\nRemaining time: %2").arg(m_configuration.name).arg(alarm->remainingTimeText()));
 
-    // TODO: icon menu
+    auto menu = new QMenu();
+    auto stopAlarm = new QAction(QIcon(":/MultiAlarm/stop.svg"), tr("Stop alarm"), this);
+
+    menu->addAction(stopAlarm);
+
+    connect(stopAlarm, SIGNAL(triggered()),
+            this,    SLOT(onPlayPressed()));
+
+    m_icon->setContextMenu(menu);
 
     setTrayIcon(":/MultiAlarm/0.ico");
   }

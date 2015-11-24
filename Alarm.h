@@ -41,6 +41,7 @@ class Alarm
       int seconds;
 
       explicit AlarmTime(int d, int h, int m, int s): days{d}, hours{h}, minutes{m}, seconds{s} {};
+      QString text() const;
     };
 
     /** \brief Alarm class constructor.
@@ -92,6 +93,16 @@ class Alarm
      */
     const AlarmTime time() const;
 
+    /** \brief Returns the alarm time as a QString.
+     *
+     */
+    QString timeText() const;
+
+    /** \brief Returns the remaining time as a QString.
+     *
+     */
+    QString remainingTimeText() const;
+
   signals:
     /** \brief Signal launched every second.
      *
@@ -99,7 +110,7 @@ class Alarm
     void tic();
 
     /** \brief Signal launched every completed interval. (1/8 th of the duration of the alarm).
-     * \param[out] value completed intervals.
+     * \param[out] value completed intervals in range [1,8].
      *
      */
     void interval(int value);
@@ -110,7 +121,7 @@ class Alarm
     void timeout();
 
     /** \brief Signals the progress of the alarm in a range [0-100]
-     * \param[out] value progress value.
+     * \param[out] value progress value in range [0-100].
      *
      */
     void progress(int value);

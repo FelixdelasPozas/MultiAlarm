@@ -32,11 +32,20 @@ class AboutDialog
 {
     Q_OBJECT
   public:
+    /** \brief AboutDialog class constructor.
+     * \param[in] parent pointer to the widget parent of this one.
+     * \param[in] flags window flags.
+     *
+     */
     AboutDialog(QWidget *parent = nullptr, Qt::WindowFlags flags = 0);
+
+    /** \brief AboutDialog class virtual destructor.
+     *
+     */
     virtual ~AboutDialog();
 
   private:
-    static const QString VERSION;
+    static const QString VERSION; /** application version string. */
 };
 
 #endif // ABOUTDIALOG_H_

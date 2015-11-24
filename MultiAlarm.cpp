@@ -55,6 +55,7 @@ MultiAlarm::MultiAlarm(QWidget *parent, Qt::WindowFlags flags)
 , m_icon     {new QSystemTrayIcon(QIcon(":/MultiAlarm/application.ico"), this)}
 {
   setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
+
   setupUi(this);
 
   statusbar->setVisible(false);
@@ -118,6 +119,13 @@ void MultiAlarm::changeEvent(QEvent* e)
       e->ignore();
     }
   }
+}
+
+//-----------------------------------------------------------------
+void MultiAlarm::closeEvent(QCloseEvent *e)
+{
+  // NOTE: need to force the application to exit because QApplication::QuitOnLastWindowClosed is false.
+  QCoreApplication::quit();
 }
 
 //-----------------------------------------------------------------

@@ -67,7 +67,7 @@ class AlarmWidget
      * \param[in] configuration AlarmConfiguration containing the details of the alarm.
      *
      */
-    void setConfiguration(const AlarmConfiguration conf);
+    void setConfiguration(const AlarmConfiguration &conf);
 
     /** \brief Returns the configuration of the alarm.
      *

@@ -41,7 +41,9 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 int main(int argc, char *argv[])
 {
   qInstallMessageHandler(myMessageOutput);
+
 	QApplication app(argc, argv);
+	app.setQuitOnLastWindowClosed(false);
 
   // allow only one instance
   QSharedMemory guard;
