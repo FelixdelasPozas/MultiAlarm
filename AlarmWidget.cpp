@@ -52,8 +52,13 @@ AlarmWidget::AlarmWidget(QWidget * parent, Qt::WindowFlags flags)
   connect(m_start, SIGNAL(clicked(bool)),
           this,    SLOT(onPlayPressed()));
 
+  connect(m_stop,  SIGNAL(clicked(bool)),
+          this,    SLOT(onStopPressed()));
+
   connect(m_delete, SIGNAL(clicked(bool)),
           this,     SLOT(onDeletePressed()));
+
+  m_stop->setEnabled(false);
 }
 
 //-----------------------------------------------------------------
@@ -75,8 +80,24 @@ AlarmWidget::~AlarmWidget()
 //-----------------------------------------------------------------
 void AlarmWidget::start()
 {
-  m_start->setIcon(QIcon(":/MultiAlarm/stop.svg"));
-  m_start->setToolTip(tr("Stop alarm"));
+  if(m_configuration.isTimer)
+  {
+    m_start->setIcon(QIcon(":/MultiAlarm/pause.svg"));
+    m_start->setToolTip(tr("Pause alarm"));
+
+    disconnect(m_start, SIGNAL(clicked(bool)),
+               this,    SLOT(onPlayPressed()));
+
+    connect(m_start, SIGNAL(clicked(bool)),
+            this,    SLOT(onPausePressed()));
+
+    m_stop->setEnabled(true);
+  }
+  else
+  {
+    m_start->hide();
+    m_stop->hide();
+  }
 
   if(m_icon)
   {
@@ -95,10 +116,28 @@ void AlarmWidget::start()
 //-----------------------------------------------------------------
 void AlarmWidget::stop()
 {
+  if(!m_alarm->isRunning())
+  {
+    onPausePressed();
+  }
   m_alarm->stop();
 
-  m_start->setIcon(QIcon(":/MultiAlarm/play.svg"));
-  m_start->setToolTip(tr("Start alarm"));
+  m_stop->setEnabled(false);
+
+  m_delete->setEnabled(true);
+  m_delete->setIcon(QIcon(":/MultiAlarm/delete.ico"));
+
+  if(m_configuration.isTimer)
+  {
+    m_start->setIcon(QIcon(":/MultiAlarm/play.svg"));
+    m_start->setToolTip(tr("Start alarm"));
+
+    disconnect(m_start, SIGNAL(clicked(bool)),
+               this,    SLOT(onPausePressed()));
+
+    connect(m_start, SIGNAL(clicked(bool)),
+            this,    SLOT(onPlayPressed()));
+  }
 
   if(m_icon)
   {
@@ -157,20 +196,57 @@ void AlarmWidget::setColor(const QString& colorName)
 //-----------------------------------------------------------------
 void AlarmWidget::onPlayPressed()
 {
-  m_started = !m_started;
+  if(m_started) return;
 
-  m_delete->setEnabled(!m_started);
+  m_started = true;
 
-  if(m_started)
+  start();
+}
+
+//-----------------------------------------------------------------
+void AlarmWidget::onPausePressed()
+{
+  if(m_icon)
   {
-    m_delete->setIcon(QIcon(":/MultiAlarm/delete-disabled.ico"));
-    start();
+    auto action = m_icon->contextMenu()->actions().first();
+
+    if(m_alarm->isRunning())
+    {
+      action->setIcon(QIcon(":/MultiAlarm/play.svg"));
+      action->setText(tr("Unpause alarm"));
+    }
+    else
+    {
+      action->setIcon(QIcon(":/MultiAlarm/pause.svg"));
+      action->setText(tr("pause alarm"));
+    }
   }
-  else
+
+  if(m_configuration.isTimer)
   {
-    m_delete->setIcon(QIcon(":/MultiAlarm/delete.ico"));
-    stop();
+    if(m_alarm->isRunning())
+    {
+      m_start->setIcon(QIcon(":/MultiAlarm/play.svg"));
+      m_start->setToolTip(tr("Unpause alarm"));
+    }
+    else
+    {
+      m_start->setIcon(QIcon(":/MultiAlarm/pause.svg"));
+      m_start->setToolTip(tr("Pause alarm"));
+    }
   }
+
+  m_alarm->pause(m_alarm->isRunning());
+}
+
+//-----------------------------------------------------------------
+void AlarmWidget::onStopPressed()
+{
+  if(!m_started) return;
+
+  m_started = false;
+
+  stop();
 }
 
 //-----------------------------------------------------------------
@@ -217,7 +293,7 @@ void AlarmWidget::onAlarmTimeout()
 {
   if(m_configuration.isTimer && !m_configuration.timerLoops)
   {
-    onPlayPressed();
+    stop();
   }
 
   auto dialog = new QMessageBox(this);
@@ -320,15 +396,26 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration &conf)
     m_icon = new QSystemTrayIcon(this);
     m_icon->setToolTip(QString("%1\nRemaining time: %2").arg(m_configuration.name).arg(alarm->remainingTimeText()));
 
-    auto menu = new QMenu();
-    auto stopAlarm = new QAction(QIcon(":/MultiAlarm/stop.svg"), tr("Stop alarm"), this);
+    if(conf.isTimer)
+    {
+      auto menu = new QMenu();
 
-    menu->addAction(stopAlarm);
+      auto pauseAlarm = new QAction(QIcon(":/MultiAlarm/pause.svg"), tr("Pause alarm"), this);
+      menu->addAction(pauseAlarm);
 
-    connect(stopAlarm, SIGNAL(triggered()),
-            this,    SLOT(onPlayPressed()));
+      connect(pauseAlarm, SIGNAL(triggered()),
+              this,    SLOT(onPausePressed()));
 
-    m_icon->setContextMenu(menu);
+      auto stopAlarm = new QAction(QIcon(":/MultiAlarm/stop.svg"), tr("Stop alarm"), this);
+      menu->addAction(stopAlarm);
+
+      connect(stopAlarm, SIGNAL(triggered()),
+              this,    SLOT(onStopPressed()));
+
+      // TODO: delete action.
+
+      m_icon->setContextMenu(menu);
+    }
 
     setTrayIcon(":/MultiAlarm/0.ico");
   }

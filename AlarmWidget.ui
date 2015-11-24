@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>316</width>
+    <width>466</width>
     <height>55</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>316</width>
+    <width>315</width>
     <height>55</height>
    </size>
   </property>
@@ -40,6 +40,18 @@
    </property>
    <item>
     <widget class="QFrame" name="m_frame">
+     <property name="minimumSize">
+      <size>
+       <width>466</width>
+       <height>55</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>466</width>
+       <height>55</height>
+      </size>
+     </property>
      <property name="frameShape">
       <enum>QFrame::Box</enum>
      </property>
@@ -52,7 +64,7 @@
      <property name="midLineWidth">
       <number>0</number>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,1,0">
+     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,1,0,0">
       <property name="spacing">
        <number>6</number>
       </property>
@@ -178,6 +190,35 @@
         </property>
         <property name="flat">
          <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="m_stop">
+        <property name="minimumSize">
+         <size>
+          <width>44</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>44</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="rsc/resources.qrc">
+          <normaloff>:/MultiAlarm/stop.svg</normaloff>:/MultiAlarm/stop.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
         </property>
        </widget>
       </item>

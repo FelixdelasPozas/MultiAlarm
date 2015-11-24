@@ -73,6 +73,11 @@ class Alarm
      */
     void pause(bool paused);
 
+    /** \brief Returns true if the timer is active.
+     *
+     */
+    bool isRunning() const;
+
     /** \brief Returns the progress of the alarm in the range [0-100].
      *
      */

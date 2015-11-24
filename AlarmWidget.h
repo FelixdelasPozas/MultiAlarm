@@ -109,6 +109,16 @@ class AlarmWidget
      */
     void onPlayPressed();
 
+    /** \brief Modifies the UI and pauses the alarm.
+     *
+     */
+    void onPausePressed();
+
+    /** \brief Modifies the UI and stops the alarm.
+     *
+     */
+    void onStopPressed();
+
     /** \brief Signals the deletion of the alarm.
      *
      */

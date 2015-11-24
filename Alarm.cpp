@@ -94,6 +94,12 @@ void Alarm::pause(bool paused)
 }
 
 //-----------------------------------------------------------------
+bool Alarm::isRunning() const
+{
+  return m_timer.isActive();
+}
+
+//-----------------------------------------------------------------
 unsigned int Alarm::progress() const
 {
   return m_progress;
