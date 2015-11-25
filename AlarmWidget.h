@@ -30,6 +30,7 @@
 
 class QTime;
 class QSoundEffect;
+class DesktopWidget;
 
 struct AlarmConfiguration
 {
@@ -167,6 +168,7 @@ class AlarmWidget
     Alarm    *m_alarm;                  /** alarm class object.                                      */
     AlarmConfiguration m_configuration; /** alarm configuration.                                     */
     QSystemTrayIcon   *m_icon;          /** system tray icon.                                        */
+    DesktopWidget     *m_widget;        /** desktop widget.                                          */
     QSoundEffect      *m_sound;         /** alarm sound.                                             */
 };
 

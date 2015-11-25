@@ -73,6 +73,7 @@ set (CORE_SOURCES
   AboutDialog.cpp
   AlarmWidget.cpp
   Alarm.cpp
+  DesktopWidget.cpp
 )
 
 set(CORE_EXTERNAL_LIBS
