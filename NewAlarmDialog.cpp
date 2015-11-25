@@ -303,6 +303,18 @@ bool NewAlarmDialog::showInDesktop() const
 }
 
 //-----------------------------------------------------------------
+void NewAlarmDialog::setDesktopWidgetPosition(const QPoint &topLeftCorner)
+{
+  m_desktopWidgetPosition = topLeftCorner;
+}
+
+//-----------------------------------------------------------------
+const QPoint NewAlarmDialog::desktopWidgetPosition() const
+{
+  return m_desktopWidgetPosition;
+}
+
+//-----------------------------------------------------------------
 void NewAlarmDialog::loadSounds()
 {
   // NOTE: Load sound files. QSound can't play a file from the qt resource file

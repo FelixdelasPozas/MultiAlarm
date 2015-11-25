@@ -154,6 +154,17 @@ class NewAlarmDialog
      */
     bool showInDesktop() const;
 
+    /** \brief Sets the position of the desktop widget.
+     * \param[in] topLeftCorner top-left corner point.
+     *
+     */
+    void setDesktopWidgetPosition(const QPoint &topLeftCorner);
+
+    /** \brief Returns the position of the desktop widget.
+     *
+     */
+    const QPoint desktopWidgetPosition() const;
+
   private slots:
     /** \brief Updates UI elements when the timer radio button changes state.
      * \param[in] value true if it's checked and false otherwise.
@@ -197,6 +208,7 @@ class NewAlarmDialog
     QList<QTemporaryFile *> m_temporaryFiles;
     QStringList             m_invalidNames;
     QStringList             m_colors;
+    QPoint                  m_desktopWidgetPosition;
 };
 
 #endif // NEWALARMDIALOG_H_

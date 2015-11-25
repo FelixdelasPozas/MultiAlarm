@@ -44,6 +44,7 @@ struct AlarmConfiguration
     int       sound;            /** sound used for the finished alarm notification.            */
     bool      useTray;          /** true if the alarm uses the tray for notifications.         */
     bool      useDesktopWidget; /** true if the alarm uses a desktop widget for notifications. */
+    QPoint    widgetPosition;   /** position of the desktop widget.                            */
 };
 
 class AlarmWidget

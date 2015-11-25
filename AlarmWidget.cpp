@@ -109,10 +109,10 @@ void AlarmWidget::start()
     m_icon->show();
   }
 
-//  if(m_desktopWidget)
-//  {
-//    m_desktopWidget->show();
-//  }
+  if(m_widget)
+  {
+    m_widget->show();
+  }
 
   m_alarm->start();
 }
@@ -145,10 +145,11 @@ void AlarmWidget::stop()
     m_icon->hide();
   }
 
-//  if(m_desktopWidget)
-//  {
-//    m_desktopWidget->hide();
-//  }
+  if(m_widget)
+  {
+    m_widget->setProgress(0);
+    m_widget->hide();
+  }
 
   setTime(m_alarm->remainingTime());
 }
@@ -258,13 +259,13 @@ void AlarmWidget::setAlarm(Alarm* alarm)
   setTime(m_alarm->remainingTime());
 
   connect(alarm, SIGNAL(tic()),
-          this,  SLOT(onAlarmTic()));
+          this,  SLOT(onAlarmTic()), Qt::DirectConnection);
 
   connect(alarm, SIGNAL(interval(int)),
-          this,  SLOT(onAlarmInterval(int)));
+          this,  SLOT(onAlarmInterval(int)), Qt::DirectConnection);
 
   connect(alarm, SIGNAL(timeout()),
-          this,  SLOT(onAlarmTimeout()));
+          this,  SLOT(onAlarmTimeout()), Qt::DirectConnection);
 }
 
 //-----------------------------------------------------------------
@@ -277,7 +278,10 @@ void AlarmWidget::onAlarmTic()
     m_icon->setToolTip(QString("%1\nRemaining time: %2\nCompleted: %3%").arg(m_configuration.name).arg(m_alarm->remainingTimeText()).arg(m_alarm->progress()));
   }
 
-  // TODO: update desktop widget.
+  if(m_widget)
+  {
+    m_widget->setProgress(m_alarm->precisionProgress());
+  }
 }
 
 //-----------------------------------------------------------------
@@ -427,8 +431,7 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration &conf)
 
   if(conf.useDesktopWidget)
   {
-    m_widget = new DesktopWidget(this);
-    m_widget->show();
+    m_widget = new DesktopWidget(m_configuration.name, m_configuration.widgetPosition, m_configuration.color);
   }
 
   if(!conf.isTimer)

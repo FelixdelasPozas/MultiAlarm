@@ -50,6 +50,7 @@ Alarm::Alarm(AlarmTime time, bool loop)
 , m_loop         {loop}
 , m_intervals    {0}
 , m_progress     {0}
+, m_dProgress    {0}
 {
   m_timer.setInterval(1000);
   m_timer.setSingleShot(false);
@@ -79,7 +80,8 @@ void Alarm::stop()
     m_timer.stop();
 
     m_intervals = 0;
-    m_progress = 0;
+    m_progress  = 0;
+    m_dProgress = 0;
     m_remainingTime = m_time;
   }
 }
@@ -106,9 +108,9 @@ unsigned int Alarm::progress() const
 }
 
 //-----------------------------------------------------------------
-unsigned int Alarm::completedIntervals() const
+double Alarm::precisionProgress() const
 {
-  return m_intervals;
+  return m_dProgress;
 }
 
 //-----------------------------------------------------------------
@@ -165,9 +167,9 @@ void Alarm::second()
     }
   }
 
-  emit tic();
-
   computeProgressValues();
+
+  emit tic();
 
   if(beforeIntervals != m_intervals)
   {
@@ -178,12 +180,6 @@ void Alarm::second()
   {
     emit progress(m_progress);
   }
-}
-
-//-----------------------------------------------------------------
-QString Alarm::timeText() const
-{
-  return m_time.text();
 }
 
 //-----------------------------------------------------------------
@@ -198,6 +194,7 @@ void Alarm::computeProgressValues()
   unsigned long long totalTime = (m_time.days * 24*60*60) + (m_time.hours * 60*60) + (m_time.minutes * 60) + m_time.seconds;
   unsigned long long remaining = (m_remainingTime.days * 24*60*60) + (m_remainingTime.hours *60*60) + (m_remainingTime.minutes * 60) + m_remainingTime.seconds;
 
-  m_progress = 100 - static_cast<int>((100*remaining)/static_cast<double>(totalTime));
+  m_progress  = 100 - static_cast<int>((100*remaining)/static_cast<double>(totalTime));
+  m_dProgress = 100.0 - (100*remaining)/static_cast<double>(totalTime);
   m_intervals = static_cast<int>(m_progress/static_cast<double>(100/8.0));
 }

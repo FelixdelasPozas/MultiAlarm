@@ -22,23 +22,43 @@
 
 // Qt
 #include <QWidget>
+#include <QColor>
 
 class QPaintEvent;
-class QLabel;
 
 class DesktopWidget
 : public QWidget
 {
   public:
     /** \brief DesktopWidget class constructor.
+     * \param[in] name alarm name.
+     * \param[in] position left-top corner position of the widget.
+     * \param[in] color widget's color.
      *
      */
-    explicit DesktopWidget(QWidget *parent = nullptr);
+    explicit DesktopWidget(const QString &name, const QPoint &position, const QColor &color);
 
     /** \brief DesktopWidget class virtual destructor.
      *
      */
     virtual ~DesktopWidget();
+
+    /** \brief Sets the progress of the widget.
+     * \param[in] value progress value in [0.0-100.0].
+     *
+     */
+    void setProgress(double value);
+
+    /** \brief Enables/disables the ability to draw the widget with the left mouse button.
+     * \param[in] value true to enable and false otherwise.
+     *
+     */
+    void enableDragging(bool value);
+
+  protected:
+    virtual void mousePressEvent(QMouseEvent *e) override final;
+    virtual void mouseReleaseEvent(QMouseEvent *e) override final;
+    virtual void mouseMoveEvent(QMouseEvent *e) override final;
 
   private:
     /** \brief Draws the progress of the timer in the widget.
@@ -46,7 +66,14 @@ class DesktopWidget
      */
     virtual void paintEvent(QPaintEvent *e) override;
 
-    QLabel *m_background;
+    double  m_progress;      /** progress of the widget in [0.0-100.0]. */
+    QColor  m_color;         /** color of the widget. */
+    QColor  m_contrastColor; /** contrast color in relation to m_color, always black or white. */
+    QString m_name;          /** alarm name */
+    bool    m_dragEnabled;   /** true if widget dragging is allowed and false otherwise. */
+
+    bool   m_buttonDown; /** true if the left mouse button is down and false otherwise. */
+    QPoint m_point;      /** dragging point. */
 };
 
 #endif // DESKTOPWIDGET_H_

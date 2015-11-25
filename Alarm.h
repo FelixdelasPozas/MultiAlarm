@@ -83,6 +83,11 @@ class Alarm
      */
     unsigned int progress() const;
 
+    /** \brief Returns the progress of the alarm in the range [0.0-100.0].
+     *
+     */
+    double precisionProgress() const;
+
     /** \brief Returns the number of completed 1/8th intervals of the alarm completed.
      *
      */
@@ -97,11 +102,6 @@ class Alarm
      *
      */
     const AlarmTime time() const;
-
-    /** \brief Returns the alarm time as a QString.
-     *
-     */
-    QString timeText() const;
 
     /** \brief Returns the remaining time as a QString.
      *
@@ -148,6 +148,7 @@ class Alarm
     bool               m_loop;          /** true to restart the alarm once it finishes. */
     unsigned int       m_intervals;     /** number of completed intervals.              */
     int                m_progress;      /** completed time of the alarm.                */
+    double             m_dProgress;     /** completed time of the alarm with decimals.  */
     QTimer             m_timer;         /** timer object.                               */
 };
 
