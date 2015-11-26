@@ -26,28 +26,27 @@
 #include <QPaintEngine>
 #include <QMouseEvent>
 
+const int DesktopWidget::WIDGET_SIZE = 100;
+
 //-----------------------------------------------------------------
-DesktopWidget::DesktopWidget(const QString &name, const QPoint &position, const QColor &color)
+DesktopWidget::DesktopWidget()
 : QWidget      {nullptr}
 , m_progress   {0}
-, m_color      {color}
-, m_name       {name}
+, m_color      {Qt::black}
+, m_name       {""}
 , m_dragEnabled{false}
 , m_buttonDown {false}
 {
-  // NOTE: attribute Qt::WA_TransparentForMouseEvents is useless, use Qt::WindowTransparentForInput instead.
+  // NOTE 1: attribute Qt::WA_TransparentForMouseEvents is useless, use Qt::WindowTransparentForInput instead.
+  // NOTE 2: Qt::WindowTransparentForInput collides with WindowOkButtonHint so once set/unset there is no
+  //         way to enable it again.
   setAttribute(Qt::WA_TranslucentBackground);
   setAttribute(Qt::WA_AlwaysStackOnTop);
   setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint|Qt::WindowTransparentForInput|Qt::Tool);
-
-  setGeometry(QRect(0,0, 100, 100));
-  move(position);
+  setGeometry(QRect(0,0, WIDGET_SIZE, WIDGET_SIZE));
   setWindowOpacity(0.60);
 
-  auto blackDistance = color.red() + color.green() + color.blue();
-  auto whiteDistance = (254 * 3) - blackDistance;
-
-  m_contrastColor = (blackDistance < whiteDistance ? "white" : "black");
+  move(0,0);
 
   hide();
 }
@@ -64,13 +63,15 @@ void DesktopWidget::setProgress(double value)
   {
     m_progress = value;
 
-    this->repaint();
+    if(isVisible()) repaint();
   }
 }
 
 //-----------------------------------------------------------------
 void DesktopWidget::enableDragging(bool value)
 {
+  return; // Disabled for now, see notes in constructor.
+
   if(value != m_dragEnabled)
   {
     m_dragEnabled = value;
@@ -125,6 +126,50 @@ void DesktopWidget::mouseMoveEvent(QMouseEvent* e)
 }
 
 //-----------------------------------------------------------------
+void DesktopWidget::setPosition(const QPoint& position)
+{
+  if(position != pos())
+  {
+    move(position);
+  }
+}
+
+//-----------------------------------------------------------------
+void DesktopWidget::setOpacity(const int opacity)
+{
+  if(opacity != windowOpacity())
+  {
+    setWindowOpacity(opacity/100.0);
+
+    if(isVisible()) repaint();
+  }
+}
+
+//-----------------------------------------------------------------
+void DesktopWidget::setColor(const QColor& color)
+{
+  m_color = color;
+
+  auto blackDistance = color.red() + color.green() + color.blue();
+  auto whiteDistance = (254 * 3) - blackDistance;
+
+  m_contrastColor = (blackDistance < whiteDistance ? "white" : "black");
+
+  if(isVisible()) repaint();
+}
+
+//-----------------------------------------------------------------
+void DesktopWidget::setName(const QString &name)
+{
+  if(m_name != name)
+  {
+    m_name = name;
+
+    if(isVisible()) repaint();
+  }
+}
+
+//-----------------------------------------------------------------
 void DesktopWidget::paintEvent(QPaintEvent *e)
 {
   QBrush brush(m_contrastColor, Qt::SolidPattern);
@@ -152,16 +197,14 @@ void DesktopWidget::paintEvent(QPaintEvent *e)
     displayText.append(part + (part != parts.last() ? "\n": ""));
   }
 
-  auto color = QColor{(m_contrastColor.red()+m_color.red())/2,
-                      (m_contrastColor.green()+m_color.green())/2,
-                      (m_contrastColor.blue()+m_color.blue())/2};
+  auto color = (m_contrastColor == Qt::black ? Qt::white : Qt::black);
   smallRect = QRect{windowRect.x()+2, windowRect.y()+2, windowRect.width()-2, windowRect.height()-2};
 
   painter.setFont(QFont("Arial", 10));
   painter.setPen(color);
   painter.drawText(smallRect, Qt::AlignCenter, displayText);
 
-  painter.setPen((m_contrastColor == Qt::white ? Qt::black : Qt::white));
+  painter.setPen(m_contrastColor);
   painter.drawText(windowRect, Qt::AlignCenter, displayText);
   painter.end();
 }

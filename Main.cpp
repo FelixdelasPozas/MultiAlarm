@@ -25,10 +25,10 @@
 #include <QSharedMemory>
 #include <QMessageBox>
 #include <QIcon>
-#include <QDebug>
 
 #include <iostream>
 
+//-----------------------------------------------------------------
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
   const char symbols[] = { 'I', 'E', '!', 'X' };
@@ -38,6 +38,7 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
   if( type == QtFatalMsg ) abort();
 }
 
+//-----------------------------------------------------------------
 int main(int argc, char *argv[])
 {
   qInstallMessageHandler(myMessageOutput);
@@ -64,8 +65,6 @@ int main(int argc, char *argv[])
 	alarm.show();
 
 	auto resultValue = app.exec();
-
-	qDebug() << "application exited with value" << resultValue;
 
 	return resultValue;
 }

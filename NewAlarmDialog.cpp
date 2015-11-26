@@ -18,6 +18,7 @@
  */
 
 // Project
+#include <DesktopWidget.h>
 #include <NewAlarmDialog.h>
 
 // Qt
@@ -29,12 +30,23 @@
 #include <QTemporaryFile>
 #include <QSoundEffect>
 #include <QSystemTrayIcon>
+#include <QDesktopWidget>
 
 const QStringList sounds{ "Buzz", "Smoke alarm", "Desk bell"};
 
 const QStringList soundNames = { ":/MultiAlarm/sounds/buzz.wav",
                                  ":/MultiAlarm/sounds/smokealarm.wav",
                                  ":/MultiAlarm/sounds/deskbell.wav" };
+
+const QStringList defaultPositions = { "Top Left",
+                                       "Top Center",
+                                       "Top Right",
+                                       "Center Left",
+                                       "Center",
+                                       "Center Right",
+                                       "Bottom Left",
+                                       "Bottom Center",
+                                       "Bottom Right" };
 
 //-----------------------------------------------------------------
 NewAlarmDialog::NewAlarmDialog(QStringList invalidNames, QStringList invalidColors, QWidget * parent, Qt::WindowFlags flags)
@@ -69,11 +81,18 @@ NewAlarmDialog::NewAlarmDialog(QStringList invalidNames, QStringList invalidColo
     m_colorComboBox->insertItem(m_colors.indexOf(color), QIcon(QPixmap::fromImage(*pixmap)), color);
   }
   m_colorComboBox->setCurrentIndex(0);
+  m_widget.setColor(m_colors.at(0));
 
   m_soundComboBox->insertItems(0, sounds);
   m_soundComboBox->setCurrentIndex(0);
 
+  computeDesktopWidgetPositions();
+
   connectSignals();
+
+  m_opacitySlider->setMinimum(0);
+  m_opacitySlider->setMaximum(100);
+  m_opacitySlider->setValue(60);
 
   loadSounds();
 
@@ -117,6 +136,57 @@ void NewAlarmDialog::onClockRadioToggled(bool value)
 }
 
 //-----------------------------------------------------------------
+void NewAlarmDialog::onDesktopWidgetStateChanged(int value)
+{
+  auto enabled = (value == Qt::Checked);
+
+  m_positionLabel->setEnabled(enabled);
+  m_positionComboBox->setEnabled(enabled);
+  m_opacityLabel->setEnabled(enabled);
+  m_opacitySlider->setEnabled(enabled);
+  m_opacitySliderValue->setEnabled(enabled);
+
+  if(value)
+  {
+    m_widget.show();
+  }
+  else
+  {
+    m_widget.hide();
+  }
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::onOpacityValueChanged(int value)
+{
+  m_opacitySliderValue->setText(QString("%1%").arg(value));
+  m_widget.setOpacity(value);
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::onWidgetPositionChanged(int value)
+{
+  m_widget.setPosition(m_widgetPositions.at(value));
+
+// NOTE: disabled as widget dragging enable/disable is not working due a Qt bug.
+//  if(value == 0)
+//  {
+//    m_widget.enableDragging(true);
+//  }
+//  else
+//  {
+//    m_widget.enableDragging(false);
+//    m_widget.setPosition(m_widgetPositions.at(value));
+//  }
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::onColorChanged(int value)
+{
+  m_widget.setColor(m_colors.at(value));
+}
+
+//-----------------------------------------------------------------
 void NewAlarmDialog::checkOkButtonRequirements()
 {
   auto validName = !m_name->text().isEmpty() && !m_invalidNames.contains(m_name->text());
@@ -125,6 +195,8 @@ void NewAlarmDialog::checkOkButtonRequirements()
   auto validTime = m_timerRadio->isChecked();
 
   auto valid = validName && validMessage && (validTime || validClock);
+
+  m_widget.setName(m_name->text());
 
   m_buttons->button(QDialogButtonBox::Ok)->setEnabled(valid);
 }
@@ -164,6 +236,18 @@ void NewAlarmDialog::connectSignals()
 
   connect(m_playSoundButton, SIGNAL(pressed()),
           this,              SLOT(playSound()));
+
+  connect(m_showDesktop, SIGNAL(stateChanged(int)),
+          this,          SLOT(onDesktopWidgetStateChanged(int)));
+
+  connect(m_opacitySlider, SIGNAL(valueChanged(int)),
+          this,            SLOT(onOpacityValueChanged(int)));
+
+  connect(m_positionComboBox, SIGNAL(currentIndexChanged(int)),
+          this,            SLOT(onWidgetPositionChanged(int)));
+
+  connect(m_colorComboBox, SIGNAL(currentIndexChanged(int)),
+          this,            SLOT(onColorChanged(int)));
 }
 
 //-----------------------------------------------------------------
@@ -303,15 +387,33 @@ bool NewAlarmDialog::showInDesktop() const
 }
 
 //-----------------------------------------------------------------
-void NewAlarmDialog::setDesktopWidgetPosition(const QPoint &topLeftCorner)
+void NewAlarmDialog::setDesktopWidgetPosition(const QPoint &position)
 {
-  m_desktopWidgetPosition = topLeftCorner;
+  for(int i = 0; i < m_widgetPositions.size(); ++i)
+  {
+    if(position == m_widgetPositions.at(i))
+    {
+      m_widget.setPosition(m_widgetPositions.at(i));
+    }
+  }
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::setWidgetOpacity(int opacity)
+{
+  m_opacitySlider->setValue(opacity);
+}
+
+//-----------------------------------------------------------------
+int NewAlarmDialog::widgetOpacity() const
+{
+  return m_opacitySlider->value();
 }
 
 //-----------------------------------------------------------------
 const QPoint NewAlarmDialog::desktopWidgetPosition() const
 {
-  return m_desktopWidgetPosition;
+  return m_widgetPositions.at(m_positionComboBox->currentIndex());
 }
 
 //-----------------------------------------------------------------
@@ -329,5 +431,44 @@ void NewAlarmDialog::loadSounds()
 
     connect(m_sounds[i], SIGNAL(playingChanged()),
             this,        SLOT(setPlayButtonIcon()));
+  }
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::computeDesktopWidgetPositions()
+{
+  QStringList positionNames;
+
+// NOTE: disabled as widget dragging enable/disable is not working due a Qt bug.
+//  positionNames << tr("Custom (drag to position)");
+//  m_widgetPositions << QPoint{0,0};
+
+  auto desktop = QApplication::desktop();
+  computePositions(desktop->geometry(), "Global ", positionNames);
+
+  for (int i = 0; i < desktop->numScreens(); ++i)
+  {
+    computePositions(desktop->screenGeometry(i), QString("Monitor %1 ").arg(i), positionNames);
+  }
+
+  m_positionComboBox->insertItems(0, positionNames);
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::computePositions(const QRect &rect, const QString &screenName, QStringList &positionNames)
+{
+  auto widgetSize = DesktopWidget::WIDGET_SIZE;
+
+  for(int y: {rect.y(), rect.y()+(rect.height()-widgetSize)/2, rect.y()+rect.height()-widgetSize})
+  {
+    for(int x: {rect.x(), rect.x()+(rect.width()-widgetSize)/2, rect.x()+rect.width()-widgetSize})
+    {
+      m_widgetPositions << QPoint{x,y};
+    }
+  }
+
+  for(auto position: defaultPositions)
+  {
+    positionNames << screenName + position;
   }
 }

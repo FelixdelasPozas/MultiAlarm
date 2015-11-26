@@ -22,12 +22,14 @@
 
 // Project
 #include "ui_NewAlarmDialog.h"
+#include <DesktopWidget.h>
 
 // Qt
 #include <QDialog>
 
 class QSoundEffect;
 class QTemporaryFile;
+class QRect;
 
 /** \class NewAlarmDialog
  * \brief Dialog for the creation of an alarm.
@@ -155,15 +157,26 @@ class NewAlarmDialog
     bool showInDesktop() const;
 
     /** \brief Sets the position of the desktop widget.
-     * \param[in] topLeftCorner top-left corner point.
+     * \param[in] position position coordinates. Must be one in the default positions.
      *
      */
-    void setDesktopWidgetPosition(const QPoint &topLeftCorner);
+    void setDesktopWidgetPosition(const QPoint &position);
 
     /** \brief Returns the position of the desktop widget.
      *
      */
     const QPoint desktopWidgetPosition() const;
+
+    /** \brief Sets the opacity for the widget.
+     * \param[in] opacity widget opacity in [0-100].
+     *
+     */
+    void setWidgetOpacity(int opacity);
+
+    /** \brief Returns the widget opacity.
+     *
+     */
+    int widgetOpacity() const;
 
   private slots:
     /** \brief Updates UI elements when the timer radio button changes state.
@@ -177,6 +190,30 @@ class NewAlarmDialog
      *
      */
     void onClockRadioToggled(bool value);
+
+    /** \brief Updates the GUI when the desktop widget checkbox changes state.
+     * \param[in] value checkbox state.
+     *
+     */
+    void onDesktopWidgetStateChanged(int value);
+
+    /** \brief Updates the opacity slider value when the slider changes.
+     * \param[in] value slider position value.
+     *
+     */
+    void onOpacityValueChanged(int value);
+
+    /** \brief Updates the widget position when the combobox changes value.
+     * \param[in] value combobox index.
+     *
+     */
+    void onWidgetPositionChanged(int value);
+
+    /** \brief Updates the widget color when the combobox changes value.
+     * \param[in] value combobox index.
+     *
+     */
+    void onColorChanged(int value);
 
     /** \brief Updates the accept button state depending on the state of the name and message fields.
      *
@@ -204,11 +241,26 @@ class NewAlarmDialog
      */
     void loadSounds();
 
+    /** \brief Fills the desktop widget position combo box with all the
+     * posible pre-set positions based on detected screen geometry.
+     *
+     */
+    void computeDesktopWidgetPositions();
+
+    /** \brief Computes all the fixed positions and position names for the given QRect.
+     * \param[in] rect QRect rectangle.
+     * \param[in] screenName name of the screen.
+     * \param[out] positionNames list of position names.
+     *
+     */
+    void computePositions(const QRect &rect, const QString &screenName, QStringList &positionNames);
+
     QVector<QSoundEffect *> m_sounds;
     QList<QTemporaryFile *> m_temporaryFiles;
     QStringList             m_invalidNames;
     QStringList             m_colors;
-    QPoint                  m_desktopWidgetPosition;
+    DesktopWidget           m_widget;
+    QList<QPoint>           m_widgetPositions;
 };
 
 #endif // NEWALARMDIALOG_H_

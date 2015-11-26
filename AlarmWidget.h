@@ -45,6 +45,7 @@ struct AlarmConfiguration
     bool      useTray;          /** true if the alarm uses the tray for notifications.         */
     bool      useDesktopWidget; /** true if the alarm uses a desktop widget for notifications. */
     QPoint    widgetPosition;   /** position of the desktop widget.                            */
+    int       widgetOpacity;    /** opacity of the desktop widget in [0-100]                   */
 };
 
 class AlarmWidget

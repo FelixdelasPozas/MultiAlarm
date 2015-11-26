@@ -124,6 +124,9 @@
             <pointsize>10</pointsize>
            </font>
           </property>
+          <property name="toolTip">
+           <string>Name</string>
+          </property>
           <property name="text">
            <string>TextLabel</string>
           </property>
@@ -147,6 +150,9 @@
             <weight>75</weight>
             <bold>true</bold>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Remaining time</string>
           </property>
           <property name="text">
            <string>TextLabel</string>
@@ -206,6 +212,9 @@
           <width>44</width>
           <height>40</height>
          </size>
+        </property>
+        <property name="toolTip">
+         <string>Stop alarm</string>
         </property>
         <property name="text">
          <string/>

@@ -30,13 +30,12 @@ class DesktopWidget
 : public QWidget
 {
   public:
+    static const int WIDGET_SIZE; /** height and width of the widget in pixels. */
+
     /** \brief DesktopWidget class constructor.
-     * \param[in] name alarm name.
-     * \param[in] position left-top corner position of the widget.
-     * \param[in] color widget's color.
      *
      */
-    explicit DesktopWidget(const QString &name, const QPoint &position, const QColor &color);
+    explicit DesktopWidget();
 
     /** \brief DesktopWidget class virtual destructor.
      *
@@ -54,6 +53,29 @@ class DesktopWidget
      *
      */
     void enableDragging(bool value);
+
+    /** \brief Sets the widget position on the screen.
+     * \param[in] position position coordinates.
+     *
+     */
+    void setPosition(const QPoint &position);
+
+    /** \brief Modifies the widget opacity.
+     * \param[in] opacity opacity value in [0-100].
+     *
+     */
+    void setOpacity(const int opacity);
+
+    /** \brief Sets the widget color.
+     * \param[in] color widget color.
+     *
+     */
+    void setColor(const QColor &color);
+
+    /** \brief Sets the name of the widget.
+     *
+     */
+    void setName(const QString &name);
 
   protected:
     virtual void mousePressEvent(QMouseEvent *e) override final;

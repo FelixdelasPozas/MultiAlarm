@@ -10,19 +10,19 @@
     <x>0</x>
     <y>0</y>
     <width>399</width>
-    <height>321</height>
+    <height>363</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>399</width>
-    <height>321</height>
+    <height>363</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>399</width>
-    <height>321</height>
+    <height>363</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -46,30 +46,63 @@
      </property>
      <item row="0" column="0">
       <widget class="QLabel" name="label">
+       <property name="toolTip">
+        <string>Alarm name</string>
+       </property>
        <property name="text">
         <string>Name</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="m_name"/>
+      <widget class="QLineEdit" name="m_name">
+       <property name="toolTip">
+        <string>Alarm name</string>
+       </property>
+      </widget>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_4">
+       <property name="toolTip">
+        <string>Alarm message to show when finished</string>
+       </property>
        <property name="text">
         <string>Message</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="m_message"/>
+      <widget class="QLineEdit" name="m_message">
+       <property name="toolTip">
+        <string>Alarm message to show when finished</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox_2">
+     <property name="toolTip">
+      <string>Type of alarm</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QGroupBox {
+    border: 1px solid gray;
+    border-radius: 5px;
+    margin-top: 2ex;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top center; /* position at the top center */
+    padding: 0px 5px;
+}</string>
+     </property>
      <property name="title">
       <string>Type</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignHCenter|Qt::AlignTop</set>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
@@ -79,6 +112,9 @@
         </property>
         <item row="0" column="0">
          <widget class="QRadioButton" name="m_timerRadio">
+          <property name="toolTip">
+           <string>Timer alarm</string>
+          </property>
           <property name="text">
            <string>Timer</string>
           </property>
@@ -86,6 +122,9 @@
         </item>
         <item row="1" column="1">
          <widget class="QDateTimeEdit" name="m_clock">
+          <property name="toolTip">
+           <string>Clock alarm duration</string>
+          </property>
           <property name="calendarPopup">
            <bool>true</bool>
           </property>
@@ -93,6 +132,9 @@
         </item>
         <item row="1" column="0">
          <widget class="QRadioButton" name="m_clockRadio">
+          <property name="toolTip">
+           <string>Clock alarm</string>
+          </property>
           <property name="text">
            <string>Clock</string>
           </property>
@@ -102,6 +144,9 @@
          <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
           <item>
            <widget class="QTimeEdit" name="m_timer">
+            <property name="toolTip">
+             <string>Timer alarm duration</string>
+            </property>
             <property name="displayFormat">
              <string>HH:mm:ss</string>
             </property>
@@ -112,6 +157,9 @@
           </item>
           <item>
            <widget class="QCheckBox" name="m_timerLoop">
+            <property name="toolTip">
+             <string>Loop timer alarm</string>
+            </property>
             <property name="text">
              <string>Loop</string>
             </property>
@@ -126,6 +174,22 @@
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox">
+     <property name="toolTip">
+      <string>Alarm notification</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QGroupBox {
+    border: 1px solid gray;
+    border-radius: 5px;
+    margin-top: 2ex;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top center; /* position at the top center */
+    padding: 0px 5px;
+}</string>
+     </property>
      <property name="title">
       <string>Notification</string>
      </property>
@@ -136,10 +200,17 @@
          <number>0</number>
         </property>
         <item row="0" column="1">
-         <widget class="QComboBox" name="m_colorComboBox"/>
+         <widget class="QComboBox" name="m_colorComboBox">
+          <property name="toolTip">
+           <string>Color of the alarm</string>
+          </property>
+         </widget>
         </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label_3">
+          <property name="toolTip">
+           <string>Color of the alarm</string>
+          </property>
           <property name="text">
            <string>Color</string>
           </property>
@@ -147,18 +218,28 @@
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_2">
+          <property name="toolTip">
+           <string>Sound of the alarm</string>
+          </property>
           <property name="text">
-           <string>Alarm sound</string>
+           <string>Sound</string>
           </property>
          </widget>
         </item>
         <item row="1" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <widget class="QComboBox" name="m_soundComboBox"/>
+           <widget class="QComboBox" name="m_soundComboBox">
+            <property name="toolTip">
+             <string>Sound of the alarm</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QToolButton" name="m_playSoundButton">
+            <property name="toolTip">
+             <string>Test sound</string>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -174,17 +255,100 @@
       </item>
       <item>
        <widget class="QCheckBox" name="m_showTray">
+        <property name="toolTip">
+         <string>Show alarm progress in the icon tray</string>
+        </property>
         <property name="text">
-         <string>Show progress in system tray.</string>
+         <string>Show progress icon in system tray.</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="m_showDesktop">
+        <property name="toolTip">
+         <string>Show alarm progress in the desktop</string>
+        </property>
         <property name="text">
-         <string>Show progress in the desktop.</string>
+         <string>Show progress widget in the desktop.</string>
         </property>
        </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,1">
+        <item>
+         <widget class="QLabel" name="m_positionLabel">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>Desktop widget position</string>
+          </property>
+          <property name="text">
+           <string>Widget position</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="m_positionComboBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>Desktop widget position</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,1">
+        <item>
+         <widget class="QLabel" name="m_opacityLabel">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>Desktop widget opacity</string>
+          </property>
+          <property name="text">
+           <string>Widget opacity</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QSlider" name="m_opacitySlider">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>Desktop widget opacity</string>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="m_opacitySliderValue">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>Desktop widget opacity</string>
+            </property>
+            <property name="text">
+             <string>100%</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>

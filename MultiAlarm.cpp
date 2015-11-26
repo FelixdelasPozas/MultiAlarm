@@ -29,7 +29,6 @@
 #include <QAction>
 #include <QMenu>
 #include <QMessageBox>
-#include <QDebug>
 
 // C++
 #include <iostream>
@@ -49,6 +48,7 @@ const QString ALARM_SOUND           = "Sound";
 const QString ALARM_USE_TRAY        = "UseTray";
 const QString ALARM_USE_DESKTOP     = "UseDesktop";
 const QString ALARM_WIDGET_POSITION = "DesktopWidgetPosition";
+const QString ALARM_WIDGET_OPACITY  = "DesktopWidgetOpacity";
 
 //-----------------------------------------------------------------
 MultiAlarm::MultiAlarm(QWidget *parent, Qt::WindowFlags flags)
@@ -279,6 +279,7 @@ void MultiAlarm::saveSettings()
       settings.setValue(ALARM_USE_TRAY, conf.useTray);
       settings.setValue(ALARM_USE_DESKTOP, conf.useDesktopWidget);
       settings.setValue(ALARM_WIDGET_POSITION, conf.widgetPosition);
+      settings.setValue(ALARM_WIDGET_OPACITY, conf.widgetOpacity);
 
       settings.endGroup();
     }
@@ -323,6 +324,7 @@ AlarmWidget* MultiAlarm::createAlarmWidget(const NewAlarmDialog& dialog)
   conf.useTray          = dialog.showInTray();
   conf.useDesktopWidget = dialog.showInDesktop();
   conf.widgetPosition   = dialog.desktopWidgetPosition();
+  conf.widgetOpacity    = dialog.widgetOpacity();
 
   auto widget = new AlarmWidget(this);
   widget->setConfiguration(conf);
@@ -355,6 +357,7 @@ AlarmWidget* MultiAlarm::createAlarmWidget(QSettings &settings, const QString &n
   conf.useTray          = settings.value(ALARM_USE_TRAY, false).toBool();
   conf.useDesktopWidget = settings.value(ALARM_USE_DESKTOP, false).toBool();
   conf.widgetPosition   = settings.value(ALARM_WIDGET_POSITION, QPoint{0,0}).toPoint();
+  conf.widgetOpacity    = settings.value(ALARM_WIDGET_OPACITY, 60).toInt();
 
   settings.endGroup();
 

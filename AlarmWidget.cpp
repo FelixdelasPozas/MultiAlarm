@@ -24,7 +24,6 @@
 
 // Qt
 #include <QTime>
-#include <QDebug>
 #include <QBitmap>
 #include <QPixmap>
 #include <QPainter>
@@ -431,7 +430,11 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration &conf)
 
   if(conf.useDesktopWidget)
   {
-    m_widget = new DesktopWidget(m_configuration.name, m_configuration.widgetPosition, m_configuration.color);
+    m_widget = new DesktopWidget();
+    m_widget->setName(m_configuration.name);
+    m_widget->setPosition(m_configuration.widgetPosition);
+    m_widget->setColor(m_configuration.color);
+    m_widget->setOpacity(m_configuration.widgetOpacity);
   }
 
   if(!conf.isTimer)
