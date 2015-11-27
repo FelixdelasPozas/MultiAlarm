@@ -114,6 +114,7 @@ void AlarmWidget::start()
   }
 
   m_alarm->start();
+  m_started = true;
 }
 
 //-----------------------------------------------------------------
@@ -124,6 +125,7 @@ void AlarmWidget::stop()
     onPausePressed();
   }
   m_alarm->stop();
+  m_started = false;
 
   m_stop->setEnabled(false);
 
@@ -199,8 +201,6 @@ void AlarmWidget::onPlayPressed()
 {
   if(m_started) return;
 
-  m_started = true;
-
   start();
 }
 
@@ -244,8 +244,6 @@ void AlarmWidget::onPausePressed()
 void AlarmWidget::onStopPressed()
 {
   if(!m_started) return;
-
-  m_started = false;
 
   stop();
 }
@@ -430,7 +428,7 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration &conf)
 
   if(conf.useDesktopWidget)
   {
-    m_widget = new DesktopWidget();
+    m_widget = new DesktopWidget(false, nullptr);
     m_widget->setName(m_configuration.name);
     m_widget->setPosition(m_configuration.widgetPosition);
     m_widget->setColor(m_configuration.color);

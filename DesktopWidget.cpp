@@ -25,30 +25,38 @@
 #include <QLabel>
 #include <QPaintEngine>
 #include <QMouseEvent>
+#include <QApplication>
+#include <QDesktopWidget>
 
 const int DesktopWidget::WIDGET_SIZE = 100;
 
 //-----------------------------------------------------------------
-DesktopWidget::DesktopWidget()
-: QWidget      {nullptr}
+DesktopWidget::DesktopWidget(bool dragEnable, QWidget *parent)
+: QWidget      {parent, Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint|Qt::NoDropShadowWindowHint|Qt::WindowTransparentForInput|Qt::Tool}
 , m_progress   {0}
 , m_color      {Qt::black}
 , m_name       {""}
-, m_dragEnabled{false}
 , m_buttonDown {false}
 {
   // NOTE 1: attribute Qt::WA_TransparentForMouseEvents is useless, use Qt::WindowTransparentForInput instead.
   // NOTE 2: Qt::WindowTransparentForInput collides with WindowOkButtonHint so once set/unset there is no
-  //         way to enable it again.
-  setAttribute(Qt::WA_TranslucentBackground);
+  //         way to enable it again, thus, enabled or disabled on constructor.
   setAttribute(Qt::WA_AlwaysStackOnTop);
-  setWindowFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint|Qt::WindowTransparentForInput|Qt::Tool);
+  setAttribute(Qt::WA_TranslucentBackground);
+
+  if(dragEnable)
+  {
+    setWindowFlags(windowFlags() & ~Qt::WindowTransparentForInput);
+  }
+
+  auto desktopRect = QApplication::desktop()->geometry();
+  m_limitX = desktopRect.width()-WIDGET_SIZE;
+  m_limitY = desktopRect.height()-WIDGET_SIZE;
+
   setGeometry(QRect(0,0, WIDGET_SIZE, WIDGET_SIZE));
   setWindowOpacity(0.60);
 
   move(0,0);
-
-  hide();
 }
 
 //-----------------------------------------------------------------
@@ -68,60 +76,50 @@ void DesktopWidget::setProgress(double value)
 }
 
 //-----------------------------------------------------------------
-void DesktopWidget::enableDragging(bool value)
-{
-  return; // Disabled for now, see notes in constructor.
-
-  if(value != m_dragEnabled)
-  {
-    m_dragEnabled = value;
-    Qt::WindowFlags flags = windowFlags();
-
-    if(value)
-    {
-      flags &= ~Qt::WindowTransparentForInput;
-    }
-    else
-    {
-      flags |= Qt::WindowTransparentForInput;
-    }
-
-    setWindowFlags(flags);
-  }
-}
-
-//-----------------------------------------------------------------
 void DesktopWidget::mousePressEvent(QMouseEvent* e)
 {
-  if(m_dragEnabled && (e->button() == Qt::MouseButton::LeftButton))
+  if(underMouse() && e->button() == Qt::MouseButton::LeftButton)
   {
     m_point = e->globalPos();
 
     m_buttonDown = true;
+    emit beingDragged();
+  }
+  else
+  {
+    QWidget::mousePressEvent(e);
   }
 }
 
 //-----------------------------------------------------------------
 void DesktopWidget::mouseReleaseEvent(QMouseEvent* e)
 {
-  if(m_dragEnabled && (e->button() == Qt::MouseButton::LeftButton))
+  if(underMouse() && e->button() == Qt::MouseButton::LeftButton)
   {
     m_point -= e->globalPos();
-    move(pos()-m_point);
+    setPosition(pos()-m_point);
     m_point = e->globalPos();
 
     m_buttonDown = false;
+  }
+  else
+  {
+    QWidget::mousePressEvent(e);
   }
 }
 
 //-----------------------------------------------------------------
 void DesktopWidget::mouseMoveEvent(QMouseEvent* e)
 {
-  if(m_dragEnabled && m_buttonDown)
+  if(m_buttonDown)
   {
     m_point -= e->globalPos();
-    move(pos()-m_point);
+    setPosition(pos()-m_point);
     m_point = e->globalPos();
+  }
+  else
+  {
+    QWidget::mousePressEvent(e);
   }
 }
 
@@ -130,7 +128,14 @@ void DesktopWidget::setPosition(const QPoint& position)
 {
   if(position != pos())
   {
-    move(position);
+    auto newPosition = position;
+    if(newPosition.x() < 0) newPosition.setX(0);
+    if(newPosition.y() < 0) newPosition.setY(0);
+
+    if(newPosition.x() > m_limitX) newPosition.setX(m_limitX);
+    if(newPosition.y() > m_limitY) newPosition.setY(m_limitY);
+
+    move(newPosition);
   }
 }
 
@@ -179,7 +184,7 @@ void DesktopWidget::paintEvent(QPaintEvent *e)
   painter.begin(this);
 
   painter.setBrush(brush);
-  painter.drawRoundRect(windowRect);
+  painter.drawRoundRect(windowRect,40,40);
 
   brush.setColor(m_color);
   brush.setStyle(Qt::SolidPattern);

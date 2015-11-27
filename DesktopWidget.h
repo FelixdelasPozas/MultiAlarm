@@ -24,18 +24,18 @@
 #include <QWidget>
 #include <QColor>
 
-class QPaintEvent;
-
 class DesktopWidget
 : public QWidget
 {
+    Q_OBJECT
   public:
     static const int WIDGET_SIZE; /** height and width of the widget in pixels. */
 
     /** \brief DesktopWidget class constructor.
+     * \param[in] dragEnable true to make the widget react to events and false to make the widget transparent to input.
      *
      */
-    explicit DesktopWidget();
+    explicit DesktopWidget(bool dragEnable, QWidget *parent);
 
     /** \brief DesktopWidget class virtual destructor.
      *
@@ -47,12 +47,6 @@ class DesktopWidget
      *
      */
     void setProgress(double value);
-
-    /** \brief Enables/disables the ability to draw the widget with the left mouse button.
-     * \param[in] value true to enable and false otherwise.
-     *
-     */
-    void enableDragging(bool value);
 
     /** \brief Sets the widget position on the screen.
      * \param[in] position position coordinates.
@@ -77,25 +71,27 @@ class DesktopWidget
      */
     void setName(const QString &name);
 
+  signals:
+    void beingDragged();
+
   protected:
     virtual void mousePressEvent(QMouseEvent *e) override final;
     virtual void mouseReleaseEvent(QMouseEvent *e) override final;
     virtual void mouseMoveEvent(QMouseEvent *e) override final;
 
   private:
-    /** \brief Draws the progress of the timer in the widget.
-     *
-     */
     virtual void paintEvent(QPaintEvent *e) override;
 
     double  m_progress;      /** progress of the widget in [0.0-100.0]. */
     QColor  m_color;         /** color of the widget. */
     QColor  m_contrastColor; /** contrast color in relation to m_color, always black or white. */
     QString m_name;          /** alarm name */
-    bool    m_dragEnabled;   /** true if widget dragging is allowed and false otherwise. */
 
-    bool   m_buttonDown; /** true if the left mouse button is down and false otherwise. */
-    QPoint m_point;      /** dragging point. */
+    bool   m_buttonDown;     /** true if the left mouse button is down and false otherwise. */
+    QPoint m_point;          /** dragging point. */
+
+    unsigned int m_limitX;   /** X limit in global screen coordinates. */
+    unsigned int m_limitY;   /** Y limit in global screen coordinates. */
 };
 
 #endif // DESKTOPWIDGET_H_

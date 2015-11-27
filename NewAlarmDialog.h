@@ -230,6 +230,11 @@ class NewAlarmDialog
      */
     void setPlayButtonIcon();
 
+    /** \brief Updates the GUI when the user repositions the desktop widget.
+     *
+     */
+    void onWidgetBeingDragged();
+
   private:
     /** \brief Helper methods to connect the signals for UI elements.
      *

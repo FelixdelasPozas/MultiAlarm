@@ -52,6 +52,7 @@ const QStringList defaultPositions = { "Top Left",
 NewAlarmDialog::NewAlarmDialog(QStringList invalidNames, QStringList invalidColors, QWidget * parent, Qt::WindowFlags flags)
 : QDialog       {parent}
 , m_invalidNames{invalidNames}
+, m_widget      {true, this}
 {
   setWindowFlags(windowFlags() & ~Qt::WindowMinMaxButtonsHint & ~Qt::WindowContextHelpButtonHint);
   setupUi(this);
@@ -166,18 +167,10 @@ void NewAlarmDialog::onOpacityValueChanged(int value)
 //-----------------------------------------------------------------
 void NewAlarmDialog::onWidgetPositionChanged(int value)
 {
-  m_widget.setPosition(m_widgetPositions.at(value));
-
-// NOTE: disabled as widget dragging enable/disable is not working due a Qt bug.
-//  if(value == 0)
-//  {
-//    m_widget.enableDragging(true);
-//  }
-//  else
-//  {
-//    m_widget.enableDragging(false);
-//    m_widget.setPosition(m_widgetPositions.at(value));
-//  }
+  if(value != 0)
+  {
+    m_widget.setPosition(m_widgetPositions.at(value));
+  }
 }
 
 //-----------------------------------------------------------------
@@ -248,6 +241,9 @@ void NewAlarmDialog::connectSignals()
 
   connect(m_colorComboBox, SIGNAL(currentIndexChanged(int)),
           this,            SLOT(onColorChanged(int)));
+
+  connect(&m_widget, SIGNAL(beingDragged()),
+          this,      SLOT(onWidgetBeingDragged()));
 }
 
 //-----------------------------------------------------------------
@@ -262,6 +258,12 @@ void NewAlarmDialog::setPlayButtonIcon()
   {
     m_playSoundButton->setIcon(QIcon(":/MultiAlarm/play.svg"));
   }
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::onWidgetBeingDragged()
+{
+  m_positionComboBox->setCurrentIndex(0);
 }
 
 //-----------------------------------------------------------------
@@ -413,7 +415,7 @@ int NewAlarmDialog::widgetOpacity() const
 //-----------------------------------------------------------------
 const QPoint NewAlarmDialog::desktopWidgetPosition() const
 {
-  return m_widgetPositions.at(m_positionComboBox->currentIndex());
+  return m_widget.pos();
 }
 
 //-----------------------------------------------------------------
@@ -439,9 +441,8 @@ void NewAlarmDialog::computeDesktopWidgetPositions()
 {
   QStringList positionNames;
 
-// NOTE: disabled as widget dragging enable/disable is not working due a Qt bug.
-//  positionNames << tr("Custom (drag to position)");
-//  m_widgetPositions << QPoint{0,0};
+  positionNames << tr("Custom (drag to position)");
+  m_widgetPositions << QPoint{0,0};
 
   auto desktop = QApplication::desktop();
   computePositions(desktop->geometry(), "Global ", positionNames);
