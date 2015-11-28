@@ -30,8 +30,9 @@
 
 class QTime;
 class QSoundEffect;
-class DesktopWidget;
+class QTemporaryFile;
 
+class DesktopWidget;
 class MultiAlarm;
 
 /** \struct AlarmConfiguration
@@ -187,6 +188,7 @@ class AlarmWidget
     QSystemTrayIcon   *m_icon;          /** system tray icon.                                        */
     DesktopWidget     *m_widget;        /** desktop widget.                                          */
     QSoundEffect      *m_sound;         /** alarm sound.                                             */
+    QTemporaryFile    *m_soundFile;     /** local sound file in termporary directory.                */
 
     MultiAlarm *m_parent;               /** main application dialog pointer, used to get the used
                                             names and colors when reconfiguring.                     */

@@ -55,6 +55,7 @@ AlarmWidget::AlarmWidget(MultiAlarm *parent, Qt::WindowFlags flags)
 , m_icon         {nullptr}
 , m_widget       {nullptr}
 , m_sound        {nullptr}
+, m_soundFile    {nullptr}
 , m_parent       {parent}
 {
   setupUi(this);
@@ -326,8 +327,8 @@ void AlarmWidget::onAlarmTimeout()
   Q_ASSERT(m_sound == nullptr);
 
   m_sound = new QSoundEffect(this);
-  auto file = QTemporaryFile::createLocalFile(soundFiles[m_configuration.sound]);
-  m_sound->setSource(QUrl::fromLocalFile(file->fileName()));
+  m_soundFile = QTemporaryFile::createLocalFile(soundFiles[m_configuration.sound]);
+  m_sound->setSource(QUrl::fromLocalFile(m_soundFile->fileName()));
   m_sound->setLoopCount(QSoundEffect::Infinite);
   m_sound->setVolume(m_configuration.soundVolume/100.0);
 
@@ -339,12 +340,10 @@ void AlarmWidget::onAlarmTimeout()
 void AlarmWidget::onDialogFinished()
 {
   m_sound->stop();
-  auto soundFile = m_sound->source().toLocalFile();
-  Q_ASSERT(soundFile.endsWith(".wav"));
-  QFile::remove(soundFile);
-
   delete m_sound;
   m_sound = nullptr;
+  delete m_soundFile;
+  m_soundFile = nullptr;
 
   auto dialog = qobject_cast<QMessageBox *>(sender());
   dialog->deleteLater();
@@ -423,17 +422,20 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration &conf)
   {
     m_icon->hide();
     delete m_icon;
+    m_icon = nullptr;
   }
 
   if(m_widget)
   {
     m_widget->hide();
     delete m_widget;
+    m_widget = nullptr;
   }
 
   if(m_alarm)
   {
     delete m_alarm;
+    m_alarm = nullptr;
   }
 
   m_configuration = conf;
