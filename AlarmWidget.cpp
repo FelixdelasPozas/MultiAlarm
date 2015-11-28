@@ -320,11 +320,10 @@ void AlarmWidget::onAlarmTimeout()
   dialog->setText(m_configuration.message);
   dialog->setStandardButtons(QMessageBox::Ok);
   dialog->setIcon(QMessageBox::Information);
+  dialog->setWindowFlags(dialog->windowFlags() & Qt::WindowStaysOnTopHint);
 
   connect(dialog, SIGNAL(finished(int)),
           this,   SLOT(onDialogFinished()));
-
-  Q_ASSERT(m_sound == nullptr);
 
   m_sound = new QSoundEffect(this);
   m_soundFile = QTemporaryFile::createLocalFile(soundFiles[m_configuration.sound]);

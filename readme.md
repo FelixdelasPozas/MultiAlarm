@@ -39,6 +39,8 @@ Main dialog with the alarm list. Each alarm has buttons to start, pause, delete 
 
 The alarm creation and modification dialog. 
 
+Simple alarm completion dialog with the alarm message appears on top of other windows.
+
 The tray icon shows the progression of the alarm in eight intervals (doesn't update the progress in real time) and the tooltip show the remaining time and the percentage of passed time. If it's a timer alarm the icon provides the options to manage the alarm without the need of opening the main window.  
 
 The desktop widget updates in realtime with a pie representation of the remaining time. 
@@ -55,7 +57,7 @@ Application tray icon and menu.
 
 | Language                     |files          |blank        |comment           |code  |
 |:-----------------------------|--------------:|------------:|-----------------:|-----:|
-| C++                          |   7           | 386         |   237            | 1472 |
+| C++                          |   7           | 385         |   237            | 1472 |
 | C/C++ Header                 |   6           | 173         |   508            |  284 |
 | CMake                        |   1           |  17         |    13            |   59 |
-| **Total**                    | **14**        | **576**     | **758**          | **1815** |
+| **Total**                    | **14**        | **575**     | **758**          | **1815** |
