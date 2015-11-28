@@ -10,9 +10,13 @@ MultiAlarm
 
 # Description
 MultiAlarm is a tool to set multiple timer and clock alarms with system tray and desktop notification widgets. 
+
 Timer alarms can be set to loop, are limited to 24 hours and can be stopped, restarted and reconfigured. Timer alarms are permanently stored until deleted by the user. 
+
 Clock alarms can't be stopped (obviously) and are deleted automatically once they expire, and can be set for any future date and time but not reconfigured. If a clock alarm hasn't expired it starts automatically on every program execution. 
+
 The tray icon and desktop widget for notifications are optional for every alarm. The desktop widget is always on top but it's transparent to user interaction (you can click through it to the windows below).
+
 There is no limit in the number of alarms or their state, all can be running at the same time with their own different notification options and alarm sounds. 
 
 ## Options
@@ -37,15 +41,27 @@ The only current option is build from source as binaries are not provided.
 # Screenshots
 Main dialog with the alarm list. Each alarm has buttons to start, pause, delete and reconfigure it. Clock alarms can't be paused, stopped or reconfigured. 
 
+![maindialog](https://cloud.githubusercontent.com/assets/12167134/11453850/8720a5b0-961b-11e5-98c4-c96abe0fc55b.jpg)
+
 The alarm creation and modification dialog. 
+
+![newalarmdialog](https://cloud.githubusercontent.com/assets/12167134/11453851/8725eda4-961b-11e5-9927-43645952260b.jpg)
 
 Simple alarm completion dialog with the alarm message appears on top of other windows.
 
+![completed](https://cloud.githubusercontent.com/assets/12167134/11453848/86d73970-961b-11e5-9a2a-ef3af85e7a47.jpg)
+
 The tray icon shows the progression of the alarm in eight intervals (doesn't update the progress in real time) and the tooltip show the remaining time and the percentage of passed time. If it's a timer alarm the icon provides the options to manage the alarm without the need of opening the main window.  
+
+![alarmtray](https://cloud.githubusercontent.com/assets/12167134/11453846/86ce32da-961b-11e5-8e82-32d931176e21.jpg)
 
 The desktop widget updates in realtime with a pie representation of the remaining time. 
 
+![desktopwidget](https://cloud.githubusercontent.com/assets/12167134/11453849/86e0e7c2-961b-11e5-8ec7-be96f572ea9a.jpg)
+
 Application tray icon and menu. 
+
+![apptray](https://cloud.githubusercontent.com/assets/12167134/11453847/86d1ca58-961b-11e5-927c-d4e4e1ee6bba.jpg)
 
 # Repository information
 
