@@ -32,6 +32,8 @@ class QTime;
 class QSoundEffect;
 class DesktopWidget;
 
+class MultiAlarm;
+
 /** \struct AlarmConfiguration
  * \brief Holds all the relevant information about an alarm and it's notifications.
  */
@@ -45,6 +47,7 @@ struct AlarmConfiguration
     bool      timerLoops;       /** true if the timer loops.                                   */
     QDateTime clockDateTime;    /** date and timer of the clock alarm.                         */
     int       sound;            /** sound used for the finished alarm notification.            */
+    int       soundVolume;      /** volume for the sound in [0 (silence) - 100 (loudest) ]     */
     bool      useTray;          /** true if the alarm uses the tray for notifications.         */
     bool      useDesktopWidget; /** true if the alarm uses a desktop widget for notifications. */
     QPoint    widgetPosition;   /** position of the desktop widget.                            */
@@ -62,11 +65,11 @@ class AlarmWidget
     Q_OBJECT
   public:
     /** \brief AlarmWidget class constructor.
-     * \param[in] parent pointer of the QWidget parent of this one.
+     * \param[in] parent Main dialog pointer.
      * \param[in] flags window flags.
      *
      */
-    explicit AlarmWidget(QWidget * parent = nullptr, Qt::WindowFlags flags = 0);
+    explicit AlarmWidget(MultiAlarm *parent, Qt::WindowFlags flags = 0);
 
     /** \brief AlarmWidget class virtual destructor.
      *
@@ -139,6 +142,11 @@ class AlarmWidget
      */
     void onDialogFinished();
 
+    /** \brief Opens the configuration dialog.
+     *
+     */
+    void onSettingsPressed();
+
   private:
     /** \brief Starts the alarm and updates the UI.
      *
@@ -179,6 +187,9 @@ class AlarmWidget
     QSystemTrayIcon   *m_icon;          /** system tray icon.                                        */
     DesktopWidget     *m_widget;        /** desktop widget.                                          */
     QSoundEffect      *m_sound;         /** alarm sound.                                             */
+
+    MultiAlarm *m_parent;               /** main application dialog pointer, used to get the used
+                                            names and colors when reconfiguring.                     */
 };
 
 #endif // ALARMWIDGET_H_

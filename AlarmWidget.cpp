@@ -18,9 +18,11 @@
  */
 
 // Project
-#include <Alarm.h>
-#include <AlarmWidget.h>
-#include <DesktopWidget.h>
+#include "Alarm.h"
+#include "AlarmWidget.h"
+#include "DesktopWidget.h"
+#include "MultiAlarm.h"
+#include "NewAlarmDialog.h"
 
 // Qt
 #include <QTime>
@@ -45,7 +47,7 @@ const QStringList soundFiles = { ":/MultiAlarm/sounds/Beeper 1.wav",
                                  ":/MultiAlarm/sounds/Smoke.wav" };
 
 //-----------------------------------------------------------------
-AlarmWidget::AlarmWidget(QWidget * parent, Qt::WindowFlags flags)
+AlarmWidget::AlarmWidget(MultiAlarm *parent, Qt::WindowFlags flags)
 : QWidget        {parent, flags}
 , m_started      {false}
 , m_contrastColor{"black"}
@@ -53,6 +55,7 @@ AlarmWidget::AlarmWidget(QWidget * parent, Qt::WindowFlags flags)
 , m_icon         {nullptr}
 , m_widget       {nullptr}
 , m_sound        {nullptr}
+, m_parent       {parent}
 {
   setupUi(this);
 
@@ -64,6 +67,9 @@ AlarmWidget::AlarmWidget(QWidget * parent, Qt::WindowFlags flags)
 
   connect(m_delete, SIGNAL(clicked(bool)),
           this,     SLOT(onDeletePressed()));
+
+  connect(m_settings, SIGNAL(clicked(bool)),
+          this, SLOT(onSettingsPressed()));
 
   m_stop->setEnabled(false);
 }
@@ -101,11 +107,13 @@ void AlarmWidget::start()
             this,    SLOT(onPausePressed()));
 
     m_stop->setEnabled(true);
+    m_settings->setEnabled(false);
   }
   else
   {
     m_start->hide();
     m_stop->hide();
+    m_settings->hide();
   }
 
   if(m_icon)
@@ -146,6 +154,7 @@ void AlarmWidget::stop()
     connect(m_start, SIGNAL(clicked(bool)),
             this,    SLOT(onPlayPressed()));
   }
+  m_settings->setEnabled(true);
 
   if(m_icon)
   {
@@ -320,6 +329,7 @@ void AlarmWidget::onAlarmTimeout()
   auto file = QTemporaryFile::createLocalFile(soundFiles[m_configuration.sound]);
   m_sound->setSource(QUrl::fromLocalFile(file->fileName()));
   m_sound->setLoopCount(QSoundEffect::Infinite);
+  m_sound->setVolume(m_configuration.soundVolume/100.0);
 
   m_sound->play();
   dialog->open();
@@ -346,6 +356,61 @@ void AlarmWidget::onDialogFinished()
 }
 
 //-----------------------------------------------------------------
+void AlarmWidget::onSettingsPressed()
+{
+  auto names  = m_parent->usedNames();
+  names.removeOne(m_configuration.name);
+  auto colors = m_parent->usedColors();
+  colors.removeOne(m_configuration.color);
+
+  NewAlarmDialog dialog(names, colors, this);
+  dialog.setWindowTitle(tr("Modify Alarm"));
+  dialog.setName(m_configuration.name);
+  dialog.setMessage(m_configuration.message);
+  dialog.setColor(m_configuration.color);
+  dialog.setIsTimer(m_configuration.isTimer);
+  dialog.setTimerTime(m_configuration.timerTime);
+  dialog.setClockDateTime(m_configuration.clockDateTime);
+  dialog.setTimerLoop(m_configuration.timerLoops);
+  dialog.setSound(m_configuration.sound);
+  dialog.setSoundVolume(m_configuration.soundVolume);
+  dialog.setShowInTray(m_configuration.useTray);
+  dialog.setShowInDesktop(m_configuration.useDesktopWidget);
+  dialog.setDesktopWidgetPosition(m_configuration.widgetPosition);
+  dialog.setWidgetOpacity(m_configuration.widgetOpacity);
+
+  dialog.exec();
+
+  if(dialog.result() == QDialog::Accepted)
+  {
+    AlarmConfiguration conf;
+    conf.name    = dialog.name();
+    conf.message = dialog.message();
+    conf.color   = dialog.color();
+    conf.isTimer = dialog.isTimer();
+
+    if(conf.isTimer)
+    {
+      conf.timerTime  = dialog.timerTime();
+      conf.timerLoops = dialog.timerLoop();
+    }
+    else
+    {
+      conf.clockDateTime = dialog.clockDateTime();
+    }
+
+    conf.sound            = dialog.sound();
+    conf.soundVolume      = dialog.soundVolume();
+    conf.useTray          = dialog.showInTray();
+    conf.useDesktopWidget = dialog.showInDesktop();
+    conf.widgetPosition   = dialog.desktopWidgetPosition();
+    conf.widgetOpacity    = dialog.widgetOpacity();
+
+    setConfiguration(conf);
+  }
+}
+
+//-----------------------------------------------------------------
 void AlarmWidget::onDeletePressed()
 {
   emit deleteAlarm();
@@ -354,6 +419,23 @@ void AlarmWidget::onDeletePressed()
 //-----------------------------------------------------------------
 void AlarmWidget::setConfiguration(const AlarmConfiguration &conf)
 {
+  if(m_icon)
+  {
+    m_icon->hide();
+    delete m_icon;
+  }
+
+  if(m_widget)
+  {
+    m_widget->hide();
+    delete m_widget;
+  }
+
+  if(m_alarm)
+  {
+    delete m_alarm;
+  }
+
   m_configuration = conf;
 
   setColor(m_configuration.color);
@@ -403,7 +485,7 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration &conf)
 
   setAlarm(alarm);
 
-  if (conf.useTray && QSystemTrayIcon::isSystemTrayAvailable() && !m_icon)
+  if (conf.useTray && QSystemTrayIcon::isSystemTrayAvailable())
   {
     m_icon = new QSystemTrayIcon(this);
     m_icon->setToolTip(QString("%1\nRemaining time: %2").arg(m_configuration.name).arg(alarm->remainingTimeText()));

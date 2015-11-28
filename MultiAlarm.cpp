@@ -49,6 +49,7 @@ const QString ALARM_TIMER_LOOP      = "Loops";
 const QString ALARM_TIMER_TIME      = "TimerTime";
 const QString ALARM_CLOCK_DATETIME  = "ClockDateTime";
 const QString ALARM_SOUND           = "Sound";
+const QString ALARM_SOUND_VOLUME    = "SoundVolume";
 const QString ALARM_USE_TRAY        = "UseTray";
 const QString ALARM_USE_DESKTOP     = "UseDesktop";
 const QString ALARM_WIDGET_POSITION = "DesktopWidgetPosition";
@@ -88,16 +89,33 @@ MultiAlarm::~MultiAlarm()
 }
 
 //-----------------------------------------------------------------
-void MultiAlarm::createNewAlarm()
+QStringList MultiAlarm::usedNames() const
 {
-  QStringList invalidNames, invalidColors;
+  QStringList result;
   for(auto alarm: m_alarms)
   {
-    invalidNames << alarm->name();
-    invalidColors << alarm->color();
+    result << alarm->name();
   }
 
-  NewAlarmDialog dialog(invalidNames, invalidColors, this);
+  return result;
+}
+
+//-----------------------------------------------------------------
+QStringList MultiAlarm::usedColors() const
+{
+  QStringList result;
+  for(auto alarm: m_alarms)
+  {
+    result << alarm->color();
+  }
+
+  return result;
+}
+
+//-----------------------------------------------------------------
+void MultiAlarm::createNewAlarm()
+{
+  NewAlarmDialog dialog(usedNames(), usedColors(), this);
 
   dialog.exec();
 
@@ -307,6 +325,7 @@ void MultiAlarm::saveSettings()
       }
 
       settings.setValue(ALARM_SOUND, conf.sound);
+      settings.setValue(ALARM_SOUND_VOLUME, conf.soundVolume);
       settings.setValue(ALARM_USE_TRAY, conf.useTray);
       settings.setValue(ALARM_USE_DESKTOP, conf.useDesktopWidget);
       settings.setValue(ALARM_WIDGET_POSITION, conf.widgetPosition);
@@ -377,6 +396,7 @@ AlarmWidget* MultiAlarm::createAlarmWidget(const NewAlarmDialog& dialog)
   }
 
   conf.sound            = dialog.sound();
+  conf.soundVolume      = dialog.soundVolume();
   conf.useTray          = dialog.showInTray();
   conf.useDesktopWidget = dialog.showInDesktop();
   conf.widgetPosition   = dialog.desktopWidgetPosition();
@@ -410,6 +430,7 @@ AlarmWidget* MultiAlarm::createAlarmWidget(QSettings &settings, const QString &n
   }
 
   conf.sound            = settings.value(ALARM_SOUND, 0).toInt();
+  conf.soundVolume      = settings.value(ALARM_SOUND_VOLUME, 100).toInt();
   conf.useTray          = settings.value(ALARM_USE_TRAY, false).toBool();
   conf.useDesktopWidget = settings.value(ALARM_USE_DESKTOP, false).toBool();
   conf.widgetPosition   = settings.value(ALARM_WIDGET_POSITION, QPoint{0,0}).toPoint();

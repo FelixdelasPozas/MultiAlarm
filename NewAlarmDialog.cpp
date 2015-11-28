@@ -109,6 +109,10 @@ NewAlarmDialog::NewAlarmDialog(QStringList invalidNames, QStringList invalidColo
   m_opacitySlider->setMaximum(100);
   m_opacitySlider->setValue(60);
 
+  m_volumeSlider->setMinimum(0);
+  m_volumeSlider->setMaximum(100);
+  m_volumeSlider->setValue(100);
+
   loadSounds();
 
   m_timer->setMinimumTime(QTime{0,1,0});
@@ -179,6 +183,11 @@ void NewAlarmDialog::onOpacityValueChanged(int value)
 }
 
 //-----------------------------------------------------------------
+void NewAlarmDialog::onVolumeChanged(int value)
+{
+  m_volumeSliderValue->setText(QString("%1%").arg(value));
+}
+//-----------------------------------------------------------------
 void NewAlarmDialog::onWidgetPositionChanged(int value)
 {
   if(value != 0)
@@ -220,6 +229,7 @@ void NewAlarmDialog::playSound()
     }
   }
 
+  m_sounds[m_soundComboBox->currentIndex()]->setVolume(m_volumeSlider->value()/100.0);
   m_sounds[m_soundComboBox->currentIndex()]->play();
 }
 
@@ -255,6 +265,9 @@ void NewAlarmDialog::connectSignals()
 
   connect(m_colorComboBox, SIGNAL(currentIndexChanged(int)),
           this,            SLOT(onColorChanged(int)));
+
+  connect(m_volumeSlider, SIGNAL(valueChanged(int)),
+          this,           SLOT(onVolumeChanged(int)));
 
   connect(&m_widget, SIGNAL(beingDragged()),
           this,      SLOT(onWidgetBeingDragged()));
@@ -308,6 +321,12 @@ const QString NewAlarmDialog::message() const
 bool NewAlarmDialog::isTimer() const
 {
   return m_timerRadio->isChecked();
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::setIsTimer(bool value)
+{
+  m_timerRadio->setChecked(value);
 }
 
 //-----------------------------------------------------------------
@@ -379,6 +398,18 @@ int NewAlarmDialog::sound() const
 }
 
 //-----------------------------------------------------------------
+void NewAlarmDialog::setSoundVolume(int value)
+{
+  m_volumeSlider->setValue(value);
+}
+
+//-----------------------------------------------------------------
+int NewAlarmDialog::soundVolume() const
+{
+  return m_volumeSlider->value();
+}
+
+//-----------------------------------------------------------------
 void NewAlarmDialog::setShowInTray(bool value)
 {
   m_showTray->setChecked(value);
@@ -409,9 +440,12 @@ void NewAlarmDialog::setDesktopWidgetPosition(const QPoint &position)
   {
     if(position == m_widgetPositions.at(i))
     {
-      m_widget.setPosition(m_widgetPositions.at(i));
+      m_positionComboBox->setCurrentIndex(i);
+      return;
     }
   }
+  m_positionComboBox->setCurrentIndex(0);
+  m_widget.setPosition(position);
 }
 
 //-----------------------------------------------------------------

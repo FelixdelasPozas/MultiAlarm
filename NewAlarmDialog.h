@@ -79,6 +79,12 @@ class NewAlarmDialog
      */
     bool isTimer() const;
 
+    /** \brief Sets the type of the alarm.
+     * \param[in] value true to set type to timer and false to set to clock.
+     *
+     */
+    void setIsTimer(bool value);
+
     /** \brief Sets the time of the timer alarm.
      * \param[in] time QTime object.
      *
@@ -133,6 +139,17 @@ class NewAlarmDialog
      *
      */
     int sound() const;
+
+    /** \brief Sets the value of the volume.
+     * \param[in] value int value in [0-100]
+     *
+     */
+    void setSoundVolume(int value);
+
+    /** \brief Returns the volume of the sound.
+     *
+     */
+    int soundVolume() const;
 
     /** \brief Enables/disables the alarm tray icon.
      * \param[in] value true to enable and false otherwise.
@@ -234,6 +251,12 @@ class NewAlarmDialog
      *
      */
     void onWidgetBeingDragged();
+
+    /** \brief Updates the GUI when the user changes the sound volume slider.
+     * \param[in] value slider value.
+     *
+     */
+    void onVolumeChanged(int value);
 
   private:
     /** \brief Helper methods to connect the signals for UI elements.

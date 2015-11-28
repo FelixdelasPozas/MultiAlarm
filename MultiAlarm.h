@@ -56,6 +56,16 @@ class MultiAlarm
      */
     virtual ~MultiAlarm();
 
+    /** \brief Return the list of used alarm names.
+     *
+     */
+    QStringList usedNames() const;
+
+    /** \brief Returns the list of used colors.
+     *
+     */
+    QStringList usedColors() const;
+
   private slots:
     /** \brief Launches the alarm creation dialog.
      *
