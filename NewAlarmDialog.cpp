@@ -32,11 +32,25 @@
 #include <QSystemTrayIcon>
 #include <QDesktopWidget>
 
-const QStringList sounds{ "Buzz", "Smoke alarm", "Desk bell"};
+const QStringList soundFiles = { ":/MultiAlarm/sounds/Beeper 1.wav",
+                                 ":/MultiAlarm/sounds/Beeper 2.wav",
+                                 ":/MultiAlarm/sounds/Beeper 3.wav",
+                                 ":/MultiAlarm/sounds/Buzzer 1.wav",
+                                 ":/MultiAlarm/sounds/Buzzer 2.wav",
+                                 ":/MultiAlarm/sounds/Code Red.wav",
+                                 ":/MultiAlarm/sounds/Electronic.wav",
+                                 ":/MultiAlarm/sounds/Pager.wav",
+                                 ":/MultiAlarm/sounds/Smoke.wav" };
 
-const QStringList soundNames = { ":/MultiAlarm/sounds/buzz.wav",
-                                 ":/MultiAlarm/sounds/smokealarm.wav",
-                                 ":/MultiAlarm/sounds/deskbell.wav" };
+const QStringList soundNames = { "Beeper 1",
+                                 "Beeper 2",
+                                 "Beeper 3",
+                                 "Buzzer 1",
+                                 "Buzzer 2",
+                                 "Code Red",
+                                 "Electronic",
+                                 "Pager",
+                                 "Smoke Alarm" };
 
 const QStringList defaultPositions = { "Top Left",
                                        "Top Center",
@@ -84,7 +98,7 @@ NewAlarmDialog::NewAlarmDialog(QStringList invalidNames, QStringList invalidColo
   m_colorComboBox->setCurrentIndex(0);
   m_widget.setColor(m_colors.at(0));
 
-  m_soundComboBox->insertItems(0, sounds);
+  m_soundComboBox->insertItems(0, soundNames);
   m_soundComboBox->setCurrentIndex(0);
 
   computeDesktopWidgetPositions();
@@ -97,8 +111,8 @@ NewAlarmDialog::NewAlarmDialog(QStringList invalidNames, QStringList invalidColo
 
   loadSounds();
 
-  m_timer->setMinimumTime(QTime(0,1,0));
-  m_clock->setMinimumTime(QTime(0,1,0));
+  m_timer->setMinimumTime(QTime{0,1,0});
+  m_clock->setMinimumTime(QTime{0,1,0});
 
   m_buttons->button(QDialogButtonBox::Ok)->setEnabled(false);
 }
@@ -197,7 +211,7 @@ void NewAlarmDialog::checkOkButtonRequirements()
 //-----------------------------------------------------------------
 void NewAlarmDialog::playSound()
 {
-  for(auto i: {0,1,2})
+  for(int i = 0; i < soundFiles.size(); ++i)
   {
     if(m_sounds[i]->isPlaying())
     {
@@ -423,9 +437,9 @@ void NewAlarmDialog::loadSounds()
 {
   // NOTE: Load sound files. QSound can't play a file from the qt resource file
   // so we will dump them first to the temporal directory, then load the resources.
-  for(auto i: {0,1,2})
+  for(int i = 0; i < soundFiles.size(); ++i)
   {
-    auto file = QTemporaryFile::createLocalFile(soundNames[i]);
+    auto file = QTemporaryFile::createLocalFile(soundFiles[i]);
     m_sounds.insert(i, new QSoundEffect(this));
     m_sounds[i]->setSource(QUrl::fromLocalFile(file->fileName()));
 

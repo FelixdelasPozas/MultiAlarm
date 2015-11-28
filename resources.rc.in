@@ -10,7 +10,7 @@ BEGIN
   BEGIN
     BLOCK "040904B0"
     BEGIN
-    VALUE "CompanyName", "Unknown"
+    VALUE "CompanyName", "Felix de las Pozas Alvarez"
     VALUE "FileDescription", "MultiAlarm"
       VALUE "FileVersion", "@MULTIALARM_VERSION_MAJOR@.@MULTIALARM_VERSION_MINOR@.@MULTIALARM_VERSION_PATCH@"
       VALUE "InternalName", "MultiAlarm"

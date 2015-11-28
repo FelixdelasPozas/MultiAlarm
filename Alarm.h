@@ -25,7 +25,7 @@
 #include <QTime>
 
 /** \class Alarm
- * \brief Holds alarm timer.
+ * \brief Holds alarm timer and sends the progression signals.
  *
  */
 class Alarm
@@ -33,6 +33,9 @@ class Alarm
 {
     Q_OBJECT
   public:
+    /** \brief AlarmTime struct holds the time information.
+     *
+     */
     struct AlarmTime
     {
       int days;
@@ -55,7 +58,8 @@ class Alarm
     /** \brief Alarm class virtual destructor.
      *
      */
-    virtual ~Alarm();
+    virtual ~Alarm()
+    {};
 
     /** \brief Starts the alarm.
      *

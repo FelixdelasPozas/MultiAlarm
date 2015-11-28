@@ -29,9 +29,13 @@
 #include <QAction>
 #include <QMenu>
 #include <QMessageBox>
+#include <QScrollBar>
 
 // C++
 #include <iostream>
+
+const int MAX_HEIGHT = 800;
+const int BAR_WIDTH  = 15;
 
 const QString STATE    = "State";
 const QString GEOMETRY = "Geometry";
@@ -64,6 +68,11 @@ MultiAlarm::MultiAlarm(QWidget *parent, Qt::WindowFlags flags)
   centralWidget()->layout()->setContentsMargins(0,0,0,0);
   centralWidget()->layout()->setSpacing(0);
   centralWidget()->layout()->setMargin(0);
+
+  m_scrollArea->hide();
+  m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  m_scrollArea->verticalScrollBar()->hide();
 
   restoreSettings();
 
@@ -143,18 +152,23 @@ void MultiAlarm::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason)
 void MultiAlarm::setupTrayIcon()
 {
   auto menu = new QMenu();
+
   auto restore = new QAction(tr("Restore"), this);
-  auto quit = new QAction(tr("Quit"), this);
-
-  menu->addAction(restore);
-  menu->addSeparator();
-  menu->addAction(quit);
-
   connect(restore, SIGNAL(triggered()),
           this,    SLOT(onRestoreActionActivated()));
 
+  auto about = new QAction(tr("About..."), this);
+  connect(about, SIGNAL(triggered()),
+          this,  SLOT(aboutDialog()));
+
+  auto quit = new QAction(tr("Quit"), this);
   connect(quit, SIGNAL(triggered()),
           this, SLOT(onQuitActionActivated()));
+
+  menu->addAction(restore);
+  menu->addSeparator();
+  menu->addAction(about);
+  menu->addAction(quit);
 
   m_icon->setContextMenu(menu);
   m_icon->setToolTip(tr("MultiAlarm"));
@@ -178,13 +192,30 @@ void MultiAlarm::onQuitActionActivated()
 //-----------------------------------------------------------------
 void MultiAlarm::addAlarmWidget(AlarmWidget *widget)
 {
+  m_scrollArea->show();
+
+  auto oldHeight = currentHeight();
+  auto barEnabled = (oldHeight > MAX_HEIGHT);
+
   connect(widget, SIGNAL(deleteAlarm()),
           this,   SLOT(onAlarmDeleted()));
 
   m_alarms << widget;
+  m_scrollWidget->layout()->addWidget(widget);
 
-  centralWidget()->layout()->addWidget(widget);
-  setFixedHeight(size().height() + widget->size().height());
+  auto height = currentHeight();
+  auto needBar = (height > MAX_HEIGHT);
+
+  if(barEnabled != needBar)
+  {
+    auto bar = m_scrollArea->verticalScrollBar();
+    bar->show();
+
+    height = MAX_HEIGHT;
+    setFixedWidth(size().width() + BAR_WIDTH);
+  }
+
+  setFixedHeight(height);
 }
 
 //-----------------------------------------------------------------
@@ -293,12 +324,37 @@ void MultiAlarm::onAlarmDeleted()
 {
   auto widget = qobject_cast<AlarmWidget *>(sender());
 
-  centralWidget()->layout()->removeWidget(widget);
-  setFixedHeight(size().height() - widget->size().height());
+  auto oldHeight = currentHeight();
+  auto barEnabled = (oldHeight > MAX_HEIGHT);
 
+  m_scrollWidget->layout()->removeWidget(widget);
   m_alarms.removeOne(widget);
-
   delete widget;
+
+  auto newHeight = currentHeight();
+  auto needBar = (newHeight > MAX_HEIGHT);
+
+  if(barEnabled != needBar)
+  {
+    auto bar = m_scrollArea->verticalScrollBar();
+    bar->hide();
+
+    setFixedWidth(size().width() - BAR_WIDTH);
+  }
+
+  if(needBar)
+  {
+    setFixedHeight(MAX_HEIGHT);
+  }
+  else
+  {
+    setFixedHeight(newHeight);
+  }
+
+  if(m_alarms.empty())
+  {
+    m_scrollArea->hide();
+  }
 }
 
 //-----------------------------------------------------------------
@@ -370,6 +426,14 @@ AlarmWidget* MultiAlarm::createAlarmWidget(QSettings &settings, const QString &n
   widget->setConfiguration(conf);
 
   return widget;
+}
+
+//-----------------------------------------------------------------
+int MultiAlarm::currentHeight() const
+{
+  auto alarmSize = m_alarms.size() * m_newButton->size().height();
+
+  return alarmSize + m_newButton->size().height() + menubar->height();
 }
 
 //-----------------------------------------------------------------

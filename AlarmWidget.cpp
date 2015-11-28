@@ -18,8 +18,8 @@
  */
 
 // Project
-#include <AlarmWidget.h>
 #include <Alarm.h>
+#include <AlarmWidget.h>
 #include <DesktopWidget.h>
 
 // Qt
@@ -34,9 +34,15 @@
 
 const QString COLOR_QSTRING = "<font color='%1'>%2</font>";
 
-const QStringList soundNames = { ":/MultiAlarm/sounds/buzz.wav",
-                                 ":/MultiAlarm/sounds/smokealarm.wav",
-                                 ":/MultiAlarm/sounds/deskbell.wav" };
+const QStringList soundFiles = { ":/MultiAlarm/sounds/Beeper 1.wav",
+                                 ":/MultiAlarm/sounds/Beeper 2.wav",
+                                 ":/MultiAlarm/sounds/Beeper 3.wav",
+                                 ":/MultiAlarm/sounds/Buzzer 1.wav",
+                                 ":/MultiAlarm/sounds/Buzzer 2.wav",
+                                 ":/MultiAlarm/sounds/Code Red.wav",
+                                 ":/MultiAlarm/sounds/Electronic.wav",
+                                 ":/MultiAlarm/sounds/Pager.wav",
+                                 ":/MultiAlarm/sounds/Smoke.wav" };
 
 //-----------------------------------------------------------------
 AlarmWidget::AlarmWidget(QWidget * parent, Qt::WindowFlags flags)
@@ -311,7 +317,7 @@ void AlarmWidget::onAlarmTimeout()
   Q_ASSERT(m_sound == nullptr);
 
   m_sound = new QSoundEffect(this);
-  auto file = QTemporaryFile::createLocalFile(soundNames[m_configuration.sound]);
+  auto file = QTemporaryFile::createLocalFile(soundFiles[m_configuration.sound]);
   m_sound->setSource(QUrl::fromLocalFile(file->fileName()));
   m_sound->setLoopCount(QSoundEffect::Infinite);
 
@@ -323,6 +329,10 @@ void AlarmWidget::onAlarmTimeout()
 void AlarmWidget::onDialogFinished()
 {
   m_sound->stop();
+  auto soundFile = m_sound->source().toLocalFile();
+  Q_ASSERT(soundFile.endsWith(".wav"));
+  QFile::remove(soundFile);
+
   delete m_sound;
   m_sound = nullptr;
 

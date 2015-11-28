@@ -1,6 +1,6 @@
 /*
  File: DesktopWidget.h
- Created on: 25 de nov. de 2015
+ Created on: 25/11/2015
  Author: Felix de las Pozas Alvarez
 
  This program is free software: you can redistribute it and/or modify
@@ -24,6 +24,10 @@
 #include <QWidget>
 #include <QColor>
 
+/** \class DesktopWidget
+ * \brief Widget to be on the desktop, invisible to events and always on top,
+ *        showing the title and progression of the alarm.
+ */
 class DesktopWidget
 : public QWidget
 {
@@ -40,7 +44,8 @@ class DesktopWidget
     /** \brief DesktopWidget class virtual destructor.
      *
      */
-    virtual ~DesktopWidget();
+    virtual ~DesktopWidget()
+    {};
 
     /** \brief Sets the progress of the widget.
      * \param[in] value progress value in [0.0-100.0].
@@ -80,7 +85,7 @@ class DesktopWidget
     virtual void mouseMoveEvent(QMouseEvent *e) override final;
 
   private:
-    virtual void paintEvent(QPaintEvent *e) override;
+    virtual void paintEvent(QPaintEvent *e) override final;
 
     double  m_progress;      /** progress of the widget in [0.0-100.0]. */
     QColor  m_color;         /** color of the widget. */
@@ -90,8 +95,8 @@ class DesktopWidget
     bool   m_buttonDown;     /** true if the left mouse button is down and false otherwise. */
     QPoint m_point;          /** dragging point. */
 
-    unsigned int m_limitX;   /** X limit in global screen coordinates. */
-    unsigned int m_limitY;   /** Y limit in global screen coordinates. */
+    int m_limitX;            /** X limit in global screen coordinates. */
+    int m_limitY;            /** Y limit in global screen coordinates. */
 };
 
 #endif // DESKTOPWIDGET_H_

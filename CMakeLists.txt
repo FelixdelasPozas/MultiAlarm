@@ -1,3 +1,6 @@
+#
+# MultiAlarm CMake configuration.
+#
 project(MultiAlarm)
 
 cmake_minimum_required (VERSION 2.8.6)
@@ -29,12 +32,12 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
   set(CORE_EXTERNAL_LIBS ${CORE_EXTERNAL_LIBS} ${QT_QTTEST_LIBRARY})
 endif (CMAKE_BUILD_TYPE MATCHES Debug)
 
-if(DEFINED MULTIALARM_VERSION_MAJOR)
+if(DEFINED MINGW)
   configure_file("${PROJECT_SOURCE_DIR}/resources.rc.in" "${PROJECT_BINARY_DIR}/resources.rc")
   set(CORE_SOURCES ${CORE_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/resources.rc)
   set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> -O coff -o <OBJECT> -i <SOURCE>")
   enable_language(RC)
-endif(DEFINED MULTIALARM_VERSION_MAJOR)
+endif(DEFINED MINGW)
 
 include_directories(
   ${CMAKE_SOURCE_DIR}

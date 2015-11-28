@@ -1,6 +1,6 @@
 /*
  File: DesktopWidget.cpp
- Created on: 25 de nov. de 2015
+ Created on: 25/11/2015
  Author: Felix de las Pozas Alvarez
 
  This program is free software: you can redistribute it and/or modify
@@ -18,12 +18,10 @@
  */
 
 // project
-#include <DesktopWidget.h>
+#include "DesktopWidget.h"
 
 // Qt
 #include <QPainter>
-#include <QLabel>
-#include <QPaintEngine>
 #include <QMouseEvent>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -57,11 +55,6 @@ DesktopWidget::DesktopWidget(bool dragEnable, QWidget *parent)
   setWindowOpacity(0.60);
 
   move(0,0);
-}
-
-//-----------------------------------------------------------------
-DesktopWidget::~DesktopWidget()
-{
 }
 
 //-----------------------------------------------------------------
@@ -182,8 +175,10 @@ void DesktopWidget::paintEvent(QPaintEvent *e)
 
   QPainter painter;
   painter.begin(this);
+  painter.setRenderHint(QPainter::Antialiasing);
 
   painter.setBrush(brush);
+  painter.setPen(m_contrastColor);
   painter.drawRoundRect(windowRect,40,40);
 
   brush.setColor(m_color);

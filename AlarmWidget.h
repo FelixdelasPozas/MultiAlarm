@@ -32,6 +32,9 @@ class QTime;
 class QSoundEffect;
 class DesktopWidget;
 
+/** \struct AlarmConfiguration
+ * \brief Holds all the relevant information about an alarm and it's notifications.
+ */
 struct AlarmConfiguration
 {
     QString   name;             /** name of the alarm.                                         */
@@ -48,6 +51,10 @@ struct AlarmConfiguration
     int       widgetOpacity;    /** opacity of the desktop widget in [0-100]                   */
 };
 
+/** \class AlarmWidget
+ * \brief Widget with alarm information and controls to
+ *        start, pause, stop and delete an alarm.
+ */
 class AlarmWidget
 : public QWidget
 , public Ui_AlarmWidget

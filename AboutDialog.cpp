@@ -1,6 +1,6 @@
 /*
  File: AboutDialog.cpp
- Created on: 02/7/2015
+ Created on: 02/07/2015
  Author: Felix de las Pozas Alvarez
 
  This program is free software: you can redistribute it and/or modify
@@ -36,9 +36,3 @@ AboutDialog::AboutDialog(QWidget *parent, Qt::WindowFlags flags)
   m_compilationDate->setText(tr("Compiled on ") + compilation_date + compilation_time);
   m_version->setText(VERSION);
 }
-
-//-----------------------------------------------------------------
-AboutDialog::~AboutDialog()
-{
-}
-

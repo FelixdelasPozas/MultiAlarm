@@ -131,6 +131,11 @@ class MultiAlarm
      */
     void addAlarmWidget(AlarmWidget *widget);
 
+    /** \brief Returns the current height of the main window.
+     *
+     */
+    int currentHeight() const;
+
   private:
     QSystemTrayIcon *m_icon;              /** application icon when minimized.      */
     QAction         *m_restoreMenuAction; /** restore application tray icon action. */

@@ -1,6 +1,6 @@
 /*
  File: AboutDialog.h
- Created on: 02/7/2015
+ Created on: 02/07/2015
  Author: Felix de las Pozas Alvarez
 
  This program is free software: you can redistribute it and/or modify
@@ -26,6 +26,10 @@
 // Qt
 #include <QDialog>
 
+/** \class AboutDialog
+ * \brief Egocentrical dialog with version and date of build.
+ *
+ */
 class AboutDialog
 : public QDialog
 , public Ui_AboutDialog
@@ -42,7 +46,8 @@ class AboutDialog
     /** \brief AboutDialog class virtual destructor.
      *
      */
-    virtual ~AboutDialog();
+    virtual ~AboutDialog()
+    {};
 
   private:
     static const QString VERSION; /** application version string. */
