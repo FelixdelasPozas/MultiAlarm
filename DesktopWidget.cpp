@@ -64,7 +64,12 @@ void DesktopWidget::setProgress(double value)
   {
     m_progress = value;
 
-    if(isVisible()) repaint();
+    if(isVisible())
+    {
+      setAttribute(Qt::WA_AlwaysStackOnTop);
+      update();
+      repaint();
+    }
   }
 }
 

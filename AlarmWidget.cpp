@@ -314,13 +314,13 @@ void AlarmWidget::onAlarmTimeout()
     stop();
   }
 
-  auto dialog = new QMessageBox(this);
+  auto dialog = new QMessageBox(QMessageBox::Information,
+                                m_configuration.name,
+                                m_configuration.message,
+                                QMessageBox::Ok,
+                                this,
+                                Qt::Dialog|Qt::MSWindowsFixedSizeDialogHint|Qt::WindowStaysOnTopHint);
   dialog->setWindowIcon(QIcon(":MultiAlarm/2.ico"));
-  dialog->setWindowTitle(m_configuration.name);
-  dialog->setText(m_configuration.message);
-  dialog->setStandardButtons(QMessageBox::Ok);
-  dialog->setIcon(QMessageBox::Information);
-  dialog->setWindowFlags(dialog->windowFlags() & Qt::WindowStaysOnTopHint);
 
   connect(dialog, SIGNAL(finished(int)),
           this,   SLOT(onDialogFinished()));
