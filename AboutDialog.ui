@@ -27,7 +27,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="rsc/resources.qrc">
-    <normaloff>:/MultiAlarm/application.ico</normaloff>:/MultiAlarm/application.ico</iconset>
+    <normaloff>:/MultiAlarm/information.svg</normaloff>:/MultiAlarm/information.svg</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

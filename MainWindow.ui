@@ -197,6 +197,10 @@
    </property>
   </action>
   <action name="m_quitAction">
+   <property name="icon">
+    <iconset resource="rsc/resources.qrc">
+     <normaloff>:/MultiAlarm/exit.svg</normaloff>:/MultiAlarm/exit.svg</iconset>
+   </property>
    <property name="text">
     <string>&amp;Quit</string>
    </property>
@@ -205,6 +209,10 @@
    </property>
   </action>
   <action name="m_aboutAction">
+   <property name="icon">
+    <iconset resource="rsc/resources.qrc">
+     <normaloff>:/MultiAlarm/information.svg</normaloff>:/MultiAlarm/information.svg</iconset>
+   </property>
    <property name="text">
     <string>About &amp;MultiAlarm...</string>
    </property>

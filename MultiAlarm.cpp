@@ -171,18 +171,23 @@ void MultiAlarm::setupTrayIcon()
 {
   auto menu = new QMenu();
 
-  auto restore = new QAction(tr("Restore"), this);
+  auto restore = new QAction(QIcon(":/MultiAlarm/application.ico"), tr("Restore"), this);
   connect(restore, SIGNAL(triggered()),
           this,    SLOT(onRestoreActionActivated()));
 
-  auto about = new QAction(tr("About..."), this);
+  auto newAlarm = new QAction(QIcon(":/MultiAlarm/add.ico"), tr("New Alarm..."), this);
+  connect(newAlarm, SIGNAL(triggered()),
+          this,    SLOT(createNewAlarm()));
+
+  auto about = new QAction(QIcon(":/MultiAlarm/information.svg"), tr("About..."), this);
   connect(about, SIGNAL(triggered()),
           this,  SLOT(aboutDialog()));
 
-  auto quit = new QAction(tr("Quit"), this);
+  auto quit = new QAction(QIcon(":/MultiAlarm/exit.svg"), tr("Quit"), this);
   connect(quit, SIGNAL(triggered()),
           this, SLOT(onQuitActionActivated()));
 
+  menu->addAction(newAlarm);
   menu->addAction(restore);
   menu->addSeparator();
   menu->addAction(about);
