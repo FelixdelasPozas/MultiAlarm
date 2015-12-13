@@ -61,7 +61,7 @@ The desktop widget updates in realtime with a pie representation of the remainin
 
 Application tray icon and menu. 
 
-![apptray](https://cloud.githubusercontent.com/assets/12167134/11453847/86d1ca58-961b-11e5-927c-d4e4e1ee6bba.jpg)
+![apptray](https://cloud.githubusercontent.com/assets/12167134/11766205/4c1a25d2-a17d-11e5-96bc-3d7c6ba5e2a6.jpg)
 
 # Repository information
 
@@ -73,7 +73,7 @@ Application tray icon and menu.
 
 | Language                     |files          |blank        |comment           |code  |
 |:-----------------------------|--------------:|------------:|-----------------:|-----:|
-| C++                          |   7           | 385         |   237            | 1477 |
+| C++                          |   7           | 386         |   237            | 1481 |
 | C/C++ Header                 |   6           | 173         |   508            |  284 |
 | CMake                        |   1           |  17         |    13            |   59 |
-| **Total**                    | **14**        | **575**     | **758**          | **1820** |
+| **Total**                    | **14**        | **576**     | **758**          | **1824** |
