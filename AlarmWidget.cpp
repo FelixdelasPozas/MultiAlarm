@@ -460,25 +460,36 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration &conf)
     int minutes = 0;
     int seconds = 0;
 
-    days = now.daysTo(conf.clockDateTime);
-    if(days > 1)
-    {
-      constexpr long int secondsInDay = 24*60*60;
-      now = now.addDays(days - 1);
+    constexpr long long int secondsInHour = 60*60;
+    constexpr long long int secondsInDay = 24*secondsInHour;
 
-      if(now.secsTo(conf.clockDateTime) > secondsInDay)
-      {
-        ++days;
-        now = now.addSecs(secondsInDay);
-      }
+    long long int difference = now.secsTo(conf.clockDateTime);
+
+    float fDays = static_cast<float>(difference)/secondsInDay;
+    while(fDays >= 1.f)
+    {
+      ++days;
+      difference -= secondsInDay;
+      fDays = static_cast<float>(difference)/secondsInDay;
     }
 
-    auto remaining = now.secsTo(conf.clockDateTime);
-    hours = remaining / 3600;
-    remaining -= hours * 3600;
-    minutes = remaining / 60;
-    remaining -= minutes * 60;
-    seconds = remaining;
+    float fHours = static_cast<float>(difference)/secondsInHour;
+    if(fHours >= 1.f)
+    {
+      ++hours;
+      difference -= secondsInHour;
+      fHours = static_cast<float>(difference)/secondsInHour;
+    }
+
+    float fMin = static_cast<float>(difference)/60;
+    while(fMin >= 1.f)
+    {
+      ++minutes;
+      difference -= 60;
+      fMin = static_cast<float>(difference)/60;
+    }
+
+    seconds = difference;
 
     Alarm::AlarmTime alarmTime(days, hours, minutes, seconds);
     alarm = new Alarm(alarmTime, false);

@@ -31,9 +31,6 @@
 #include <QMessageBox>
 #include <QScrollBar>
 
-// C++
-#include <iostream>
-
 const int MAX_HEIGHT = 800;
 const int BAR_WIDTH  = 15;
 
@@ -261,7 +258,9 @@ void MultiAlarm::restoreSettings()
   QStringList expired;
 
   settings.beginGroup(ALARMS);
-  for(auto alarmName : settings.childGroups())
+  auto alarmIds = settings.childGroups();
+  alarmIds.sort();
+  for(auto alarmName : alarmIds)
   {
     auto alarmWidget = createAlarmWidget(settings, alarmName);
 
