@@ -36,7 +36,7 @@ The following libraries are required:
 * [Qt 5 opensource framework](http://www.qt.io/).
 
 # Install
-The only current option is build from source as binaries are not provided. 
+Install the latest build from the [releases](https://github.com/FelixdelasPozas/MultiAlarm/releases) page. 
 
 # Screenshots
 Main dialog with the alarm list. Each alarm has buttons to start, pause, delete and reconfigure it. Clock alarms can't be paused, stopped or reconfigured. 
