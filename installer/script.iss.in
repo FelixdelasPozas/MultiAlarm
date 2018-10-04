@@ -1,0 +1,39 @@
+; Mingw64 Distribution Inno Setup File
+
+[Setup]
+AppName=MultiAlarm
+AppVersion=@MULTIALARM_VERSION_MAJOR@.@MULTIALARM_VERSION_MINOR@.@MULTIALARM_VERSION_PATCH@
+DefaultDirName={pf64}\MultiAlarm
+DefaultGroupName=MultiAlarm
+OutputDir=@PROJECT_BINARY_DIR@
+AppComments=MultiAlarm
+AppContact=Felix de las Pozas Alvarez
+AppCopyright=(c)2018 Felix de las Pozas Alvarez
+AppPublisher=Felix de las Pozas Alvarez
+ArchitecturesAllowed=x64
+Compression=lzma2/ultra64
+CreateUninstallRegKey=yes
+Uninstallable=yes
+DisableFinishedPage=no
+DisableWelcomePage=no
+ChangesAssociations=no
+CloseApplications=yes
+UninstallDisplayIcon=@CMAKE_SOURCE_DIR@/rsc/application.ico
+UninstallDisplayName=MultiAlarm v@MULTIALARM_VERSION_MAJOR@.@MULTIALARM_VERSION_MINOR@.@MULTIALARM_VERSION_PATCH@
+SourceDir=@PROJECT_BINARY_DIR@
+SetupIconFile=@CMAKE_SOURCE_DIR@/rsc/application.ico
+OutputBaseFilename=MultiAlarm_v@MULTIALARM_VERSION_MAJOR@.@MULTIALARM_VERSION_MINOR@.@MULTIALARM_VERSION_PATCH@_Setup
+WizardImageFile=@CMAKE_SOURCE_DIR@/installer/image.bmp
+WizardSmallImageFile=@CMAKE_SOURCE_DIR@/installer/smallimage.bmp
+
+[Files]
+Source: "MultiAlarm.exe"; DestDir: "{app}";
+Source: "*.dll"; DestDir: "{app}";
+Source: "iconengines/*.*"; DestDir: "{app}/iconengines/";
+Source: "imageformats/*.*"; DestDir: "{app}/imageformats/";
+Source: "platforms/*.*"; DestDir: "{app}/platforms/";
+Source: "audio/*.*"; DestDir: "{app}/audio/";
+Source: "mediaservice/*.*"; DestDir: "{app}/mediaservice/";
+
+[Run]
+Filename: "{app}\MultiAlarm.exe"; Description: "Launch MultiAlarm"; Flags: postinstall nowait skipifsilent unchecked

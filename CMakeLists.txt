@@ -10,7 +10,7 @@ cmake_policy(SET CMP0020 OLD)
 # Version Number
 set (MULTIALARM_VERSION_MAJOR 1)
 set (MULTIALARM_VERSION_MINOR 0)
-set (MULTIALARM_VERSION_PATCH 0)
+set (MULTIALARM_VERSION_PATCH 1)
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -34,6 +34,7 @@ endif (CMAKE_BUILD_TYPE MATCHES Debug)
 
 if(DEFINED MINGW)
   configure_file("${PROJECT_SOURCE_DIR}/resources.rc.in" "${PROJECT_BINARY_DIR}/resources.rc")
+  configure_file("${PROJECT_SOURCE_DIR}/installer/script.iss.in" "${PROJECT_BINARY_DIR}/script.iss")
   set(CORE_SOURCES ${CORE_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/resources.rc)
   set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> -O coff -o <OBJECT> -i <SOURCE>")
   enable_language(RC)
