@@ -65,7 +65,7 @@ Application tray icon and menu.
 
 # Repository information
 
-**Version**: 1.0.0
+**Version**: 1.0.1
 
 **Status**: finished
 
@@ -73,7 +73,7 @@ Application tray icon and menu.
 
 | Language                     |files          |blank        |comment           |code  |
 |:-----------------------------|--------------:|------------:|-----------------:|-----:|
-| C++                          |   7           | 386         |   237            | 1481 |
+| C++                          |   7           | 388         |   236            | 1490 |
 | C/C++ Header                 |   6           | 173         |   508            |  284 |
-| CMake                        |   1           |  17         |    13            |   59 |
-| **Total**                    | **14**        | **576**     | **758**          | **1824** |
+| CMake                        |   1           |  17         |    13            |   60 |
+| **Total**                    | **14**        | **578**     | **757**          | **1834** |
