@@ -20,6 +20,7 @@
 // Project
 #include <DesktopWidget.h>
 #include <NewAlarmDialog.h>
+#include <LogiLED.h>
 
 // Qt
 #include <QImage>
@@ -70,6 +71,8 @@ NewAlarmDialog::NewAlarmDialog(QStringList invalidNames, QStringList invalidColo
 {
   setWindowFlags(windowFlags() & ~Qt::WindowMinMaxButtonsHint & ~Qt::WindowContextHelpButtonHint);
   setupUi(this);
+
+  m_showLogiled->setEnabled(LogiLED::isAvailable());
 
   auto dateTime = QDateTime::currentDateTime();
   m_clock->setDate(dateTime.date());
@@ -135,6 +138,11 @@ NewAlarmDialog::~NewAlarmDialog()
     delete file;
   }
   m_temporaryFiles.clear();
+
+  if(m_showLogiled->isChecked())
+  {
+    LogiLED::getInstance().unregisterItem("NewAlarm");
+  }
 }
 
 //-----------------------------------------------------------------
@@ -165,14 +173,7 @@ void NewAlarmDialog::onDesktopWidgetStateChanged(int value)
   m_opacitySlider->setEnabled(enabled);
   m_opacitySliderValue->setEnabled(enabled);
 
-  if(value)
-  {
-    m_widget.show();
-  }
-  else
-  {
-    m_widget.hide();
-  }
+  value ? m_widget.show() : m_widget.hide();
 }
 
 //-----------------------------------------------------------------
@@ -199,7 +200,14 @@ void NewAlarmDialog::onWidgetPositionChanged(int value)
 //-----------------------------------------------------------------
 void NewAlarmDialog::onColorChanged(int value)
 {
-  m_widget.setColor(m_colors.at(value));
+  auto color = m_colors.at(value);
+
+  m_widget.setColor(color);
+
+  if(m_showLogiled->isChecked())
+  {
+    LogiLED::getInstance().updateItem("NewAlarm", 100, QColor{color});
+  }
 }
 
 //-----------------------------------------------------------------
@@ -271,6 +279,9 @@ void NewAlarmDialog::connectSignals()
 
   connect(&m_widget, SIGNAL(beingDragged()),
           this,      SLOT(onWidgetBeingDragged()));
+
+  connect(m_showLogiled, SIGNAL(stateChanged(int)),
+          this,          SLOT(onKeyboardNotificationStateChanged(int)));
 }
 
 //-----------------------------------------------------------------
@@ -434,6 +445,18 @@ bool NewAlarmDialog::showInDesktop() const
 }
 
 //-----------------------------------------------------------------
+void NewAlarmDialog::setShowInKeyboard(bool value)
+{
+  m_showLogiled->setChecked(value);
+}
+
+//-----------------------------------------------------------------
+bool NewAlarmDialog::showInKeyboard() const
+{
+  return m_showLogiled->isChecked();
+}
+
+//-----------------------------------------------------------------
 void NewAlarmDialog::setDesktopWidgetPosition(const QPoint &position)
 {
   for(int i = 0; i < m_widgetPositions.size(); ++i)
@@ -519,5 +542,19 @@ void NewAlarmDialog::computePositions(const QRect &rect, const QString &screenNa
   for(auto position: defaultPositions)
   {
     positionNames << screenName + position;
+  }
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::onKeyboardNotificationStateChanged(int value)
+{
+  if(value)
+  {
+    auto color = m_colors.at(m_colorComboBox->currentIndex());
+    LogiLED::getInstance().registerItem("NewAlarm", 100, QColor{color}, QColor{0,0,0});
+  }
+  else
+  {
+    LogiLED::getInstance().unregisterItem("NewAlarm");
   }
 }

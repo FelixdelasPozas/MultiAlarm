@@ -9,8 +9,8 @@ cmake_policy(SET CMP0020 OLD)
 
 # Version Number
 set (MULTIALARM_VERSION_MAJOR 1)
-set (MULTIALARM_VERSION_MINOR 0)
-set (MULTIALARM_VERSION_PATCH 1)
+set (MULTIALARM_VERSION_MINOR 1)
+set (MULTIALARM_VERSION_PATCH 0)
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -20,6 +20,10 @@ set(CMAKE_AUTOMOC ON)
 
 # Find the QtWidgets library
 find_package(Qt5 COMPONENTS Widgets Multimedia)
+
+# Fixed, need to be changed to your own installation of Logitech Gaming LED SKD files. 
+set(LOGITECH_INCLUDE "D:/Desarrollo/Code/LogitechG810/include/")
+set(LOGITECH_LIBRARY "D:/Desarrollo/Code/LogitechG810/include/LogitechLedEnginesWrapper.a")
 
 # We need add -DQT_WIDGETS_LIB when using QtWidgets in Qt 5.
 #add_definitions(${Qt5Widgets_DEFINITIONS})
@@ -48,6 +52,7 @@ include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}  # For wrap/ui files
   ${Qt5Widgets_INCLUDE_DIRS}
   ${Qt5Multimedia_INCLUDE_DIRS}
+  ${LOGITECH_INCLUDE}
   )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-deprecated -std=c++11 -mwindows")
@@ -78,9 +83,11 @@ set (CORE_SOURCES
   AlarmWidget.cpp
   Alarm.cpp
   DesktopWidget.cpp
+  LogiLED.cpp
 )
 
 set(CORE_EXTERNAL_LIBS
+  ${LOGITECH_LIBRARY}
   Qt5::Widgets
   Qt5::Multimedia
 )

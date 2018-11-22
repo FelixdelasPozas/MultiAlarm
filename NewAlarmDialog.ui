@@ -10,19 +10,19 @@
     <x>0</x>
     <y>0</y>
     <width>399</width>
-    <height>387</height>
+    <height>410</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>399</width>
-    <height>387</height>
+    <height>410</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>399</width>
-    <height>387</height>
+    <height>410</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -380,6 +380,16 @@ QGroupBox::title {
          </layout>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="m_showLogiled">
+        <property name="toolTip">
+         <string>Show alarm progress using the keyboard lights.</string>
+        </property>
+        <property name="text">
+         <string>Show progress in the keyboard lights.</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

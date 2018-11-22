@@ -21,6 +21,7 @@
 #include "MultiAlarm.h"
 #include "AboutDialog.h"
 #include "NewAlarmDialog.h"
+#include "LogiLED.h"
 #include "Alarm.h"
 
 // Qt
@@ -49,6 +50,7 @@ const QString ALARM_SOUND           = "Sound";
 const QString ALARM_SOUND_VOLUME    = "SoundVolume";
 const QString ALARM_USE_TRAY        = "UseTray";
 const QString ALARM_USE_DESKTOP     = "UseDesktop";
+const QString ALARM_USE_LOGILED     = "UseLogiled";
 const QString ALARM_WIDGET_POSITION = "DesktopWidgetPosition";
 const QString ALARM_WIDGET_OPACITY  = "DesktopWidgetOpacity";
 
@@ -75,6 +77,8 @@ MultiAlarm::MultiAlarm(QWidget *parent, Qt::WindowFlags flags)
   restoreSettings();
 
   setupTrayIcon();
+
+  LogiLED::getInstance();
 
   connectSignals();
 }
@@ -332,6 +336,7 @@ void MultiAlarm::saveSettings()
       settings.setValue(ALARM_SOUND_VOLUME, conf.soundVolume);
       settings.setValue(ALARM_USE_TRAY, conf.useTray);
       settings.setValue(ALARM_USE_DESKTOP, conf.useDesktopWidget);
+      settings.setValue(ALARM_USE_LOGILED, conf.useLogiled);
       settings.setValue(ALARM_WIDGET_POSITION, conf.widgetPosition);
       settings.setValue(ALARM_WIDGET_OPACITY, conf.widgetOpacity);
 
@@ -403,6 +408,7 @@ AlarmWidget* MultiAlarm::createAlarmWidget(const NewAlarmDialog& dialog)
   conf.soundVolume      = dialog.soundVolume();
   conf.useTray          = dialog.showInTray();
   conf.useDesktopWidget = dialog.showInDesktop();
+  conf.useLogiled       = dialog.showInKeyboard();
   conf.widgetPosition   = dialog.desktopWidgetPosition();
   conf.widgetOpacity    = dialog.widgetOpacity();
 
@@ -437,6 +443,7 @@ AlarmWidget* MultiAlarm::createAlarmWidget(QSettings &settings, const QString &n
   conf.soundVolume      = settings.value(ALARM_SOUND_VOLUME, 100).toInt();
   conf.useTray          = settings.value(ALARM_USE_TRAY, false).toBool();
   conf.useDesktopWidget = settings.value(ALARM_USE_DESKTOP, false).toBool();
+  conf.useLogiled       = settings.value(ALARM_USE_LOGILED, false).toBool();
   conf.widgetPosition   = settings.value(ALARM_WIDGET_POSITION, QPoint{0,0}).toPoint();
   conf.widgetOpacity    = settings.value(ALARM_WIDGET_OPACITY, 60).toInt();
 

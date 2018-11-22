@@ -34,25 +34,27 @@ class QTemporaryFile;
 
 class DesktopWidget;
 class MultiAlarm;
+class LogiLED;
 
 /** \struct AlarmConfiguration
  * \brief Holds all the relevant information about an alarm and it's notifications.
  */
 struct AlarmConfiguration
 {
-    QString   name;             /** name of the alarm.                                         */
-    QString   message;          /** message of the alarm to show on completion.                */
-    QString   color;            /** name of the color of the alarm.                            */
-    bool      isTimer;          /** true if the alarm is a timer.                              */
-    QTime     timerTime;        /** duration of the timer alarm.                               */
-    bool      timerLoops;       /** true if the timer loops.                                   */
-    QDateTime clockDateTime;    /** date and timer of the clock alarm.                         */
-    int       sound;            /** sound used for the finished alarm notification.            */
-    int       soundVolume;      /** volume for the sound in [0 (silence) - 100 (loudest) ]     */
-    bool      useTray;          /** true if the alarm uses the tray for notifications.         */
-    bool      useDesktopWidget; /** true if the alarm uses a desktop widget for notifications. */
-    QPoint    widgetPosition;   /** position of the desktop widget.                            */
-    int       widgetOpacity;    /** opacity of the desktop widget in [0-100]                   */
+    QString   name;             /** name of the alarm.                                            */
+    QString   message;          /** message of the alarm to show on completion.                   */
+    QString   color;            /** name of the color of the alarm.                               */
+    bool      isTimer;          /** true if the alarm is a timer.                                 */
+    QTime     timerTime;        /** duration of the timer alarm.                                  */
+    bool      timerLoops;       /** true if the timer loops.                                      */
+    QDateTime clockDateTime;    /** date and timer of the clock alarm.                            */
+    int       sound;            /** sound used for the finished alarm notification.               */
+    int       soundVolume;      /** volume for the sound in [0 (silence) - 100 (loudest) ]        */
+    bool      useTray;          /** true if the alarm uses the tray for notifications.            */
+    bool      useDesktopWidget; /** true if the alarm uses a desktop widget for notifications.    */
+    bool      useLogiled;       /** true if the alarm uses the keyboard lights for notifications. */
+    QPoint    widgetPosition;   /** position of the desktop widget.                               */
+    int       widgetOpacity;    /** opacity of the desktop widget in [0-100]                      */
 };
 
 /** \class AlarmWidget
@@ -187,6 +189,7 @@ class AlarmWidget
     AlarmConfiguration m_configuration; /** alarm configuration.                                     */
     QSystemTrayIcon   *m_icon;          /** system tray icon.                                        */
     DesktopWidget     *m_widget;        /** desktop widget.                                          */
+    LogiLED           *m_logiled;       /** LogiLED instance.                                        */
     QSoundEffect      *m_sound;         /** alarm sound.                                             */
     QTemporaryFile    *m_soundFile;     /** local sound file in termporary directory.                */
 

@@ -23,6 +23,7 @@
 #include "DesktopWidget.h"
 #include "MultiAlarm.h"
 #include "NewAlarmDialog.h"
+#include "LogiLED.h"
 
 // Qt
 #include <QTime>
@@ -54,6 +55,7 @@ AlarmWidget::AlarmWidget(MultiAlarm *parent, Qt::WindowFlags flags)
 , m_alarm        {nullptr}
 , m_icon         {nullptr}
 , m_widget       {nullptr}
+, m_logiled      {nullptr}
 , m_sound        {nullptr}
 , m_soundFile    {nullptr}
 , m_parent       {parent}
@@ -128,6 +130,11 @@ void AlarmWidget::start()
     m_widget->show();
   }
 
+  if(m_logiled)
+  {
+    m_logiled->registerItem(name(), m_alarm->progress(), QColor{color()}, QColor{m_contrastColor});
+  }
+
   m_alarm->start();
   m_started = true;
 }
@@ -166,6 +173,11 @@ void AlarmWidget::stop()
   {
     m_widget->setProgress(0);
     m_widget->hide();
+  }
+
+  if(m_logiled)
+  {
+    m_logiled->unregisterItem(name());
   }
 
   setTime(m_alarm->remainingTime());
@@ -295,6 +307,11 @@ void AlarmWidget::onAlarmTic()
   {
     m_widget->setProgress(m_alarm->precisionProgress());
   }
+
+  if(m_logiled)
+  {
+    m_logiled->updateItem(name(), m_alarm->progress());
+  }
 }
 
 //-----------------------------------------------------------------
@@ -374,6 +391,7 @@ void AlarmWidget::onSettingsPressed()
   dialog.setSoundVolume(m_configuration.soundVolume);
   dialog.setShowInTray(m_configuration.useTray);
   dialog.setShowInDesktop(m_configuration.useDesktopWidget);
+  dialog.setShowInKeyboard(m_configuration.useLogiled);
   dialog.setDesktopWidgetPosition(m_configuration.widgetPosition);
   dialog.setWidgetOpacity(m_configuration.widgetOpacity);
 
@@ -401,6 +419,7 @@ void AlarmWidget::onSettingsPressed()
     conf.soundVolume      = dialog.soundVolume();
     conf.useTray          = dialog.showInTray();
     conf.useDesktopWidget = dialog.showInDesktop();
+    conf.useLogiled       = dialog.showInKeyboard();
     conf.widgetPosition   = dialog.desktopWidgetPosition();
     conf.widgetOpacity    = dialog.widgetOpacity();
 
@@ -429,6 +448,11 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration &conf)
     m_widget->hide();
     delete m_widget;
     m_widget = nullptr;
+  }
+
+  if(m_logiled)
+  {
+    m_logiled = nullptr;
   }
 
   if(m_alarm)
@@ -497,7 +521,7 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration &conf)
 
   setAlarm(alarm);
 
-  if (conf.useTray && QSystemTrayIcon::isSystemTrayAvailable())
+  if(conf.useTray && QSystemTrayIcon::isSystemTrayAvailable())
   {
     m_icon = new QSystemTrayIcon(this);
     m_icon->setToolTip(QString("%1\nRemaining time: %2").arg(m_configuration.name).arg(alarm->remainingTimeText()));
@@ -537,6 +561,11 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration &conf)
     m_widget->setPosition(m_configuration.widgetPosition);
     m_widget->setColor(m_configuration.color);
     m_widget->setOpacity(m_configuration.widgetOpacity);
+  }
+
+  if(conf.useLogiled && LogiLED::isAvailable())
+  {
+    m_logiled = &LogiLED::getInstance();
   }
 
   if(!conf.isTimer)

@@ -173,6 +173,16 @@ class NewAlarmDialog
      */
     bool showInDesktop() const;
 
+    /** \brief Enables/disables the alarm use of the keyboard lights.
+     *
+     */
+    void setShowInKeyboard(bool value);
+
+    /** \brief Returns true if the alarm will show a progress in the keyboard lights.
+     *
+     */
+    bool showInKeyboard() const;
+
     /** \brief Sets the position of the desktop widget.
      * \param[in] position position coordinates. Must be one in the default positions.
      *
@@ -258,6 +268,11 @@ class NewAlarmDialog
      */
     void onVolumeChanged(int value);
 
+    /** \brief Shows/hides the keyboard lights for the alarm when the checkbox changes state.
+     * \param[in] value Checkbox state.
+     */
+    void onKeyboardNotificationStateChanged(int value);
+
   private:
     /** \brief Helper methods to connect the signals for UI elements.
      *
@@ -283,12 +298,12 @@ class NewAlarmDialog
      */
     void computePositions(const QRect &rect, const QString &screenName, QStringList &positionNames);
 
-    QVector<QSoundEffect *> m_sounds;
-    QList<QTemporaryFile *> m_temporaryFiles;
-    QStringList             m_invalidNames;
-    QStringList             m_colors;
-    DesktopWidget           m_widget;
-    QList<QPoint>           m_widgetPositions;
+    QVector<QSoundEffect *> m_sounds;          /** Desktop widgets sounds list.                                    */
+    QList<QTemporaryFile *> m_temporaryFiles;  /** Desktop sounds temporary files in system's temporary directory. */
+    QStringList             m_invalidNames;    /** List of current alarm names. Alarm name must be unique.         */
+    QStringList             m_colors;          /** List of current alarm colors. Alarm color must be unique.       */
+    DesktopWidget           m_widget;          /** Desktop widget for the alarm.                                   */
+    QList<QPoint>           m_widgetPositions; /** List of default defined desktop widget positions.               */
 };
 
 #endif // NEWALARMDIALOG_H_
