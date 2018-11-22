@@ -44,9 +44,9 @@ Main dialog with the alarm list. Each alarm has buttons to start, pause, delete 
 
 ![maindialog](https://cloud.githubusercontent.com/assets/12167134/11453850/8720a5b0-961b-11e5-98c4-c96abe0fc55b.jpg)
 
-The alarm creation and modification dialog. 
+The alarm creation and modification dialog with the desktop widget.
 
-![newalarmdialog](https://cloud.githubusercontent.com/assets/12167134/11453851/8725eda4-961b-11e5-9927-43645952260b.jpg)
+![newalarmdialog](https://user-images.githubusercontent.com/12167134/48921204-65810d80-ee9e-11e8-9a94-7f6c389446b6.jpg)
 
 Simple alarm completion dialog with the alarm message appears on top of other windows.
 
