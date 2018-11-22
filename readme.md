@@ -15,7 +15,7 @@ Timer alarms can be set to loop, are limited to 24 hours and can be stopped, res
 
 Clock alarms can't be stopped (obviously) and are deleted automatically once they expire, and can be set for any future date and time but not reconfigured. If a clock alarm hasn't expired it starts automatically on every program execution. 
 
-The tray icon and desktop widget for notifications are optional for every alarm. The desktop widget is always on top but it's transparent to user interaction (you can click through it to the windows below).
+The tray icon, desktop widget and keyboard lights for notifications are optional for every alarm. The keyboard lights are only available for setups with Logitech RGB Gaming keyboards and only the first row of keys are used (F1 to Pause keys). When multiple alarms are active the lights of the keyboard will alternate with the state of each alarm. The desktop widget is always on top but it's transparent to user interaction (you can click through it to the windows below).
 
 There is no limit in the number of alarms or their state, all can be running at the same time with their own different notification options and alarm sounds. 
 
@@ -34,6 +34,7 @@ Several options can be configured:
 ## External dependencies
 The following libraries are required:
 * [Qt 5 opensource framework](http://www.qt.io/).
+* [Logitech Gaming SDK](https://www.logitechg.com/es-es/developers)
 
 # Install
 Install the latest build from the [releases](https://github.com/FelixdelasPozas/MultiAlarm/releases) page. 
@@ -63,9 +64,13 @@ Application tray icon and menu.
 
 ![apptray](https://cloud.githubusercontent.com/assets/12167134/11766205/4c1a25d2-a17d-11e5-96bc-3d7c6ba5e2a6.jpg)
 
+Keyboard notification for an alarm with red foreground and white background at 40%. Only the keys from F1 to Pause are used to show the progress of the alarm. If there are multiple keyboard notifications the lights will alternate between alarms. 
+
+![keyboard](https://user-images.githubusercontent.com/12167134/48899357-b1589600-ee4f-11e8-89c4-2d13083acd61.jpg)
+
 # Repository information
 
-**Version**: 1.0.1
+**Version**: 1.1.0
 
 **Status**: finished
 
@@ -73,7 +78,7 @@ Application tray icon and menu.
 
 | Language                     |files          |blank        |comment           |code  |
 |:-----------------------------|--------------:|------------:|-----------------:|-----:|
-| C++                          |   7           | 388         |   236            | 1490 |
-| C/C++ Header                 |   6           | 173         |   508            |  284 |
-| CMake                        |   1           |  17         |    13            |   60 |
-| **Total**                    | **14**        | **578**     | **757**          | **1834** |
+| C++                          |   8           | 438         |   272            | 1681 |
+| C/C++ Header                 |   7           | 200         |   604            |  336 |
+| CMake                        |   1           |  18         |    14            |   65 |
+| **Total**                    | **16**        | **656**     | **890**          | **2082** |
