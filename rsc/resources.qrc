@@ -1,6 +1,7 @@
 <RCC>
   <qresource prefix="/MultiAlarm">
     <file>application.ico</file>
+	<file>application.svg</file>
 	<file>add.ico</file>
 	<file>add-disabled.ico</file>
 	<file>delete.ico</file>

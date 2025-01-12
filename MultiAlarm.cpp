@@ -174,7 +174,7 @@ void MultiAlarm::setupTrayIcon()
 {
   auto menu = new QMenu();
 
-  auto restore = new QAction(QIcon(":/MultiAlarm/application.ico"), tr("Restore"), this);
+  auto restore = new QAction(QIcon(":/MultiAlarm/application.svg"), tr("Restore"), this);
   connect(restore, SIGNAL(triggered()),
           this,    SLOT(onRestoreActionActivated()));
 

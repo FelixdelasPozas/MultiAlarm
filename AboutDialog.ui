@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>532</width>
-    <height>283</height>
+    <height>302</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>532</width>
-    <height>283</height>
+    <height>302</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>532</width>
-    <height>283</height>
+    <height>302</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -339,6 +339,19 @@ Qt Framework</string>
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_11">
+     <property name="text">
+      <string>Icons courtesy of &lt;a href=&quot;https://www.svgrepo.com/&quot;&gt;SVG Repo&lt;/a&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="openExternalLinks">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">

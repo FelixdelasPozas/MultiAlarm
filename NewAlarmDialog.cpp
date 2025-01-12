@@ -72,7 +72,15 @@ NewAlarmDialog::NewAlarmDialog(QStringList invalidNames, QStringList invalidColo
   setWindowFlags(windowFlags() & ~Qt::WindowMinMaxButtonsHint & ~Qt::WindowContextHelpButtonHint);
   setupUi(this);
 
-  m_showLogiled->setEnabled(LogiLED::isAvailable());
+  if(LogiLED::isAvailable())
+  {
+    m_showLogiled->setChecked(true);
+  }
+  else
+  {
+    m_showLogiled->setEnabled(false);
+    m_showLogiled->setToolTip(tr("LogiLED is not available because LGHub or the Logitech Gaming Software is not running."));
+  }
 
   auto dateTime = QDateTime::currentDateTime();
   m_clock->setDate(dateTime.date());

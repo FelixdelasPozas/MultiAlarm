@@ -33,7 +33,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="rsc/resources.qrc">
-    <normaloff>:/MultiAlarm/application.ico</normaloff>:/MultiAlarm/application.ico</iconset>
+    <normaloff>:/MultiAlarm/application.svg</normaloff>:/MultiAlarm/application.svg</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
