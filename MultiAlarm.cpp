@@ -26,11 +26,11 @@
 
 // Qt
 #include <QCloseEvent>
-#include <QSettings>
 #include <QAction>
 #include <QMenu>
 #include <QMessageBox>
 #include <QScrollBar>
+#include <QDir>
 
 const int MAX_HEIGHT = 800;
 const int BAR_WIDTH  = 15;
@@ -53,6 +53,8 @@ const QString ALARM_USE_DESKTOP     = "UseDesktop";
 const QString ALARM_USE_LOGILED     = "UseLogiled";
 const QString ALARM_WIDGET_POSITION = "DesktopWidgetPosition";
 const QString ALARM_WIDGET_OPACITY  = "DesktopWidgetOpacity";
+
+const QString INI_FILENAME = "MultiAlarm.ini";
 
 //-----------------------------------------------------------------
 MultiAlarm::MultiAlarm(QWidget *parent, Qt::WindowFlags flags)
@@ -245,28 +247,28 @@ void MultiAlarm::addAlarmWidget(AlarmWidget *widget)
 //-----------------------------------------------------------------
 void MultiAlarm::restoreSettings()
 {
-  QSettings settings("MultiAlarm.ini", QSettings::IniFormat);
+  auto settings = applicationSettings();
 
-  if(settings.contains(STATE))
+  if(settings->contains(STATE))
   {
-    auto state = settings.value(STATE).toByteArray();
+    auto state = settings->value(STATE).toByteArray();
     restoreState(state);
   }
 
-  if(settings.contains(GEOMETRY))
+  if(settings->contains(GEOMETRY))
   {
-    auto geometry = settings.value(GEOMETRY).toByteArray();
+    auto geometry = settings->value(GEOMETRY).toByteArray();
     restoreGeometry(geometry);
   }
 
   QStringList expired;
 
-  settings.beginGroup(ALARMS);
-  auto alarmIds = settings.childGroups();
+  settings->beginGroup(ALARMS);
+  auto alarmIds = settings->childGroups();
   alarmIds.sort();
   for(auto alarmName : alarmIds)
   {
-    auto alarmWidget = createAlarmWidget(settings, alarmName);
+    auto alarmWidget = createAlarmWidget(*settings, alarmName);
 
     if(alarmWidget)
     {
@@ -277,7 +279,7 @@ void MultiAlarm::restoreSettings()
       expired << alarmName;
     }
   }
-  settings.endGroup();
+  settings->endGroup();
 
   if(!expired.empty())
   {
@@ -293,21 +295,23 @@ void MultiAlarm::restoreSettings()
     mb.setText(message);
     mb.exec();
   }
+
+  delete settings;
 }
 
 //-----------------------------------------------------------------
-void MultiAlarm::saveSettings()
+void MultiAlarm::saveSettings() const
 {
-  QSettings settings("MultiAlarm.ini", QSettings::IniFormat);
+  auto settings = applicationSettings();
 
-  settings.setValue(STATE, saveState());
-  settings.setValue(GEOMETRY, saveGeometry());
+  settings->setValue(STATE, saveState());
+  settings->setValue(GEOMETRY, saveGeometry());
 
-  settings.beginGroup(ALARMS);
+  settings->beginGroup(ALARMS);
 
-  for(auto alarm: settings.childGroups())
+  for(auto alarm: settings->childGroups())
   {
-    settings.remove(alarm);
+    settings->remove(alarm);
   }
 
   if(!m_alarms.empty())
@@ -316,35 +320,38 @@ void MultiAlarm::saveSettings()
     {
       auto conf = widget->alarmConfiguration();
 
-      settings.beginGroup(widget->name());
+      settings->beginGroup(widget->name());
 
-      settings.setValue(ALARM_MESSAGE, conf.message);
-      settings.setValue(ALARM_COLOR, widget->color());
-      settings.setValue(ALARM_IS_TIMER, conf.isTimer);
+      settings->setValue(ALARM_MESSAGE, conf.message);
+      settings->setValue(ALARM_COLOR, widget->color());
+      settings->setValue(ALARM_IS_TIMER, conf.isTimer);
 
       if(conf.isTimer)
       {
-        settings.setValue(ALARM_TIMER_LOOP, conf.timerLoops);
-        settings.setValue(ALARM_TIMER_TIME, conf.timerTime);
+        settings->setValue(ALARM_TIMER_LOOP, conf.timerLoops);
+        settings->setValue(ALARM_TIMER_TIME, conf.timerTime);
       }
       else
       {
-        settings.setValue(ALARM_CLOCK_DATETIME, conf.clockDateTime);
+        settings->setValue(ALARM_CLOCK_DATETIME, conf.clockDateTime);
       }
 
-      settings.setValue(ALARM_SOUND, conf.sound);
-      settings.setValue(ALARM_SOUND_VOLUME, conf.soundVolume);
-      settings.setValue(ALARM_USE_TRAY, conf.useTray);
-      settings.setValue(ALARM_USE_DESKTOP, conf.useDesktopWidget);
-      settings.setValue(ALARM_USE_LOGILED, conf.useLogiled);
-      settings.setValue(ALARM_WIDGET_POSITION, conf.widgetPosition);
-      settings.setValue(ALARM_WIDGET_OPACITY, conf.widgetOpacity);
+      settings->setValue(ALARM_SOUND, conf.sound);
+      settings->setValue(ALARM_SOUND_VOLUME, conf.soundVolume);
+      settings->setValue(ALARM_USE_TRAY, conf.useTray);
+      settings->setValue(ALARM_USE_DESKTOP, conf.useDesktopWidget);
+      settings->setValue(ALARM_USE_LOGILED, conf.useLogiled);
+      settings->setValue(ALARM_WIDGET_POSITION, conf.widgetPosition);
+      settings->setValue(ALARM_WIDGET_OPACITY, conf.widgetOpacity);
 
-      settings.endGroup();
+      settings->endGroup();
     }
   }
 
-  settings.endGroup();
+  settings->endGroup();
+  settings->sync();
+
+  delete settings;
 }
 
 //-----------------------------------------------------------------
@@ -485,4 +492,20 @@ void MultiAlarm::connectSignals()
 
   connect(m_icon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
           this,   SLOT(onTrayIconActivated(QSystemTrayIcon::ActivationReason)));
+}
+
+//-----------------------------------------------------------------
+QSettings* MultiAlarm::applicationSettings() const
+{
+  QDir applicationDir{QCoreApplication::applicationDirPath()};
+  if(applicationDir.exists(INI_FILENAME))
+  {
+    const auto fInfo = QFileInfo(applicationDir.absoluteFilePath(INI_FILENAME));
+    if(fInfo.isWritable())
+    {
+      return new QSettings(INI_FILENAME, QSettings::IniFormat);
+    }
+  }
+
+  return new QSettings("Felix de las Pozas Alvarez", "MultiAlarm");
 }

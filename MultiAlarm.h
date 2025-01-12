@@ -28,6 +28,7 @@
 // Qt
 #include <QMainWindow>
 #include <QSystemTrayIcon>
+#include <QSettings>
 
 // C++
 #include <memory>
@@ -123,7 +124,7 @@ class MultiAlarm
     /** \brief Saves application settings to ini file.
      *
      */
-    void saveSettings();
+    void saveSettings() const;
 
     /** \brief Helper method to setup the tray icon.
      *
@@ -145,6 +146,12 @@ class MultiAlarm
      *
      */
     int currentHeight() const;
+
+    /** \brief Returns the application settings. From INI file if exists or the registry if not.
+     *         Needs to be a pointer because QSettings is not copyable.
+     *
+     */
+    QSettings* applicationSettings() const;
 
   private:
     QSystemTrayIcon *m_icon;              /** application icon when minimized.      */
