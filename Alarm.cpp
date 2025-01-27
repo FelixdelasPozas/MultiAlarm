@@ -18,7 +18,7 @@
  */
 
 // Project
-#include "Alarm.h"
+#include <Alarm.h>
 
 //-----------------------------------------------------------------
 QString Alarm::AlarmTime::text() const

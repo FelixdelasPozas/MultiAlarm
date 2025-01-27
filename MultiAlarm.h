@@ -21,9 +21,9 @@
 #define MULTIALARM_H_
 
 // Project
-#include "AlarmWidget.h"
-#include "NewAlarmDialog.h"
-#include "ui_MainWindow.h"
+#include <AlarmWidget.h>
+#include <NewAlarmDialog.h>
+#include <ui_MainWindow.h>
 
 // Qt
 #include <QMainWindow>

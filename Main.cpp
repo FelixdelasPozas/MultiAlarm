@@ -18,7 +18,7 @@
  */
 
 // Project
-#include "MultiAlarm.h"
+#include <MultiAlarm.h>
 
 // Qt
 #include <QApplication>

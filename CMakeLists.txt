@@ -3,7 +3,7 @@
 #
 project(MultiAlarm)
 
-cmake_minimum_required (VERSION 2.8.6)
+cmake_minimum_required (VERSION 3.5.0)
 
 cmake_policy(SET CMP0020 OLD)
 
@@ -17,6 +17,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
 
 # Find the QtWidgets library
 find_package(Qt5 COMPONENTS Widgets Multimedia)
@@ -31,6 +32,7 @@ set(LOGITECH_LIBRARY "D:/Desarrollo/Code/LogitechG810/include/LogitechLedEngines
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Multimedia_EXECUTABLE_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -m64 -Wall -mwindows  -Wno-deprecated")
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
   set(CORE_EXTERNAL_LIBS ${CORE_EXTERNAL_LIBS} ${QT_QTTEST_LIBRARY})
@@ -84,6 +86,7 @@ set (CORE_SOURCES
   Alarm.cpp
   DesktopWidget.cpp
   LogiLED.cpp
+  Utils.cpp
 )
 
 set(CORE_EXTERNAL_LIBS

@@ -18,11 +18,11 @@
  */
 
 // Project
-#include "MultiAlarm.h"
-#include "AboutDialog.h"
-#include "NewAlarmDialog.h"
-#include "LogiLED.h"
-#include "Alarm.h"
+#include <MultiAlarm.h>
+#include <AboutDialog.h>
+#include <NewAlarmDialog.h>
+#include <LogiLED.h>
+#include <Alarm.h>
 
 // Qt
 #include <QCloseEvent>

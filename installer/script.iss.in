@@ -3,7 +3,7 @@
 [Setup]
 AppName=MultiAlarm
 AppVersion=@MULTIALARM_VERSION_MAJOR@.@MULTIALARM_VERSION_MINOR@.@MULTIALARM_VERSION_PATCH@
-DefaultDirName={pf64}\MultiAlarm
+DefaultDirName={commonpf64}\MultiAlarm
 DefaultGroupName=MultiAlarm
 OutputDir=@PROJECT_BINARY_DIR@
 AppComments=MultiAlarm

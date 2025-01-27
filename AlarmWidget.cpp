@@ -18,12 +18,12 @@
  */
 
 // Project
-#include "Alarm.h"
-#include "AlarmWidget.h"
-#include "DesktopWidget.h"
-#include "MultiAlarm.h"
-#include "NewAlarmDialog.h"
-#include "LogiLED.h"
+#include <Alarm.h>
+#include <AlarmWidget.h>
+#include <DesktopWidget.h>
+#include <MultiAlarm.h>
+#include <NewAlarmDialog.h>
+#include <LogiLED.h>
 
 // Qt
 #include <QTime>

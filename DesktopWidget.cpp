@@ -18,7 +18,7 @@
  */
 
 // project
-#include "DesktopWidget.h"
+#include <DesktopWidget.h>
 
 // Qt
 #include <QPainter>

@@ -18,7 +18,12 @@
  */
 
 // Project
-#include "AboutDialog.h"
+#include <AboutDialog.h>
+
+// Qt
+#include <QDesktopServices>
+#include <QUrl>
+#include <QDateTime>
 
 const QString AboutDialog::VERSION = QString("version 1.2.0");
 
@@ -35,4 +40,8 @@ AboutDialog::AboutDialog(QWidget *parent, Qt::WindowFlags flags)
 
   m_compilationDate->setText(tr("Compiled on ") + compilation_date + compilation_time);
   m_version->setText(VERSION);
+  m_copy->setText(tr("Copyright (c) 2015-%1 Félix de las Pozas Álvarez").arg(QDateTime::currentDateTime().date().year()));
+
+  QObject::connect(m_kofiLabel, &Utils::ClickableHoverLabel::clicked,
+                   [this](){ QDesktopServices::openUrl(QUrl{"https://ko-fi.com/felixdelaspozas"}); });  
 }
