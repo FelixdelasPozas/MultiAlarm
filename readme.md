@@ -37,7 +37,7 @@ The following libraries are required:
 * [Logitech Gaming SDK](https://www.logitechg.com/es-es/developers)
 
 # Install
-Install the latest build from the [releases](https://github.com/FelixdelasPozas/MultiAlarm/releases) page. 
+MultiAlarm is available for Windows 7 onwards. You can download the latest installer from the [releases page](https://github.com/FelixdelasPozas/MultiAlarm/releases). Neither the application or the installer are digitally signed so the system will ask for approval before running it the first time.
 
 # Screenshots
 Main dialog with the alarm list. Each alarm has buttons to start, pause, delete and reconfigure it. Clock alarms can't be paused, stopped or reconfigured. 
