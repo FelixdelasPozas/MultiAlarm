@@ -343,7 +343,7 @@ void AlarmWidget::onAlarmTimeout()
           this,   SLOT(onDialogFinished()));
 
   m_sound = new QSoundEffect(this);
-  m_soundFile = QTemporaryFile::createLocalFile(soundFiles[m_configuration.sound]);
+  m_soundFile = QTemporaryFile::createNativeFile(soundFiles[m_configuration.sound]);
   m_sound->setSource(QUrl::fromLocalFile(m_soundFile->fileName()));
   m_sound->setLoopCount(QSoundEffect::Infinite);
   m_sound->setVolume(m_configuration.soundVolume/100.0);

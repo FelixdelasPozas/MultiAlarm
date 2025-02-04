@@ -87,6 +87,11 @@ class LogiLED
      */
     bool updateItem(const QString &id, const int progress, const QColor &foreground = QColor(), const QColor &background = QColor());
 
+    /** \brief Returns the Logitech library version string. 
+     *
+     */
+    std::string version() const;
+
   private slots:
     /** \brief Updates the keyboard lights.
      *
@@ -137,21 +142,21 @@ class LogiLED
        *
        */
       Item(const QString &i, const int p, const QColor &f, const QColor &b): id(i), progress(p), foreground(f), background(b) {};
-
-      /** \brief Operator==
-       * \param[in] other Other Item struct reference.
-       *
-       */
-      bool operator==(const Item &other)
-      {
-        return (id == other.id);
-      }
     };
 
     bool               m_available; /** true if the LogiLED API is available and initialized. */
     QList<struct Item> m_items;     /** list of registered items to show in the keyboard.     */
     int                m_current;   /** index to current item showing.                        */
     QReadWriteLock     m_lock;      /** data protection mutex.                                */
+
+    friend bool operator==(const LogiLED::Item &rhs, const LogiLED::Item &lhs);
 };
+
+/** \brief Comparison operator for LogiLED items. Returns true if equal in id.
+ * \param[in] rhs LogiLED struct item.
+ * \param[in] lhs LogiLED struct item.
+ *
+ */
+bool operator==(const LogiLED::Item &rhs, const LogiLED::Item &lhs);
 
 #endif // LOGILED_H_

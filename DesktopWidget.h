@@ -39,7 +39,7 @@ class DesktopWidget
      * \param[in] dragEnable true to make the widget react to events and false to make the widget transparent to input.
      *
      */
-    explicit DesktopWidget(bool dragEnable, QWidget *parent);
+    explicit DesktopWidget(bool dragEnable, QWidget *parent = nullptr);
 
     /** \brief DesktopWidget class virtual destructor.
      *

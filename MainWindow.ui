@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>470</width>
-    <height>148</height>
+    <height>99</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -41,7 +41,7 @@
      <number>0</number>
     </property>
     <property name="sizeConstraint">
-     <enum>QLayout::SetNoConstraint</enum>
+     <enum>QLayout::SizeConstraint::SetNoConstraint</enum>
     </property>
     <property name="leftMargin">
      <number>0</number>
@@ -71,7 +71,6 @@
       </property>
       <property name="font">
        <font>
-        <weight>75</weight>
         <bold>true</bold>
         <underline>false</underline>
        </font>
@@ -106,22 +105,22 @@
        </sizepolicy>
       </property>
       <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
+       <enum>QFrame::Shape::NoFrame</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Plain</enum>
+       <enum>QFrame::Shadow::Plain</enum>
       </property>
       <property name="lineWidth">
        <number>0</number>
       </property>
       <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOff</enum>
+       <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
       </property>
       <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOff</enum>
+       <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
       </property>
       <property name="sizeAdjustPolicy">
-       <enum>QAbstractScrollArea::AdjustToContents</enum>
+       <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
       </property>
       <property name="widgetResizable">
        <bool>true</bool>
@@ -132,7 +131,7 @@
          <x>0</x>
          <y>0</y>
          <width>470</width>
-         <height>53</height>
+         <height>33</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -163,7 +162,7 @@
      <x>0</x>
      <y>0</y>
      <width>470</width>
-     <height>21</height>
+     <height>33</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuMenu">
@@ -183,7 +182,6 @@
    <addaction name="menuMenu"/>
    <addaction name="menuAbout"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="m_newAction">
    <property name="icon">
     <iconset resource="rsc/resources.qrc">

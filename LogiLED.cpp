@@ -78,11 +78,11 @@ bool LogiLED::registerItem(const QString& id, const int progress, const QColor& 
 {
   if(m_available)
   {
-    const struct Item item{id, progress, foreground, background};
-    int currentItemsSize = 0;
+    const Item item{id, progress, foreground, background};
+    int isEmpty = true;
     {
       QWriteLocker lock(&m_lock);
-      currentItemsSize = m_items.size();
+      isEmpty = m_items.isEmpty();
 
       if(!m_items.contains(item))
       {
@@ -91,7 +91,7 @@ bool LogiLED::registerItem(const QString& id, const int progress, const QColor& 
     }
 
     // only start updating lights when inserting the first
-    if (currentItemsSize == 0)
+    if (isEmpty)
     {
       updateLights();
     }
@@ -108,7 +108,7 @@ bool LogiLED::unregisterItem(const QString& id)
   {
     QWriteLocker lock(&m_lock);
 
-    for(auto &item: m_items)
+    for(const auto &item: m_items)
     {
       if(item.id == id)
       {
@@ -133,15 +133,17 @@ bool LogiLED::updateItem(const QString& id, const int progress, const QColor& fo
   {
     QWriteLocker lock(&m_lock);
 
-    for(auto &item: m_items)
+    for(int i = 0; i < m_items.size(); ++i)
     {
+      auto item = m_items.at(i);
+
       if(item.id == id)
       {
         item.progress = progress;
         if(foreground != QColor()) item.foreground = foreground;
         if(background != QColor()) item.background = background;
 
-        if(m_current == m_items.indexOf(item) ||  item.id == "NewAlarm")
+        if(m_current == i || item.id == "NewAlarm")
         {
           changeKeysToColor(item.progress, item.foreground, item.background);
         }
@@ -201,4 +203,19 @@ void LogiLED::changeKeysToColor(const int progress, const QColor foreground, con
                                              100 * (foreground.blueF() * percent + background.blueF() * (1-percent)));
   }
 
+}
+
+//--------------------------------------------------------------------
+std::string LogiLED::version() const
+{
+  int major, minor, build;
+  LogiLedGetSdkVersion(&major, &minor, &build);
+
+  return std::to_string(major) + "." + std::to_string(minor) + "." + std::to_string(build);
+}
+
+//--------------------------------------------------------------------
+bool operator==(const LogiLED::Item &rhs, const LogiLED::Item &lhs)
+{
+  return rhs.id == lhs.id;
 }

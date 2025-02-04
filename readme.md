@@ -19,6 +19,8 @@ The tray icon, desktop widget and keyboard lights for notifications are optional
 
 There is no limit in the number of alarms or their state, all can be running at the same time with their own different notification options and alarm sounds. 
 
+If you like this project you can support it on [Ko-fi](https://ko-fi.com/felixdelaspozas).
+
 ## Options
 Several options can be configured:
 * different color for each alarm.
@@ -33,7 +35,7 @@ Several options can be configured:
 
 ## External dependencies
 The following libraries are required:
-* [Qt 5 opensource framework](http://www.qt.io/).
+* [Qt Library](http://www.qt.io/).
 * [Logitech Gaming SDK](https://www.logitechg.com/es-es/developers)
 
 # Install
@@ -70,7 +72,7 @@ Keyboard notification for an alarm with red foreground and white background at 4
 
 # Repository information
 
-**Version**: 1.2.0
+**Version**: 1.3.0
 
 **Status**: finished
 
@@ -78,7 +80,7 @@ Keyboard notification for an alarm with red foreground and white background at 4
 
 | Language                     |files          |blank        |comment           |code  |
 |:-----------------------------|--------------:|------------:|-----------------:|-----:|
-| C++                          |   9           | 455         |   295            | 1736 |
-| C/C++ Header                 |   8           | 214         |   642            |  360 |
-| CMake                        |   1           |  18         |    14            |   68 |
-| **Total**                    | **16**        | **687**     | **951**          | **2164** |
+| C++                          |   9           | 462         |   296            | 1769 |
+| C/C++ Header                 |   8           | 216         |   646            |  360 |
+| CMake                        |   1           |  18         |     8            |   70 |
+| **Total**                    | **18**        | **696**     | **950**          | **2199** |

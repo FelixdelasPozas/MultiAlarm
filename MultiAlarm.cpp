@@ -60,16 +60,15 @@ const QString INI_FILENAME = "MultiAlarm.ini";
 MultiAlarm::MultiAlarm(QWidget *parent, Qt::WindowFlags flags)
 : QMainWindow{parent, flags}
 , m_icon     {new QSystemTrayIcon(QIcon(":/MultiAlarm/application.ico"), this)}
+, m_needsExit{false}
 {
   setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
 
   setupUi(this);
 
-  statusbar->setVisible(false);
   setFixedHeight(m_newButton->height() + menubar->height());
   centralWidget()->layout()->setContentsMargins(0,0,0,0);
   centralWidget()->layout()->setSpacing(0);
-  centralWidget()->layout()->setMargin(0);
 
   m_scrollArea->hide();
   m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -155,8 +154,18 @@ void MultiAlarm::changeEvent(QEvent* e)
 //-----------------------------------------------------------------
 void MultiAlarm::closeEvent(QCloseEvent *e)
 {
-  // NOTE: need to force the application to exit because QApplication::QuitOnLastWindowClosed is false.
-  QCoreApplication::quit();
+  if(!m_needsExit)
+  {
+    hide();
+    m_icon->show();
+
+    e->accept();
+  }
+  else
+  {
+    if(e) QMainWindow::closeEvent(e);
+    QApplication::exit(0);
+  }
 }
 
 //-----------------------------------------------------------------
@@ -211,13 +220,18 @@ void MultiAlarm::onRestoreActionActivated()
 //-----------------------------------------------------------------
 void MultiAlarm::onQuitActionActivated()
 {
-  m_icon->hide();
-  close();
+  m_needsExit = true;
+  if (this->isVisible())
+    close();
+  else
+    closeEvent(nullptr);
 }
 
 //-----------------------------------------------------------------
 void MultiAlarm::addAlarmWidget(AlarmWidget *widget)
 {
+  if(!widget) return;
+
   m_scrollArea->show();
 
   auto oldHeight = currentHeight();
@@ -266,7 +280,7 @@ void MultiAlarm::restoreSettings()
   settings->beginGroup(ALARMS);
   auto alarmIds = settings->childGroups();
   alarmIds.sort();
-  for(auto alarmName : alarmIds)
+  for(auto &alarmName : alarmIds)
   {
     auto alarmWidget = createAlarmWidget(*settings, alarmName);
 
@@ -357,7 +371,8 @@ void MultiAlarm::saveSettings() const
 //-----------------------------------------------------------------
 void MultiAlarm::onAlarmDeleted()
 {
-  auto widget = qobject_cast<AlarmWidget *>(sender());
+  AlarmWidget* widget = qobject_cast<AlarmWidget *>(sender());
+  if(!widget) return;
 
   auto oldHeight = currentHeight();
   auto barEnabled = (oldHeight > MAX_HEIGHT);
@@ -479,7 +494,7 @@ int MultiAlarm::currentHeight() const
 void MultiAlarm::connectSignals()
 {
   connect(m_quitAction, SIGNAL(triggered()),
-          this,         SLOT(close()));
+          QApplication::instance(), SLOT(quit()));
 
   connect(m_newAction, SIGNAL(triggered()),
           this,        SLOT(createNewAlarm()));

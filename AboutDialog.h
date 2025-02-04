@@ -32,7 +32,7 @@
  */
 class AboutDialog
 : public QDialog
-, public Ui_AboutDialog
+, public Ui::AboutDialog
 {
     Q_OBJECT
   public:
@@ -41,7 +41,7 @@ class AboutDialog
      * \param[in] flags window flags.
      *
      */
-    AboutDialog(QWidget *parent = nullptr, Qt::WindowFlags flags = 0);
+    AboutDialog(QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags());
 
     /** \brief AboutDialog class virtual destructor.
      *

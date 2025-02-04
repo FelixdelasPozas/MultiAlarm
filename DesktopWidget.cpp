@@ -22,9 +22,10 @@
 
 // Qt
 #include <QPainter>
+#include <QPointF>
 #include <QMouseEvent>
+#include <QScreen>
 #include <QApplication>
-#include <QDesktopWidget>
 
 const int DesktopWidget::WIDGET_SIZE = 100;
 
@@ -47,7 +48,7 @@ DesktopWidget::DesktopWidget(bool dragEnable, QWidget *parent)
     setWindowFlags(windowFlags() & ~Qt::WindowTransparentForInput);
   }
 
-  auto desktopRect = QApplication::desktop()->geometry();
+  auto desktopRect = QApplication::screens().at(0)->virtualGeometry();
   m_limitX = desktopRect.width()-WIDGET_SIZE;
   m_limitY = desktopRect.height()-WIDGET_SIZE;
 
@@ -78,7 +79,7 @@ void DesktopWidget::mousePressEvent(QMouseEvent* e)
 {
   if(underMouse() && e->button() == Qt::MouseButton::LeftButton)
   {
-    m_point = e->globalPos();
+    m_point = e->globalPosition().toPoint();
 
     m_buttonDown = true;
     emit beingDragged();
@@ -94,9 +95,9 @@ void DesktopWidget::mouseReleaseEvent(QMouseEvent* e)
 {
   if(underMouse() && e->button() == Qt::MouseButton::LeftButton)
   {
-    m_point -= e->globalPos();
+    m_point -= e->globalPosition().toPoint();
     setPosition(pos()-m_point);
-    m_point = e->globalPos();
+    m_point = e->globalPosition().toPoint();
 
     m_buttonDown = false;
   }
@@ -111,9 +112,9 @@ void DesktopWidget::mouseMoveEvent(QMouseEvent* e)
 {
   if(m_buttonDown)
   {
-    m_point -= e->globalPos();
+    m_point -= e->globalPosition().toPoint();
     setPosition(pos()-m_point);
-    m_point = e->globalPos();
+    m_point = e->globalPosition().toPoint();
   }
   else
   {
@@ -184,7 +185,7 @@ void DesktopWidget::paintEvent(QPaintEvent *e)
 
   painter.setBrush(brush);
   painter.setPen(m_contrastColor);
-  painter.drawRoundRect(windowRect,40,40);
+  painter.drawRoundedRect(windowRect,20,20);
 
   brush.setColor(m_color);
   brush.setStyle(Qt::SolidPattern);

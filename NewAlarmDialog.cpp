@@ -29,9 +29,9 @@
 #include <QPixmap>
 #include <QPushButton>
 #include <QTemporaryFile>
+#include <QScreen>
 #include <QSoundEffect>
 #include <QSystemTrayIcon>
-#include <QDesktopWidget>
 
 const QStringList soundFiles = { ":/MultiAlarm/sounds/Beeper 1.wav",
                                  ":/MultiAlarm/sounds/Beeper 2.wav",
@@ -504,7 +504,7 @@ void NewAlarmDialog::loadSounds()
   // so we will dump them first to the temporal directory, then load the resources.
   for(int i = 0; i < soundFiles.size(); ++i)
   {
-    auto file = QTemporaryFile::createLocalFile(soundFiles[i]);
+    auto file = QTemporaryFile::createNativeFile(soundFiles[i]);
     m_sounds.insert(i, new QSoundEffect(this));
     m_sounds[i]->setSource(QUrl::fromLocalFile(file->fileName()));
 
@@ -523,12 +523,12 @@ void NewAlarmDialog::computeDesktopWidgetPositions()
   positionNames << tr("Custom (drag to position)");
   m_widgetPositions << QPoint{0,0};
 
-  auto desktop = QApplication::desktop();
-  computePositions(desktop->geometry(), "Global ", positionNames);
+  const auto screens = QApplication::screens();
+  computePositions(QRect{screens.at(0)->virtualGeometry()}, "Global ", positionNames);
 
-  for (int i = 0; i < desktop->numScreens(); ++i)
+  for (int i = 0; i < screens.size(); ++i)
   {
-    computePositions(desktop->screenGeometry(i), QString("Monitor %1 ").arg(i), positionNames);
+    computePositions(screens.at(i)->geometry(), QString("Monitor %1 ").arg(i), positionNames);
   }
 
   m_positionComboBox->insertItems(0, positionNames);

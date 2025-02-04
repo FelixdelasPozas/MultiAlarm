@@ -72,7 +72,7 @@ class AlarmWidget
      * \param[in] flags window flags.
      *
      */
-    explicit AlarmWidget(MultiAlarm *parent, Qt::WindowFlags flags = 0);
+    explicit AlarmWidget(MultiAlarm *parent, Qt::WindowFlags flags = Qt::WindowFlags());
 
     /** \brief AlarmWidget class virtual destructor.
      *

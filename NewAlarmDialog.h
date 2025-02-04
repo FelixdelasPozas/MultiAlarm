@@ -46,7 +46,7 @@ class NewAlarmDialog
      * \param[in] flags window flags.
      *
      */
-    NewAlarmDialog(QStringList invalidNames, QStringList invalidColors, QWidget * parent = nullptr, Qt::WindowFlags f = 0);
+    NewAlarmDialog(QStringList invalidNames, QStringList invalidColors, QWidget * parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 
     /** \brief NewAlarmDialog class virtual destructor.
      *

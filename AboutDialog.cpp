@@ -19,13 +19,15 @@
 
 // Project
 #include <AboutDialog.h>
+#include <LogiLED.h>
 
 // Qt
 #include <QDesktopServices>
 #include <QUrl>
 #include <QDateTime>
+#include <QtGlobal>
 
-const QString AboutDialog::VERSION = QString("version 1.2.0");
+const QString AboutDialog::VERSION = QString("version 1.3.0");
 
 //-----------------------------------------------------------------
 AboutDialog::AboutDialog(QWidget *parent, Qt::WindowFlags flags)
@@ -40,7 +42,13 @@ AboutDialog::AboutDialog(QWidget *parent, Qt::WindowFlags flags)
 
   m_compilationDate->setText(tr("Compiled on ") + compilation_date + compilation_time);
   m_version->setText(VERSION);
+  m_qtVersion->setText(tr("version %1").arg(qVersion()));
   m_copy->setText(tr("Copyright (c) 2015-%1 Félix de las Pozas Álvarez").arg(QDateTime::currentDateTime().date().year()));
+  
+  if(LogiLED::getInstance().isAvailable())
+    m_LEDVersion->setText(tr("version %1").arg(QString::fromStdString(LogiLED::getInstance().version())));
+  else
+    m_LEDVersion->setText(tr("<font color=red>No keyboard present</font>"));
 
   QObject::connect(m_kofiLabel, &Utils::ClickableHoverLabel::clicked,
                    [this](){ QDesktopServices::openUrl(QUrl{"https://ko-fi.com/felixdelaspozas"}); });  

@@ -41,7 +41,7 @@ void Utils::ClickableHoverLabel::mousePressEvent(QMouseEvent *e)
 }
 
 //-----------------------------------------------------------------
-void Utils::ClickableHoverLabel::enterEvent(QEvent *event)
+void Utils::ClickableHoverLabel::enterEvent(QEnterEvent *event)
 {
   setCursor(Qt::PointingHandCursor);
   QLabel::enterEvent(event);

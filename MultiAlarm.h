@@ -50,7 +50,7 @@ class MultiAlarm
     /** \brief MultiAlarm class constructor.
      *
      */
-    MultiAlarm(QWidget *parent = nullptr, Qt::WindowFlags flags = 0);
+    MultiAlarm(QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags());
 
     /** \brief MultiAlarm class virtual destructor.
      *
@@ -154,11 +154,12 @@ class MultiAlarm
     QSettings* applicationSettings() const;
 
   private:
-    QSystemTrayIcon *m_icon;              /** application icon when minimized.      */
-    QAction         *m_restoreMenuAction; /** restore application tray icon action. */
-    QAction         *m_quitMenuAction;    /** quit application tray icon action.    */
+    QSystemTrayIcon *m_icon;              /** application icon when minimized.       */
+    QAction         *m_restoreMenuAction; /** restore application tray icon action.  */
+    QAction         *m_quitMenuAction;    /** quit application tray icon action.     */
+    bool             m_needsExit;         /** true to exit the application on close. */
 
-    QList<AlarmWidget *> m_alarms;        /** alarms widgets.                       */
+    QList<AlarmWidget *> m_alarms;        /** alarms widgets.                        */
 };
 
 #endif // MULTIALARM_H_

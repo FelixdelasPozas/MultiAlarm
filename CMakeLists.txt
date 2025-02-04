@@ -1,15 +1,16 @@
-#
-# MultiAlarm CMake configuration.
-#
+cmake_minimum_required (VERSION 3.10.0)
+
 project(MultiAlarm)
 
-cmake_minimum_required (VERSION 3.5.0)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 cmake_policy(SET CMP0020 OLD)
 
 # Version Number
 set (MULTIALARM_VERSION_MAJOR 1)
-set (MULTIALARM_VERSION_MINOR 2)
+set (MULTIALARM_VERSION_MINOR 3)
 set (MULTIALARM_VERSION_PATCH 0)
 
 # Find includes in corresponding build directories
@@ -20,19 +21,15 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 
 # Find the QtWidgets library
-find_package(Qt5 COMPONENTS Widgets Multimedia)
+find_package(Qt6 COMPONENTS Widgets Multimedia)
 
 # Fixed, need to be changed to your own installation of Logitech Gaming LED SKD files. 
 set(LOGITECH_INCLUDE "D:/Desarrollo/Code/LogitechG810/include/")
 set(LOGITECH_LIBRARY "D:/Desarrollo/Code/LogitechG810/include/LogitechLedEnginesWrapper.a")
 
-# We need add -DQT_WIDGETS_LIB when using QtWidgets in Qt 5.
-#add_definitions(${Qt5Widgets_DEFINITIONS})
-#add_definitions(${Qt5Multimedia_DEFINITIONS})
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Multimedia_EXECUTABLE_COMPILE_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -m64 -Wall -mwindows  -Wno-deprecated")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt6Widgets_EXECUTABLE_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt6Multimedia_EXECUTABLE_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -m64 -Wall -mwindows -Wno-deprecated")
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
   set(CORE_EXTERNAL_LIBS ${CORE_EXTERNAL_LIBS} ${QT_QTTEST_LIBRARY})
@@ -60,11 +57,11 @@ include_directories(
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-deprecated -std=c++11 -mwindows")
 
 # Add Qt Resource files
-qt5_add_resources(RESOURCES
+qt6_add_resources(RESOURCES
   rsc/resources.qrc
 )
 
-qt5_wrap_ui(CORE_UI
+qt6_wrap_ui(CORE_UI
   # .ui for Qt
   NewAlarmDialog.ui
   MainWindow.ui
@@ -91,10 +88,9 @@ set (CORE_SOURCES
 
 set(CORE_EXTERNAL_LIBS
   ${LOGITECH_LIBRARY}
-  Qt5::Widgets
-  Qt5::Multimedia
+  Qt6::Widgets
+  Qt6::Multimedia
 )
   
 add_executable(MultiAlarm ${CORE_SOURCES})
 target_link_libraries (MultiAlarm ${CORE_EXTERNAL_LIBS})
-qt5_use_modules(MultiAlarm Widgets)
