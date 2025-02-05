@@ -28,12 +28,13 @@ WizardSmallImageFile=@CMAKE_SOURCE_DIR@/installer/smallimage.bmp
 
 [Files]
 Source: "MultiAlarm.exe"; DestDir: "{app}";
-Source: "*.dll"; Excludes: "Qt6Network.dll"; DestDir: "{app}";
+Source: "*.dll"; DestDir: "{app}";
 Source: "iconengines/*.*"; DestDir: "{app}/iconengines/";
 Source: "imageformats/*.*"; DestDir: "{app}/imageformats/";
 Source: "platforms/*.*"; DestDir: "{app}/platforms/";
 Source: "multimedia/*.*"; DestDir: "{app}/platforms/";
 Source: "styles/*.*"; DestDir: "{app}/platforms/";
+Source: "networkinformation/*.*"; DestDir: "{app}/platforms/";
 
 [Run]
 Filename: "{app}\MultiAlarm.exe"; Description: "Launch MultiAlarm"; Flags: postinstall nowait skipifsilent unchecked

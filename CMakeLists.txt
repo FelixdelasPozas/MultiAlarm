@@ -49,8 +49,6 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_BINARY_DIR}          # Generated .h files
   ${CMAKE_CURRENT_BINARY_DIR}  # For wrap/ui files
-  ${Qt5Widgets_INCLUDE_DIRS}
-  ${Qt5Multimedia_INCLUDE_DIRS}
   ${LOGITECH_INCLUDE}
   )
 
