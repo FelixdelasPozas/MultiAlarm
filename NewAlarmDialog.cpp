@@ -524,11 +524,11 @@ void NewAlarmDialog::computeDesktopWidgetPositions()
   m_widgetPositions << QPoint{0,0};
 
   const auto screens = QApplication::screens();
-  computePositions(QRect{screens.at(0)->virtualGeometry()}, "Global ", positionNames);
+  computePositions(QRect{screens.at(0)->availableVirtualGeometry()}, "Global ", positionNames);
 
   for (int i = 0; i < screens.size(); ++i)
   {
-    computePositions(screens.at(i)->geometry(), QString("Monitor %1 ").arg(i), positionNames);
+    computePositions(screens.at(i)->availableGeometry(), QString("Monitor %1 ").arg(i), positionNames);
   }
 
   m_positionComboBox->insertItems(0, positionNames);

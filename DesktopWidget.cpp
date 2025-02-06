@@ -48,7 +48,7 @@ DesktopWidget::DesktopWidget(bool dragEnable, QWidget *parent)
     setWindowFlags(windowFlags() & ~Qt::WindowTransparentForInput);
   }
 
-  auto desktopRect = QApplication::screens().at(0)->virtualGeometry();
+  auto desktopRect = QApplication::screens().at(0)->availableVirtualGeometry();
   m_limitX = desktopRect.width()-WIDGET_SIZE;
   m_limitY = desktopRect.height()-WIDGET_SIZE;
 
