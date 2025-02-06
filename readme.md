@@ -39,7 +39,9 @@ The following libraries are required:
 * [Logitech Gaming SDK](https://www.logitechg.com/es-es/developers)
 
 # Install
-MultiAlarm is available for Windows 7 onwards. You can download the latest installer from the [releases page](https://github.com/FelixdelasPozas/MultiAlarm/releases). Neither the application or the installer are digitally signed so the system will ask for approval before running it the first time.
+MultiAlarm is available for Windows 10 onwards. You can download the latest installer from the [releases page](https://github.com/FelixdelasPozas/MultiAlarm/releases). Neither the application or the installer are digitally signed so the system will ask for approval before running it the first time.
+
+The last version compatible with windows 7 and 8 is version 1.2.0, you can download it from [here](https://github.com/FelixdelasPozas/MultiAlarm/releases/tag/1.2.0).
 
 # Screenshots
 Main dialog with the alarm list. Each alarm has buttons to start, pause, delete and reconfigure it. Clock alarms can't be paused, stopped or reconfigured. 
@@ -72,7 +74,7 @@ Keyboard notification for an alarm with red foreground and white background at 4
 
 # Repository information
 
-**Version**: 1.3.1
+**Version**: 1.3.2
 
 **Status**: finished
 
@@ -80,7 +82,7 @@ Keyboard notification for an alarm with red foreground and white background at 4
 
 | Language                     |files          |blank        |comment           |code  |
 |:-----------------------------|--------------:|------------:|-----------------:|-----:|
-| C++                          |   9           | 462         |   296            | 1769 |
+| C++                          |   9           | 457         |   296            | 1648 |
 | C/C++ Header                 |   8           | 216         |   646            |  360 |
-| CMake                        |   1           |  18         |     8            |   70 |
-| **Total**                    | **18**        | **696**     | **950**          | **2199** |
+| CMake                        |   1           |  18         |     8            |   68 |
+| **Total**                    | **18**        | **691**     | **950**          | **2076** |
