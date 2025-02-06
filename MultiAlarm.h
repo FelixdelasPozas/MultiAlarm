@@ -151,7 +151,7 @@ class MultiAlarm
      *         Needs to be a pointer because QSettings is not copyable.
      *
      */
-    QSettings* applicationSettings() const;
+    std::unique_ptr<QSettings> applicationSettings() const;
 
   private:
     QSystemTrayIcon *m_icon;              /** application icon when minimized.       */

@@ -80,18 +80,18 @@ AlarmWidget::AlarmWidget(MultiAlarm *parent, Qt::WindowFlags flags)
 //-----------------------------------------------------------------
 AlarmWidget::~AlarmWidget()
 {
-  delete m_alarm;
+  m_alarm = nullptr;
 
   if(m_icon)
   {
     m_icon->hide();
-    delete m_icon;
+    m_icon = nullptr;
   }
 
   if(m_widget)
   {
     m_widget->hide();
-    delete m_widget;
+    m_widget = nullptr;
   }
 }
 
@@ -126,14 +126,10 @@ void AlarmWidget::start()
   }
 
   if(m_widget)
-  {
     m_widget->show();
-  }
 
   if(m_logiled)
-  {
     m_logiled->registerItem(name(), m_alarm->progress(), QColor{color()}, QColor{m_contrastColor});
-  }
 
   m_alarm->start();
   m_started = true;
@@ -143,9 +139,8 @@ void AlarmWidget::start()
 void AlarmWidget::stop()
 {
   if(!m_alarm->isRunning())
-  {
     onPausePressed();
-  }
+
   m_alarm->stop();
   m_started = false;
 
@@ -165,9 +160,7 @@ void AlarmWidget::stop()
   m_settings->setEnabled(true);
 
   if(m_icon)
-  {
     m_icon->hide();
-  }
 
   if(m_widget)
   {
@@ -176,9 +169,7 @@ void AlarmWidget::stop()
   }
 
   if(m_logiled)
-  {
     m_logiled->unregisterItem(name());
-  }
 
   setTime(m_alarm->remainingTime());
 }
@@ -277,20 +268,20 @@ void AlarmWidget::onStopPressed()
 }
 
 //-----------------------------------------------------------------
-void AlarmWidget::setAlarm(Alarm* alarm)
+void AlarmWidget::setAlarm(std::unique_ptr<Alarm> alarm)
 {
-  m_alarm = alarm;
+  m_alarm = std::move(alarm);
 
   setTime(m_alarm->remainingTime());
 
-  connect(alarm, SIGNAL(tic()),
-          this,  SLOT(onAlarmTic()), Qt::DirectConnection);
+  connect(m_alarm.get(), SIGNAL(tic()),
+          this,          SLOT(onAlarmTic()), Qt::DirectConnection);
 
-  connect(alarm, SIGNAL(interval(int)),
-          this,  SLOT(onAlarmInterval(int)), Qt::DirectConnection);
+  connect(m_alarm.get(), SIGNAL(interval(int)),
+          this,          SLOT(onAlarmInterval(int)), Qt::DirectConnection);
 
-  connect(alarm, SIGNAL(timeout()),
-          this,  SLOT(onAlarmTimeout()), Qt::DirectConnection);
+  connect(m_alarm.get(), SIGNAL(timeout()),
+          this,          SLOT(onAlarmTimeout()), Qt::DirectConnection);
 }
 
 //-----------------------------------------------------------------
@@ -299,37 +290,27 @@ void AlarmWidget::onAlarmTic()
   setTime(m_alarm->remainingTime());
 
   if(m_icon)
-  {
     m_icon->setToolTip(QString("%1\nRemaining time: %2\nCompleted: %3%").arg(m_configuration.name).arg(m_alarm->remainingTimeText()).arg(m_alarm->progress()));
-  }
 
   if(m_widget)
-  {
     m_widget->setProgress(m_alarm->precisionProgress());
-  }
 
   if(m_logiled)
-  {
     m_logiled->updateItem(name(), m_alarm->progress());
-  }
 }
 
 //-----------------------------------------------------------------
 void AlarmWidget::onAlarmInterval(int value)
 {
   if(m_icon)
-  {
     setTrayIcon(QString(":/MultiAlarm/%1.ico").arg(value));
-  }
 }
 
 //-----------------------------------------------------------------
 void AlarmWidget::onAlarmTimeout()
 {
   if(m_configuration.isTimer && !m_configuration.timerLoops)
-  {
     stop();
-  }
 
   auto dialog = new QMessageBox(QMessageBox::Information,
                                 m_configuration.name,
@@ -342,8 +323,8 @@ void AlarmWidget::onAlarmTimeout()
   connect(dialog, SIGNAL(finished(int)),
           this,   SLOT(onDialogFinished()));
 
-  m_sound = new QSoundEffect(this);
-  m_soundFile = QTemporaryFile::createNativeFile(soundFiles[m_configuration.sound]);
+  m_sound = std::make_unique<QSoundEffect>(this);
+  m_soundFile = std::unique_ptr<QTemporaryFile>(QTemporaryFile::createNativeFile(soundFiles[m_configuration.sound]));
   m_sound->setSource(QUrl::fromLocalFile(m_soundFile->fileName()));
   m_sound->setLoopCount(QSoundEffect::Infinite);
   m_sound->setVolume(m_configuration.soundVolume/100.0);
@@ -356,18 +337,14 @@ void AlarmWidget::onAlarmTimeout()
 void AlarmWidget::onDialogFinished()
 {
   m_sound->stop();
-  delete m_sound;
   m_sound = nullptr;
-  delete m_soundFile;
   m_soundFile = nullptr;
 
   auto dialog = qobject_cast<QMessageBox *>(sender());
   dialog->deleteLater();
 
   if(!m_configuration.isTimer)
-  {
     emit deleteAlarm();
-  }
 }
 
 //-----------------------------------------------------------------
@@ -439,27 +416,20 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration &conf)
   if(m_icon)
   {
     m_icon->hide();
-    delete m_icon;
     m_icon = nullptr;
   }
 
   if(m_widget)
   {
     m_widget->hide();
-    delete m_widget;
     m_widget = nullptr;
   }
 
   if(m_logiled)
-  {
     m_logiled = nullptr;
-  }
 
   if(m_alarm)
-  {
-    delete m_alarm;
     m_alarm = nullptr;
-  }
 
   m_configuration = conf;
 
@@ -467,64 +437,37 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration &conf)
   m_name->setText(COLOR_QSTRING.arg(m_contrastColor).arg(conf.name));
   setToolTip(conf.name + QString(" Alarm"));
 
-  Alarm *alarm = nullptr;
+  std::unique_ptr<Alarm> alarm = nullptr;
 
   if(conf.isTimer)
   {
     Alarm::AlarmTime alarmTime(0, conf.timerTime.hour(), conf.timerTime.minute(), conf.timerTime.second());
-    alarm = new Alarm(alarmTime, conf.timerLoops);
+    alarm = std::make_unique<Alarm>(alarmTime, conf.timerLoops);
   }
   else
   {
     m_start->hide();
 
-    auto now = QDateTime::currentDateTime();
-    int days = 0;
-    int hours = 0;
-    int minutes = 0;
-    int seconds = 0;
-
     constexpr long long int secondsInHour = 60*60;
     constexpr long long int secondsInDay = 24*secondsInHour;
 
-    long long int difference = now.secsTo(conf.clockDateTime);
-
-    float fDays = static_cast<float>(difference)/secondsInDay;
-    while(fDays >= 1.f)
-    {
-      ++days;
-      difference -= secondsInDay;
-      fDays = static_cast<float>(difference)/secondsInDay;
-    }
-
-    float fHours = static_cast<float>(difference)/secondsInHour;
-    if(fHours >= 1.f)
-    {
-      ++hours;
-      difference -= secondsInHour;
-      fHours = static_cast<float>(difference)/secondsInHour;
-    }
-
-    float fMin = static_cast<float>(difference)/60;
-    while(fMin >= 1.f)
-    {
-      ++minutes;
-      difference -= 60;
-      fMin = static_cast<float>(difference)/60;
-    }
-
-    seconds = difference;
+    auto now = QDateTime::currentDateTime();
+    const long long int difference = now.secsTo(conf.clockDateTime);
+    const int days = std::floor(static_cast<float>(difference)/secondsInDay);
+    const int hours = std::floor(static_cast<float>(difference - days*secondsInDay)/secondsInHour);
+    const int minutes = std::floor(static_cast<float>(difference - days*secondsInDay - hours*secondsInHour)/60);
+    const int seconds = difference - days*secondsInDay - hours*secondsInHour - minutes*60;
 
     Alarm::AlarmTime alarmTime(days, hours, minutes, seconds);
-    alarm = new Alarm(alarmTime, false);
+    alarm = std::make_unique<Alarm>(alarmTime, false);
   }
 
-  setAlarm(alarm);
+  setAlarm(std::move(alarm));
 
   if(conf.useTray && QSystemTrayIcon::isSystemTrayAvailable())
   {
-    m_icon = new QSystemTrayIcon(this);
-    m_icon->setToolTip(QString("%1\nRemaining time: %2").arg(m_configuration.name).arg(alarm->remainingTimeText()));
+    m_icon = std::make_unique<QSystemTrayIcon>(this);
+    m_icon->setToolTip(QString("%1\nRemaining time: %2").arg(m_configuration.name).arg(m_alarm->remainingTimeText()));
 
     if(conf.isTimer)
     {
@@ -556,7 +499,7 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration &conf)
 
   if(conf.useDesktopWidget)
   {
-    m_widget = new DesktopWidget(false, nullptr);
+    m_widget = std::make_unique<DesktopWidget>(false, nullptr);
     m_widget->setName(m_configuration.name);
     m_widget->setPosition(m_configuration.widgetPosition);
     m_widget->setColor(m_configuration.color);
@@ -564,14 +507,10 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration &conf)
   }
 
   if(conf.useLogiled && LogiLED::isAvailable())
-  {
     m_logiled = &LogiLED::getInstance();
-  }
 
   if(!conf.isTimer)
-  {
     start();
-  }
 }
 
 //-----------------------------------------------------------------
@@ -600,15 +539,11 @@ void AlarmWidget::setTrayIcon(const QString &icon)
     for(int x = 0; x < blackMask.width(); ++x)
     {
       if(blackMask.pixel(x,y) == 0xffffffff)
-      {
         qimage.setPixel(x,y,colorqrgb);
-      }
       else
       {
         if(whiteMask.pixel(x,y) == 0xffffffff)
-        {
           qimage.setPixel(x,y, otherColorqrgb);
-        }
       }
     }
   }

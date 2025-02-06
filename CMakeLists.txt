@@ -11,7 +11,7 @@ cmake_policy(SET CMP0020 OLD)
 # Version Number
 set (MULTIALARM_VERSION_MAJOR 1)
 set (MULTIALARM_VERSION_MINOR 3)
-set (MULTIALARM_VERSION_PATCH 1)
+set (MULTIALARM_VERSION_PATCH 2)
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

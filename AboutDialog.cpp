@@ -27,7 +27,7 @@
 #include <QDateTime>
 #include <QtGlobal>
 
-const QString AboutDialog::VERSION = QString("version 1.3.1");
+const QString AboutDialog::VERSION = QString("version 1.3.2");
 
 //-----------------------------------------------------------------
 AboutDialog::AboutDialog(QWidget *parent, Qt::WindowFlags flags)
@@ -37,8 +37,8 @@ AboutDialog::AboutDialog(QWidget *parent, Qt::WindowFlags flags)
 
   setWindowFlags(windowFlags() & ~(Qt::WindowContextHelpButtonHint) & ~(Qt::WindowMaximizeButtonHint) & ~(Qt::WindowMinimizeButtonHint));
 
-  auto compilation_date = QString(__DATE__);
-  auto compilation_time = QString(" (") + QString(__TIME__) + QString(")");
+  const auto compilation_date = QString(__DATE__);
+  const auto compilation_time = QString(" (") + QString(__TIME__) + QString(")");
 
   m_compilationDate->setText(tr("Compiled on ") + compilation_date + compilation_time);
   m_version->setText(VERSION);

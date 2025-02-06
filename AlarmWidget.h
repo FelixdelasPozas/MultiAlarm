@@ -170,7 +170,7 @@ class AlarmWidget
     /** \brief Sets the alarm.
      *
      */
-    void setAlarm(Alarm *alarm);
+    void setAlarm(std::unique_ptr<Alarm> alarm);
 
     /** \brief Sets the duration of the alarm's timer.
      * \param[in] time alarm's timer duration.
@@ -183,18 +183,18 @@ class AlarmWidget
      */
     void setTrayIcon(const QString &icon);
 
-    bool      m_started;                /** true if the alarm has been started and false otherwise.  */
-    QString   m_contrastColor;          /** color of the text of the widget (always black or white). */
-    Alarm    *m_alarm;                  /** alarm class object.                                      */
-    AlarmConfiguration m_configuration; /** alarm configuration.                                     */
-    QSystemTrayIcon   *m_icon;          /** system tray icon.                                        */
-    DesktopWidget     *m_widget;        /** desktop widget.                                          */
-    LogiLED           *m_logiled;       /** LogiLED instance.                                        */
-    QSoundEffect      *m_sound;         /** alarm sound.                                             */
-    QTemporaryFile    *m_soundFile;     /** local sound file in termporary directory.                */
+    bool                             m_started;       /** true if the alarm has been started and false otherwise.  */
+    QString                          m_contrastColor; /** color of the text of the widget (always black or white). */
+    std::unique_ptr<Alarm>           m_alarm;         /** alarm class object.                                      */
+    AlarmConfiguration               m_configuration; /** alarm configuration.                                     */
+    std::unique_ptr<QSystemTrayIcon> m_icon;          /** system tray icon.                                        */
+    std::unique_ptr<DesktopWidget>   m_widget;        /** desktop widget.                                          */
+    LogiLED                         *m_logiled;       /** LogiLED instance.                                        */
+    std::unique_ptr<QSoundEffect>    m_sound;         /** alarm sound.                                             */
+    std::unique_ptr<QTemporaryFile>  m_soundFile;     /** local sound file in termporary directory.                */
 
-    MultiAlarm *m_parent;               /** main application dialog pointer, used to get the used
-                                            names and colors when reconfiguring.                     */
+    MultiAlarm *m_parent;                             /** main application dialog pointer, used to get the used
+                                                          names and colors when reconfiguring.                     */
 };
 
 #endif // ALARMWIDGET_H_

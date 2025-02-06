@@ -44,9 +44,7 @@ DesktopWidget::DesktopWidget(bool dragEnable, QWidget *parent)
   setAttribute(Qt::WA_TranslucentBackground);
 
   if(dragEnable)
-  {
     setWindowFlags(windowFlags() & ~Qt::WindowTransparentForInput);
-  }
 
   auto desktopRect = QApplication::screens().at(0)->availableVirtualGeometry();
   m_limitX = desktopRect.width()-WIDGET_SIZE;
@@ -85,9 +83,7 @@ void DesktopWidget::mousePressEvent(QMouseEvent* e)
     emit beingDragged();
   }
   else
-  {
     QWidget::mousePressEvent(e);
-  }
 }
 
 //-----------------------------------------------------------------
@@ -102,9 +98,7 @@ void DesktopWidget::mouseReleaseEvent(QMouseEvent* e)
     m_buttonDown = false;
   }
   else
-  {
     QWidget::mousePressEvent(e);
-  }
 }
 
 //-----------------------------------------------------------------
@@ -117,9 +111,7 @@ void DesktopWidget::mouseMoveEvent(QMouseEvent* e)
     m_point = e->globalPosition().toPoint();
   }
   else
-  {
     QWidget::mousePressEvent(e);
-  }
 }
 
 //-----------------------------------------------------------------
@@ -199,9 +191,7 @@ void DesktopWidget::paintEvent(QPaintEvent *e)
   QString displayText;
   auto parts = m_name.split(" ");
   for(auto part: parts)
-  {
     displayText.append(part + (part != parts.last() ? "\n": ""));
-  }
 
   auto color = (m_contrastColor == Qt::black ? Qt::white : Qt::black);
   smallRect = QRect{windowRect.x()+2, windowRect.y()+2, windowRect.width()-2, windowRect.height()-2};

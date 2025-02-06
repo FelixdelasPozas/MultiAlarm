@@ -48,9 +48,7 @@ LogiLED::LogiLED()
 , m_current  {0}
 {
   if(m_available)
-  {
     LogiLedSetTargetDevice(LOGI_DEVICETYPE_PERKEY_RGB);
-  }
 }
 
 //--------------------------------------------------------------------
@@ -85,16 +83,12 @@ bool LogiLED::registerItem(const QString& id, const int progress, const QColor& 
       isEmpty = m_items.isEmpty();
 
       if(!m_items.contains(item))
-      {
         m_items << item;
-      }
     }
 
     // only start updating lights when inserting the first
     if (isEmpty)
-    {
       updateLights();
-    }
 
     return true;
   }
@@ -115,9 +109,8 @@ bool LogiLED::unregisterItem(const QString& id)
         m_items.removeAll(item);
 
         if(m_items.isEmpty())
-        {
           restart();
-        }
+
         return true;
       }
     }
@@ -144,9 +137,7 @@ bool LogiLED::updateItem(const QString& id, const int progress, const QColor& fo
         if(background != QColor()) item.background = background;
 
         if(m_current == i || item.id == "NewAlarm")
-        {
           changeKeysToColor(item.progress, item.foreground, item.background);
-        }
 
         return true;
       }

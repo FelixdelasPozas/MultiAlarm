@@ -94,10 +94,9 @@ MultiAlarm::~MultiAlarm()
 QStringList MultiAlarm::usedNames() const
 {
   QStringList result;
+
   for(auto alarm: m_alarms)
-  {
     result << alarm->name();
-  }
 
   return result;
 }
@@ -106,10 +105,9 @@ QStringList MultiAlarm::usedNames() const
 QStringList MultiAlarm::usedColors() const
 {
   QStringList result;
+
   for(auto alarm: m_alarms)
-  {
     result << alarm->color();
-  }
 
   return result;
 }
@@ -132,7 +130,6 @@ void MultiAlarm::createNewAlarm()
 void MultiAlarm::aboutDialog()
 {
   AboutDialog dialog(this);
-
   dialog.exec();
 }
 
@@ -261,7 +258,7 @@ void MultiAlarm::addAlarmWidget(AlarmWidget *widget)
 //-----------------------------------------------------------------
 void MultiAlarm::restoreSettings()
 {
-  auto settings = applicationSettings();
+  const auto settings = applicationSettings();
 
   if(settings->contains(STATE))
   {
@@ -285,13 +282,9 @@ void MultiAlarm::restoreSettings()
     auto alarmWidget = createAlarmWidget(*settings, alarmName);
 
     if(alarmWidget)
-    {
       addAlarmWidget(alarmWidget);
-    }
     else
-    {
       expired << alarmName;
-    }
   }
   settings->endGroup();
 
@@ -299,9 +292,7 @@ void MultiAlarm::restoreSettings()
   {
     auto message = QString("The following clock alarms will be deleted because they have expired:\n");
     for(auto alarm: expired)
-    {
       message += alarm + QString("\n");
-    }
 
     QMessageBox mb;
     mb.setWindowTitle("Expired Clock Alarms");
@@ -309,8 +300,6 @@ void MultiAlarm::restoreSettings()
     mb.setText(message);
     mb.exec();
   }
-
-  delete settings;
 }
 
 //-----------------------------------------------------------------
@@ -324,9 +313,7 @@ void MultiAlarm::saveSettings() const
   settings->beginGroup(ALARMS);
 
   for(auto alarm: settings->childGroups())
-  {
     settings->remove(alarm);
-  }
 
   if(!m_alarms.empty())
   {
@@ -346,9 +333,7 @@ void MultiAlarm::saveSettings() const
         settings->setValue(ALARM_TIMER_TIME, conf.timerTime);
       }
       else
-      {
         settings->setValue(ALARM_CLOCK_DATETIME, conf.clockDateTime);
-      }
 
       settings->setValue(ALARM_SOUND, conf.sound);
       settings->setValue(ALARM_SOUND_VOLUME, conf.soundVolume);
@@ -364,8 +349,6 @@ void MultiAlarm::saveSettings() const
 
   settings->endGroup();
   settings->sync();
-
-  delete settings;
 }
 
 //-----------------------------------------------------------------
@@ -379,7 +362,7 @@ void MultiAlarm::onAlarmDeleted()
 
   m_scrollWidget->layout()->removeWidget(widget);
   m_alarms.removeOne(widget);
-  delete widget;
+  widget->deleteLater();
 
   auto newHeight = currentHeight();
   auto needBar = (newHeight > MAX_HEIGHT);
@@ -393,18 +376,12 @@ void MultiAlarm::onAlarmDeleted()
   }
 
   if(needBar)
-  {
     setFixedHeight(MAX_HEIGHT);
-  }
   else
-  {
     setFixedHeight(newHeight);
-  }
 
   if(m_alarms.empty())
-  {
     m_scrollArea->hide();
-  }
 }
 
 //-----------------------------------------------------------------
@@ -422,9 +399,7 @@ AlarmWidget* MultiAlarm::createAlarmWidget(const NewAlarmDialog& dialog)
     conf.timerLoops = dialog.timerLoop();
   }
   else
-  {
     conf.clockDateTime = dialog.clockDateTime();
-  }
 
   conf.sound            = dialog.sound();
   conf.soundVolume      = dialog.soundVolume();
@@ -457,9 +432,7 @@ AlarmWidget* MultiAlarm::createAlarmWidget(QSettings &settings, const QString &n
     conf.timerLoops = settings.value(ALARM_TIMER_LOOP, false).toBool();
   }
   else
-  {
     conf.clockDateTime = settings.value(ALARM_CLOCK_DATETIME, QDateTime()).toDateTime();
-  }
 
   conf.sound            = settings.value(ALARM_SOUND, 0).toInt();
   conf.soundVolume      = settings.value(ALARM_SOUND_VOLUME, 100).toInt();
@@ -472,9 +445,7 @@ AlarmWidget* MultiAlarm::createAlarmWidget(QSettings &settings, const QString &n
   settings.endGroup();
 
   if(!conf.isTimer && conf.clockDateTime < QDateTime::currentDateTime())
-  {
     return nullptr;
-  }
 
   auto widget = new AlarmWidget(this);
   widget->setConfiguration(conf);
@@ -485,7 +456,7 @@ AlarmWidget* MultiAlarm::createAlarmWidget(QSettings &settings, const QString &n
 //-----------------------------------------------------------------
 int MultiAlarm::currentHeight() const
 {
-  auto alarmSize = m_alarms.size() * m_newButton->size().height();
+  const auto alarmSize = m_alarms.size() * m_newButton->size().height();
 
   return alarmSize + m_newButton->size().height() + menubar->height();
 }
@@ -510,17 +481,15 @@ void MultiAlarm::connectSignals()
 }
 
 //-----------------------------------------------------------------
-QSettings* MultiAlarm::applicationSettings() const
+std::unique_ptr<QSettings> MultiAlarm::applicationSettings() const
 {
   QDir applicationDir{QCoreApplication::applicationDirPath()};
   if(applicationDir.exists(INI_FILENAME))
   {
     const auto fInfo = QFileInfo(applicationDir.absoluteFilePath(INI_FILENAME));
     if(fInfo.isWritable())
-    {
-      return new QSettings(INI_FILENAME, QSettings::IniFormat);
-    }
+      return std::make_unique<QSettings>(INI_FILENAME, QSettings::IniFormat);
   }
 
-  return new QSettings("Felix de las Pozas Alvarez", "MultiAlarm");
+  return std::make_unique<QSettings>("Felix de las Pozas Alvarez", "MultiAlarm");
 }

@@ -30,16 +30,7 @@ QString Alarm::AlarmTime::text() const
     text += QString("%1 Day%2 ").arg(days).arg((days > 1 ? "s": ""));
   }
 
-  for(auto unit: {hours, minutes, seconds})
-  {
-    if(unit < 10)
-    {
-      text += "0";
-    }
-    text += QString("%1:").arg(unit);
-  }
-  text.remove(text.length()-1, 1);
-
+  text += QTime{hours, minutes, seconds}.toString("hh:mm:ss");
   return text;
 }
 
@@ -63,9 +54,7 @@ Alarm::Alarm(AlarmTime time, bool loop)
 void Alarm::start()
 {
   if(!m_timer.isActive())
-  {
     m_timer.start();
-  }
 }
 
 //-----------------------------------------------------------------
@@ -86,9 +75,7 @@ void Alarm::stop()
 void Alarm::pause(bool paused)
 {
   if(paused == m_timer.isActive())
-  {
     paused ? m_timer.stop() : m_timer.start();
-  }
 }
 
 //-----------------------------------------------------------------
@@ -187,8 +174,10 @@ QString Alarm::remainingTimeText() const
 //-----------------------------------------------------------------
 void Alarm::computeProgressValues()
 {
-  unsigned long long totalTime = (m_time.days * 24*60*60) + (m_time.hours * 60*60) + (m_time.minutes * 60) + m_time.seconds;
-  unsigned long long remaining = (m_remainingTime.days * 24*60*60) + (m_remainingTime.hours *60*60) + (m_remainingTime.minutes * 60) + m_remainingTime.seconds;
+  constexpr unsigned long long secondsInDay = 24*60*60;
+  constexpr unsigned long long secondsInHour = 60*60;
+  unsigned long long totalTime = (m_time.days * secondsInDay) + (m_time.hours * secondsInHour) + (m_time.minutes * 60) + m_time.seconds;
+  unsigned long long remaining = (m_remainingTime.days * secondsInDay) + (m_remainingTime.hours * secondsInHour) + (m_remainingTime.minutes * 60) + m_remainingTime.seconds;
 
   m_progress  = 100 - static_cast<int>((100*remaining)/static_cast<double>(totalTime));
   m_dProgress = 100.0 - (100*remaining)/static_cast<double>(totalTime);
