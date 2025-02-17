@@ -193,8 +193,8 @@ class AlarmWidget
     std::unique_ptr<QSoundEffect>    m_sound;         /** alarm sound.                                             */
     std::unique_ptr<QTemporaryFile>  m_soundFile;     /** local sound file in termporary directory.                */
 
-    MultiAlarm *m_parent;                             /** main application dialog pointer, used to get the used
-                                                          names and colors when reconfiguring.                     */
+    MultiAlarm *m_parent;                             /** main application dialog pointer, used to get the used    *
+                                                        * names and colors when reconfiguring.                     */
 };
 
 #endif // ALARMWIDGET_H_

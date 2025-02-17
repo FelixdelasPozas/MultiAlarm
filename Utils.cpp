@@ -75,15 +75,7 @@ void DrawFrame::paintEvent(QPaintEvent *p)
 
   auto rect = this->rect();
   auto width = rect.width();
-  const auto topLeft = rect.topLeft()+QPoint{1,1};
-  const auto bottomRight = rect.bottomRight()-QPoint{1,1};
-  const int progressWidth = m_progress * width;
-  Q_ASSERT(progressWidth >= 0 && progressWidth <= rect.width());
-
-  painter.drawRoundedRect(rect, 5, 5);
-
-  rect.setTopLeft(topLeft);
-  rect.setBottomRight(bottomRight);
+  const int progressWidth = std::max(0, std::min(static_cast<int>(std::nearbyint(m_progress * width)), width));
 
   QLinearGradient uncompletedGradient;
   uncompletedGradient.setCoordinateMode(QGradient::ObjectMode);
@@ -105,6 +97,8 @@ void DrawFrame::paintEvent(QPaintEvent *p)
   QPainterPath completedPath;
   completedPath.addRoundedRect(rect, 5, 5);
   painter.fillPath(completedPath, completedGradient);
+
+  painter.drawRoundedRect(this->rect(), 5, 5);
 
   painter.end();
 

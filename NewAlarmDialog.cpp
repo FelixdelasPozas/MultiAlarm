@@ -98,13 +98,22 @@ NewAlarmDialog::NewAlarmDialog(QStringList invalidNames, QStringList invalidColo
     m_colors.removeAll(color);
   }
 
-  for(auto color: m_colors)
+  auto toCamelCase = [](const QString &s)
+  {
+    QStringList words = s.split(" ", Qt::SkipEmptyParts);
+    for (QString &word : words)
+      word.front() = word.front().toUpper();
+
+    return words.join(" ");
+  };
+
+  for (auto color : m_colors)
   {
     auto pixmap = new QImage(32, 32, QImage::Format_RGB32);
     QPainter painter(pixmap);
     painter.fillRect(0,0,31,31, color);
     painter.end();
-    m_colorComboBox->insertItem(m_colors.indexOf(color), QIcon(QPixmap::fromImage(*pixmap)), color);
+    m_colorComboBox->insertItem(m_colors.indexOf(color), QIcon(QPixmap::fromImage(*pixmap)), toCamelCase(color));
   }
   m_colorComboBox->setCurrentIndex(0);
   m_widget.setColor(m_colors.at(0));
@@ -221,7 +230,7 @@ void NewAlarmDialog::onColorChanged(int value)
 //-----------------------------------------------------------------
 void NewAlarmDialog::checkOkButtonRequirements()
 {
-  auto validName = !m_name->text().isEmpty() && !m_invalidNames.contains(m_name->text());
+  auto validName = !m_name->text().isEmpty() && !m_invalidNames.contains(m_name->text(), Qt::CaseInsensitive);
   auto validMessage = !m_message->text().isEmpty();
   auto validClock = m_clockRadio->isChecked() && (m_clock->dateTime() > QDateTime::currentDateTime());
   auto validTime = m_timerRadio->isChecked();
@@ -388,7 +397,7 @@ const QDateTime NewAlarmDialog::clockDateTime() const
 void NewAlarmDialog::setColor(const QString& colorname)
 {
   int index = 0;
-  if(m_colors.contains(colorname))
+  if(m_colors.contains(colorname, Qt::CaseInsensitive))
   {
     index = m_colors.indexOf(colorname);
   }
@@ -399,7 +408,7 @@ void NewAlarmDialog::setColor(const QString& colorname)
 //-----------------------------------------------------------------
 const QString NewAlarmDialog::color() const
 {
-  return m_colors.at(m_colorComboBox->currentIndex());
+  return m_colors.at(m_colorComboBox->currentIndex()).toCaseFolded();
 }
 
 //-----------------------------------------------------------------

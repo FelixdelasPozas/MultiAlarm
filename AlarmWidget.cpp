@@ -386,7 +386,7 @@ void AlarmWidget::onSettingsPressed()
     AlarmConfiguration conf;
     conf.name    = dialog.name();
     conf.message = dialog.message();
-    conf.color   = dialog.color();
+    conf.color   = dialog.color().toLower();
     conf.isTimer = dialog.isTimer();
 
     if(conf.isTimer)

@@ -390,7 +390,7 @@ AlarmWidget* MultiAlarm::createAlarmWidget(const NewAlarmDialog& dialog)
   AlarmConfiguration conf;
   conf.name    = dialog.name();
   conf.message = dialog.message();
-  conf.color   = dialog.color();
+  conf.color   = dialog.color().toLower();
   conf.isTimer = dialog.isTimer();
 
   if(conf.isTimer)
@@ -458,7 +458,7 @@ int MultiAlarm::currentHeight() const
 {
   const auto alarmSize = m_alarms.size() * m_newButton->size().height();
 
-  return alarmSize + m_newButton->size().height() + menubar->height();
+  return alarmSize + m_newButton->size().height() + menubar->height() + 4; // 4 is spacing in the bottom.
 }
 
 //-----------------------------------------------------------------
