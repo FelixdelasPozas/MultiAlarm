@@ -17,7 +17,12 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
- #include <Utils.h>
+// Project
+#include <Utils.h>
+
+// Qt
+#include <QPainter>
+#include <QPainterPath>
 
 //-----------------------------------------------------------------
 Utils::ClickableHoverLabel::ClickableHoverLabel(QWidget *parent, Qt::WindowFlags f)
@@ -52,4 +57,56 @@ void Utils::ClickableHoverLabel::leaveEvent(QEvent *event)
 {
   setCursor(Qt::ArrowCursor);
   QLabel::leaveEvent(event);
+}
+
+//-----------------------------------------------------------------
+void DrawFrame::paintEvent(QPaintEvent *p)
+{
+  QPainter painter(this);
+  painter.setPen(Qt::black);
+  painter.setRenderHint(QPainter::Antialiasing);
+
+  auto makeStops = [](const QColor &a, const QColor &b)
+  {
+    QGradientStops stops;
+    stops << QGradientStop{0,a} << QGradientStop{0.4,b} << QGradientStop{0.6,b} << QGradientStop{1,a};
+    return stops;
+  };
+
+  auto rect = this->rect();
+  auto width = rect.width();
+  const auto topLeft = rect.topLeft()+QPoint{1,1};
+  const auto bottomRight = rect.bottomRight()-QPoint{1,1};
+  const int progressWidth = m_progress * width;
+  Q_ASSERT(progressWidth >= 0 && progressWidth <= rect.width());
+
+  painter.drawRoundedRect(rect, 5, 5);
+
+  rect.setTopLeft(topLeft);
+  rect.setBottomRight(bottomRight);
+
+  QLinearGradient uncompletedGradient;
+  uncompletedGradient.setCoordinateMode(QGradient::ObjectMode);
+  uncompletedGradient.setStart({0,0});
+  uncompletedGradient.setFinalStop({0,1});
+  uncompletedGradient.setStops(makeStops(m_color, m_shineColor));
+
+  QPainterPath uncompletedPath;
+  uncompletedPath.addRoundedRect(rect, 5, 5);
+  painter.fillPath(uncompletedPath, uncompletedGradient);
+
+  QLinearGradient completedGradient;
+  completedGradient.setCoordinateMode(QGradient::ObjectMode);
+  completedGradient.setStart({0,0});
+  completedGradient.setFinalStop({0,1});
+  completedGradient.setStops(makeStops(m_shineColor, m_color.darker()));
+
+  rect.setWidth(progressWidth);
+  QPainterPath completedPath;
+  completedPath.addRoundedRect(rect, 5, 5);
+  painter.fillPath(completedPath, completedGradient);
+
+  painter.end();
+
+  QFrame::paintEvent(p);
 }

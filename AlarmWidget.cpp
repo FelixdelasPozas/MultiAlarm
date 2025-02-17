@@ -24,6 +24,7 @@
 #include <MultiAlarm.h>
 #include <NewAlarmDialog.h>
 #include <LogiLED.h>
+#include <Utils.h>
 
 // Qt
 #include <QTime>
@@ -172,6 +173,9 @@ void AlarmWidget::stop()
     m_logiled->unregisterItem(name());
 
   setTime(m_alarm->remainingTime());
+  
+  m_frame->setProgress(0);
+  repaint();
 }
 
 //-----------------------------------------------------------------
@@ -210,8 +214,7 @@ void AlarmWidget::setColor(const QString& colorName)
   m_name->setText(COLOR_QSTRING.arg(m_contrastColor).arg(m_name->text()));
   m_time->setText(COLOR_QSTRING.arg(m_contrastColor).arg(m_time->text()));
 
-  auto style = QString("QFrame#m_frame { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 %1, stop:0.4 %2, stop:0.6 %2, stop:1 %1) }").arg(colorName).arg(mix.name(QColor::NameFormat::HexRgb));
-  setStyleSheet(style);
+  m_frame->setColors(color, mix);
   update();
 }
 
@@ -289,6 +292,8 @@ void AlarmWidget::onAlarmTic()
 {
   setTime(m_alarm->remainingTime());
 
+  m_frame->setProgress(m_alarm->precisionProgress()/100.);
+
   if(m_icon)
     m_icon->setToolTip(QString("%1\nRemaining time: %2\nCompleted: %3%").arg(m_configuration.name).arg(m_alarm->remainingTimeText()).arg(m_alarm->progress()));
 
@@ -297,6 +302,8 @@ void AlarmWidget::onAlarmTic()
 
   if(m_logiled)
     m_logiled->updateItem(name(), m_alarm->progress());
+
+  repaint();
 }
 
 //-----------------------------------------------------------------

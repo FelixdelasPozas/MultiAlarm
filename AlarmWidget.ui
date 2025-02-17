@@ -39,7 +39,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QFrame" name="m_frame">
+    <widget class="DrawFrame" name="m_frame">
      <property name="minimumSize">
       <size>
        <width>466</width>
@@ -52,17 +52,12 @@
        <height>55</height>
       </size>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="lineWidth">
-      <number>1</number>
-     </property>
-     <property name="midLineWidth">
-      <number>0</number>
+     <property name="styleSheet">
+      <string notr="true">.QFrame
+{
+border-radius: 5px;
+border: 1px solid black;
+}</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,1,0,0,0">
       <property name="spacing">
@@ -131,7 +126,7 @@
            <string>TextLabel</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignmentFlag::AlignCenter</set>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
@@ -147,7 +142,6 @@
           <property name="font">
            <font>
             <pointsize>12</pointsize>
-            <weight>75</weight>
             <bold>true</bold>
            </font>
           </property>
@@ -158,7 +152,7 @@
            <string>TextLabel</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignmentFlag::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -268,6 +262,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DrawFrame</class>
+   <extends>QFrame</extends>
+   <header>Utils.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="rsc/resources.qrc"/>
  </resources>
