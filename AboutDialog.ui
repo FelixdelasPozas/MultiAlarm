@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>532</width>
-    <height>424</height>
+    <height>405</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>532</width>
-    <height>424</height>
+    <height>405</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>532</width>
-    <height>424</height>
+    <height>405</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -390,23 +390,11 @@ QGroupBox::title {
      </item>
      <item>
       <widget class="Utils::ClickableHoverLabel" name="m_kofiLabel">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>60</height>
-        </size>
-       </property>
-       <property name="toolTip">
-        <string>Thank you for your support!</string>
-       </property>
        <property name="text">
         <string/>
        </property>
        <property name="pixmap">
         <pixmap resource="rsc/resources.qrc">:/MultiAlarm/kofi_logo.png</pixmap>
-       </property>
-       <property name="scaledContents">
-        <bool>true</bool>
        </property>
       </widget>
      </item>
