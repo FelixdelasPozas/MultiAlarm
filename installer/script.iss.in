@@ -35,6 +35,7 @@ Source: "platforms/*.*"; DestDir: "{app}/platforms/";
 Source: "multimedia/*.*"; DestDir: "{app}/platforms/";
 Source: "styles/*.*"; DestDir: "{app}/platforms/";
 Source: "networkinformation/*.*"; DestDir: "{app}/platforms/";
+Source: "C:/WINDOWS/SYSTEM32/MSVCR120.dll"; DestDir: "{app}";
 
 [Run]
 Filename: "{app}\MultiAlarm.exe"; Description: "Launch MultiAlarm"; Flags: postinstall nowait skipifsilent unchecked
