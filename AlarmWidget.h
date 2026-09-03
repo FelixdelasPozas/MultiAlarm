@@ -31,6 +31,7 @@
 class QTime;
 class QSoundEffect;
 class QTemporaryFile;
+class QMouseEvent;
 
 class DesktopWidget;
 class MultiAlarm;
@@ -55,6 +56,7 @@ struct AlarmConfiguration
     bool      useLogiled;       /** true if the alarm uses the keyboard lights for notifications. */
     QPoint    widgetPosition;   /** position of the desktop widget.                               */
     int       widgetOpacity;    /** opacity of the desktop widget in [0-100]                      */
+    int       position;         /** position of the alarm in the list of alarms.                  */
 };
 
 /** \class AlarmWidget
@@ -102,6 +104,9 @@ class AlarmWidget
 
   signals:
     void deleteAlarm();
+
+  private: 
+    virtual void mousePressEvent(QMouseEvent *event) override;
 
   private slots:
     /** \brief Modifies the UI and desktop widget time.

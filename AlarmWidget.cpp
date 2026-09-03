@@ -35,6 +35,9 @@
 #include <QSoundEffect>
 #include <QTemporaryFile>
 #include <QMenu>
+#include <QMouseEvent>
+#include <QMimeData>
+#include <QDrag>
 
 const QString COLOR_QSTRING = "<font color='%1'>%2</font>";
 
@@ -188,6 +191,27 @@ const QString AlarmWidget::name() const
 const QString AlarmWidget::color() const
 {
   return m_configuration.color;
+}
+
+//-----------------------------------------------------------------
+void AlarmWidget::mousePressEvent(QMouseEvent* event)
+{
+    if (event->button() == Qt::LeftButton) {
+        QMimeData* mimeData = new QMimeData;
+        // Pass the pointer address as text to find it later
+        mimeData->setText(QString::number(reinterpret_cast<quintptr>(this)));
+
+        QDrag* drag = new QDrag(this);
+        drag->setMimeData(mimeData);
+        drag->setPixmap(this->grab());
+        drag->setHotSpot(event->position().toPoint());
+
+        this->hide();
+
+        if (drag->exec(Qt::MoveAction) == Qt::IgnoreAction) {
+            this->show();
+        }
+    }
 }
 
 //-----------------------------------------------------------------

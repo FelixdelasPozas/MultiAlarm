@@ -80,6 +80,7 @@ set (CORE_SOURCES
   DesktopWidget.cpp
   LogiLED.cpp
   Utils.cpp
+  ScrollArea.cpp
 )
 
 set(CORE_EXTERNAL_LIBS

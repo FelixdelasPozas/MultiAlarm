@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>470</width>
-    <height>99</height>
+    <height>155</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -97,7 +97,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QScrollArea" name="m_scrollArea">
+     <widget class="ScrollArea" name="m_scrollArea">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
         <horstretch>0</horstretch>
@@ -131,7 +131,7 @@
          <x>0</x>
          <y>0</y>
          <width>470</width>
-         <height>33</height>
+         <height>67</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -219,6 +219,14 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ScrollArea</class>
+   <extends>QScrollArea</extends>
+   <header location="global">ScrollArea.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="rsc/resources.qrc"/>
  </resources>

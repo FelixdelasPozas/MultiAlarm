@@ -39,7 +39,7 @@ const QString STATE    = "State";
 const QString GEOMETRY = "Geometry";
 const QString ALARMS   = "Alarms";
 
-const QString ALARM_NAME            = "Name";
+const QString ALARM_POSITION        = "Position";
 const QString ALARM_MESSAGE         = "Message";
 const QString ALARM_COLOR           = "Color";
 const QString ALARM_IS_TIMER        = "Timer";
@@ -71,6 +71,7 @@ MultiAlarm::MultiAlarm(QWidget *parent, Qt::WindowFlags flags)
   centralWidget()->layout()->setSpacing(0);
 
   m_scrollArea->hide();
+  m_scrollArea->setAcceptDrops(true);
   m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   m_scrollArea->verticalScrollBar()->hide();
@@ -122,6 +123,7 @@ void MultiAlarm::createNewAlarm()
   if(dialog.result() == QDialog::Accepted)
   {
     auto alarmWidget = createAlarmWidget(dialog);
+    m_alarms << alarmWidget;
     addAlarmWidget(alarmWidget);
   }
 }
@@ -237,8 +239,8 @@ void MultiAlarm::addAlarmWidget(AlarmWidget *widget)
   connect(widget, SIGNAL(deleteAlarm()),
           this,   SLOT(onAlarmDeleted()));
 
-  m_alarms << widget;
-  m_scrollWidget->layout()->addWidget(widget);
+  auto layout = qobject_cast<QVBoxLayout*>(m_scrollArea->layout());
+  layout->insertWidget(layout->count(), widget);
 
   auto height = currentHeight();
   auto needBar = (height > MAX_HEIGHT);
@@ -276,15 +278,17 @@ void MultiAlarm::restoreSettings()
 
   settings->beginGroup(ALARMS);
   auto alarmIds = settings->childGroups();
-  alarmIds.sort();
   for(auto &alarmName : alarmIds)
   {
     auto alarmWidget = createAlarmWidget(*settings, alarmName);
 
     if(alarmWidget)
-      addAlarmWidget(alarmWidget);
+      m_alarms << alarmWidget;
     else
+    {
       expired << alarmName;
+      delete alarmWidget;
+    }
   }
   settings->endGroup();
 
@@ -300,6 +304,16 @@ void MultiAlarm::restoreSettings()
     mb.setText(message);
     mb.exec();
   }
+
+  auto sorter = [](const AlarmWidget *l, const AlarmWidget *r)
+  {
+    return (l->alarmConfiguration().position < r->alarmConfiguration().position);
+  };
+  std::sort(m_alarms.begin(), m_alarms.end(), sorter);
+
+  for (auto alarm : m_alarms) {
+      addAlarmWidget(alarm);
+  }
 }
 
 //-----------------------------------------------------------------
@@ -311,18 +325,19 @@ void MultiAlarm::saveSettings() const
   settings->setValue(GEOMETRY, saveGeometry());
 
   settings->beginGroup(ALARMS);
-
-  for(auto alarm: settings->childGroups())
-    settings->remove(alarm);
+  settings->clear();
 
   if(!m_alarms.empty())
   {
-    for(auto widget: m_alarms)
+    for(auto i = 0; i < m_scrollArea->layout()->count(); ++i)
     {
+      auto item = m_scrollArea->layout()->itemAt(i);
+      auto widget = qobject_cast<AlarmWidget*>(item->widget());
       auto conf = widget->alarmConfiguration();
 
       settings->beginGroup(widget->name());
 
+      settings->setValue(ALARM_POSITION, i);
       settings->setValue(ALARM_MESSAGE, conf.message);
       settings->setValue(ALARM_COLOR, widget->color());
       settings->setValue(ALARM_IS_TIMER, conf.isTimer);
@@ -421,10 +436,11 @@ AlarmWidget* MultiAlarm::createAlarmWidget(QSettings &settings, const QString &n
   settings.beginGroup(name);
 
   AlarmConfiguration conf;
-  conf.name    = name;
-  conf.message = settings.value(ALARM_MESSAGE, QString()).toString();
-  conf.color   = settings.value(ALARM_COLOR, QString("white")).toString();
-  conf.isTimer = settings.value(ALARM_IS_TIMER, false).toBool();
+  conf.name     = name;
+  conf.message  = settings.value(ALARM_MESSAGE, QString()).toString();
+  conf.color    = settings.value(ALARM_COLOR, QString("white")).toString();
+  conf.isTimer  = settings.value(ALARM_IS_TIMER, false).toBool();
+  conf.position = settings.value(ALARM_POSITION, 0).toInt();
 
   if(conf.isTimer)
   {
