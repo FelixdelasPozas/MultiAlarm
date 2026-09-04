@@ -57,6 +57,7 @@ struct AlarmConfiguration
     QPoint    widgetPosition;   /** position of the desktop widget.                               */
     int       widgetOpacity;    /** opacity of the desktop widget in [0-100]                      */
     int       position;         /** position of the alarm in the list of alarms.                  */
+    int       closeSeconds;     /** number of seconds to close the notification [5-120].          */
 };
 
 /** \class AlarmWidget

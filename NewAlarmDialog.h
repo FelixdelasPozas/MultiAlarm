@@ -33,7 +33,6 @@ class QRect;
 
 /** \class NewAlarmDialog
  * \brief Dialog for the creation of an alarm.
- *
  */
 class NewAlarmDialog
 : public QDialog
@@ -44,227 +43,195 @@ class NewAlarmDialog
     /** \brief NewAlarmDialog class constructor.
      * \param[in] parent raw pointer of the QWidget parent of this one.
      * \param[in] flags window flags.
-     *
      */
     NewAlarmDialog(QStringList invalidNames, QStringList invalidColors, QWidget * parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 
     /** \brief NewAlarmDialog class virtual destructor.
-     *
      */
     virtual ~NewAlarmDialog();
 
     /** \brief Sets the name/identificator of the alarm.
-     *
      */
     void setName(const QString &name);
 
     /** \brief Returns the name/identificator of the alarm.
-     *
      */
     const QString name() const;
 
     /** \brief Sets the message to show when the alarm finishes.
      * \param[in] message text message.
-     *
      */
     void setMessage(const QString &message);
 
     /** \brief Returns the message to show when the alarm finishes.
-     *
      */
     const QString message() const;
 
     /** \brief Returns true if the alarm is a timer, otherwise is a clock.
-     *
      */
     bool isTimer() const;
 
     /** \brief Sets the type of the alarm.
      * \param[in] value true to set type to timer and false to set to clock.
-     *
      */
-    void setIsTimer(bool value);
+    void setIsTimer(const bool value);
 
     /** \brief Sets the time of the timer alarm.
      * \param[in] time Timer duration in milliseconds.
-     *
      */
     void setTimerTime(const uint64_t &time);
 
     /** \brief Returns the time of the timer alarm in milliseconds.
-     *
      */
     const uint64_t timerTime() const;
 
     /** \brief Enables/disables the timer looping.
      * \param[in] value true to loop forever and false otherwise.
-     *
      */
     void setTimerLoop(bool value);
 
     /** \brief Returns true if the timer loops.
-     *
      */
     bool timerLoop() const;
 
     /** \brief Sets the date and time of the clock alarm.
      * \param[in] time QDateTime object.
-     *
      */
     void setClockDateTime(const QDateTime &time);
 
     /** \brief Retuns the date and time of the clock alarm.
-     *
      */
     const QDateTime clockDateTime() const;
 
     /** \brief Sets the color for the tray and desktop notifications.
      * \param[in] colorName color name string.
-     *
      */
     void setColor(const QString &colorname);
 
     /** \brief Returns the color for the tray and desktop notifications.
-     *
      */
     const QString color() const;
 
     /** \brief Sets the index of the sound to be played when the alarm finishes.
      * \param[in] soundIndex index of sound combo box.
-     *
      */
     void setSound(int soundIndex);
 
     /** \brief Returns the index of the selected sound for the alarm.
-     *
      */
     int sound() const;
 
     /** \brief Sets the value of the volume.
      * \param[in] value int value in [0-100]
-     *
      */
-    void setSoundVolume(int value);
+    void setSoundVolume(const int value);
 
     /** \brief Returns the volume of the sound.
-     *
      */
     int soundVolume() const;
 
     /** \brief Enables/disables the alarm tray icon.
      * \param[in] value true to enable and false otherwise.
-     *
      */
-    void setShowInTray(bool value);
+    void setShowInTray(const bool value);
 
     /** \brief Returns true if the alarm will show an icon in the system tray while running.
-     *
      */
     bool showInTray() const;
 
     /** \brief Enables/disables the alarm desktop widget.
      * \param[in] value true to enable and false otherwise.
-     *
      */
-    void setShowInDesktop(bool value);
+    void setShowInDesktop(const bool value);
 
     /** \brief Returns true if the alarm will show a widget in the desktop while running.
-     *
      */
     bool showInDesktop() const;
 
     /** \brief Enables/disables the alarm use of the keyboard lights.
-     *
      */
-    void setShowInKeyboard(bool value);
+    void setShowInKeyboard(const bool value);
 
     /** \brief Returns true if the alarm will show a progress in the keyboard lights.
-     *
      */
     bool showInKeyboard() const;
 
     /** \brief Sets the position of the desktop widget.
      * \param[in] position position coordinates. Must be one in the default positions.
-     *
      */
     void setDesktopWidgetPosition(const QPoint &position);
 
     /** \brief Returns the position of the desktop widget.
-     *
      */
     const QPoint desktopWidgetPosition() const;
 
     /** \brief Sets the opacity for the widget.
      * \param[in] opacity widget opacity in [0-100].
-     *
      */
-    void setWidgetOpacity(int opacity);
+    void setWidgetOpacity(const int opacity);
 
     /** \brief Returns the widget opacity.
-     *
      */
     int widgetOpacity() const;
+
+    /** \brief Sets the number of seconds to close the notification. 
+     * \param[in] seconds Number of seconds in [5-120] o 0 if no closable. 
+     */
+    void setCloseSeconds(const int seconds);
+
+    /** \brief Returns the number of seconds to close the notification or 0 if no closable. 
+     */
+    int closeSeconds() const;
 
   private slots:
     /** \brief Updates UI elements when the timer radio button changes state.
      * \param[in] value true if it's checked and false otherwise.
-     *
      */
     void onTimerRadioToggled(bool value);
 
     /** \brief Updates UI elements when the clock radio button changes state.
      * \param[in] value true if it's checked and false otherwise.
-     *
      */
     void onClockRadioToggled(bool value);
 
     /** \brief Updates the GUI when the desktop widget checkbox changes state.
      * \param[in] value checkbox state.
-     *
      */
     void onDesktopWidgetStateChanged(int value);
 
     /** \brief Updates the opacity slider value when the slider changes.
      * \param[in] value slider position value.
-     *
      */
     void onOpacityValueChanged(int value);
 
     /** \brief Updates the widget position when the combobox changes value.
      * \param[in] value combobox index.
-     *
      */
     void onWidgetPositionChanged(int value);
 
     /** \brief Updates the widget color when the combobox changes value.
      * \param[in] value combobox index.
-     *
      */
     void onColorChanged(int value);
 
     /** \brief Updates the accept button state depending on the state of the name and message fields.
-     *
      */
     void checkOkButtonRequirements();
 
     /** \brief Plays the sound specified by the sound combo box index.
-     *
      */
     void playSound();
 
     /** \brief Restores the icon of the play button when a sound finishes playing.
-     *
      */
     void setPlayButtonIcon();
 
     /** \brief Updates the GUI when the user repositions the desktop widget.
-     *
      */
     void onWidgetBeingDragged();
 
     /** \brief Updates the GUI when the user changes the sound volume slider.
      * \param[in] value slider value.
-     *
      */
     void onVolumeChanged(int value);
 
@@ -273,20 +240,22 @@ class NewAlarmDialog
      */
     void onKeyboardNotificationStateChanged(int value);
 
+    /** \brief Modifies the UI when the close notification checkbox changes state. 
+     * \param[in] value checkbox value.
+     */
+    void onCloseNotificationStateChanged(Qt::CheckState value);
+
   private:
     /** \brief Helper methods to connect the signals for UI elements.
-     *
      */
     void connectSignals();
 
     /** \brief Loads the sounds into the sounds vector.
-     *
      */
     void loadSounds();
 
     /** \brief Fills the desktop widget position combo box with all the
      * posible pre-set positions based on detected screen geometry.
-     *
      */
     void computeDesktopWidgetPositions();
 
@@ -294,7 +263,6 @@ class NewAlarmDialog
      * \param[in] rect QRect rectangle.
      * \param[in] screenName name of the screen.
      * \param[out] positionNames list of position names.
-     *
      */
     void computePositions(const QRect &rect, const QString &screenName, QStringList &positionNames);
 

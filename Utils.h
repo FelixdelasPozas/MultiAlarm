@@ -24,6 +24,8 @@
 #include <QLabel>
 #include <QFrame>
 #include <QColor>
+#include <QMessageBox>
+#include <QTimer>
 
 namespace Utils
 {
@@ -114,6 +116,59 @@ class DrawFrame
     qreal m_progress = 0;                        /** progress value for drawing the gradients. */
     QColor m_color = QColor(0, 0, 0);            /** first gradient color. */
     QColor m_shineColor = QColor(255, 255, 255); /** second gradient color. */
+};
+
+/** \brief Implementation of an autoclose QMessageBox.
+ */
+class AutoCloseMessageBox : public QMessageBox
+{
+    Q_OBJECT
+  public:
+    /**
+     * \brief AutoCloseMessageBox class constructor. 
+     * \param[in] parent Raw pointer of the widget parent of this one.
+     *
+     */
+    AutoCloseMessageBox(QWidget* parent = nullptr) :
+        QMessageBox{parent} {};
+
+    /** \brief AutoCloseMessageBox class constructor. 
+     * \param[in] icon Message box icon.
+     * \param[in] title Dialog title.
+     * \param[in] text Dialog text.
+     * \param[in] buttons Buttons to show. 
+     * \param[in] parent Raw pointer of the widget parent of this one. 
+     * \param[in] flags Dialog flags. 
+     */
+    AutoCloseMessageBox(Icon icon, const QString& title, const QString& text, StandardButtons buttons = NoButton,
+                        QWidget* parent = Q_NULLPTR,
+                        Qt::WindowFlags flags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint) :
+        QMessageBox(icon, title, text, buttons, parent, flags) {};
+
+    /** \brief AutoCloseMessageBox class virtual destructor. 
+     */
+    virtual ~AutoCloseMessageBox() = default;
+
+    /** \brief Sets if the dialog must auto-close.
+     * \param[in] value True to auto-close and false otherwise. 
+     */
+    void setAutoClose(const bool value);
+
+    /** \brief Sets the closing time.
+     * \param[in] seconds Closing time in seconds. 
+     */
+    void setCloseTime(const unsigned int seconds);
+
+  protected:
+    void showEvent(QShowEvent* event) override;
+    void timerEvent(QTimerEvent* event) override;
+
+  private:
+    QString m_text;                 /** text to show. */
+    uint32_t m_closeSeconds = 5;    /** seconds to close. */
+    bool m_autoClose = false;        /** true to auto-close false to act as a regular QMessageBox. */
+    unsigned int m_currentTime = 0; /** current time since showing the messagebox. */
+    int m_timerId = 0;              /** current timer id. */
 };
 
 #endif // UTILS_H_

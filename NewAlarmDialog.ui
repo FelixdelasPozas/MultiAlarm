@@ -10,19 +10,19 @@
     <x>0</x>
     <y>0</y>
     <width>448</width>
-    <height>462</height>
+    <height>512</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>448</width>
-    <height>462</height>
+    <height>512</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>448</width>
-    <height>462</height>
+    <height>512</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -380,6 +380,33 @@ QGroupBox::title {
          <string>Show progress in the keyboard lights.</string>
         </property>
        </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <item>
+         <widget class="QCheckBox" name="m_closeCheckbox">
+          <property name="text">
+           <string>Automatically close notification in </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="m_closeSpinbox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="suffix">
+           <string> seconds</string>
+          </property>
+          <property name="minimum">
+           <number>5</number>
+          </property>
+          <property name="maximum">
+           <number>120</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>

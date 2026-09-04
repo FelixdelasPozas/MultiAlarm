@@ -298,6 +298,9 @@ void NewAlarmDialog::connectSignals()
 
   connect(m_showLogiled, SIGNAL(stateChanged(int)),
           this,          SLOT(onKeyboardNotificationStateChanged(int)));
+
+  connect(m_closeCheckbox, SIGNAL(checkStateChanged(Qt::CheckState)),
+          this,            SLOT(onCloseNotificationStateChanged(Qt::CheckState)));
 }
 
 //-----------------------------------------------------------------
@@ -351,7 +354,7 @@ bool NewAlarmDialog::isTimer() const
 }
 
 //-----------------------------------------------------------------
-void NewAlarmDialog::setIsTimer(bool value)
+void NewAlarmDialog::setIsTimer(const bool value)
 {
   m_timerRadio->setChecked(value);
 }
@@ -369,7 +372,7 @@ const quint64 NewAlarmDialog::timerTime() const
 }
 
 //-----------------------------------------------------------------
-void NewAlarmDialog::setTimerLoop(bool value)
+void NewAlarmDialog::setTimerLoop(const bool value)
 {
   m_timerLoop->setChecked(value);
 }
@@ -425,7 +428,7 @@ int NewAlarmDialog::sound() const
 }
 
 //-----------------------------------------------------------------
-void NewAlarmDialog::setSoundVolume(int value)
+void NewAlarmDialog::setSoundVolume(const int value)
 {
   m_volumeSlider->setValue(value);
 }
@@ -437,7 +440,7 @@ int NewAlarmDialog::soundVolume() const
 }
 
 //-----------------------------------------------------------------
-void NewAlarmDialog::setShowInTray(bool value)
+void NewAlarmDialog::setShowInTray(const bool value)
 {
   m_showTray->setChecked(value);
 }
@@ -449,7 +452,7 @@ bool NewAlarmDialog::showInTray() const
 }
 
 //-----------------------------------------------------------------
-void NewAlarmDialog::setShowInDesktop(bool value)
+void NewAlarmDialog::setShowInDesktop(const bool value)
 {
   m_showDesktop->setChecked(value);
 }
@@ -461,7 +464,7 @@ bool NewAlarmDialog::showInDesktop() const
 }
 
 //-----------------------------------------------------------------
-void NewAlarmDialog::setShowInKeyboard(bool value)
+void NewAlarmDialog::setShowInKeyboard(const bool value)
 {
   m_showLogiled->setChecked(value);
 }
@@ -488,7 +491,7 @@ void NewAlarmDialog::setDesktopWidgetPosition(const QPoint &position)
 }
 
 //-----------------------------------------------------------------
-void NewAlarmDialog::setWidgetOpacity(int opacity)
+void NewAlarmDialog::setWidgetOpacity(const int opacity)
 {
   m_opacitySlider->setValue(opacity);
 }
@@ -497,6 +500,24 @@ void NewAlarmDialog::setWidgetOpacity(int opacity)
 int NewAlarmDialog::widgetOpacity() const
 {
   return m_opacitySlider->value();
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::setCloseSeconds(const int seconds)
+{
+  const auto enabled = seconds >= 5;
+  m_closeCheckbox->setChecked(enabled);
+  m_closeSpinbox->setEnabled(enabled);
+  m_closeSpinbox->setValue(enabled ? seconds : 5);
+}
+
+//-----------------------------------------------------------------
+int NewAlarmDialog::closeSeconds() const
+{
+  if(m_closeCheckbox->isChecked())
+    return m_closeSpinbox->value();
+
+  return 0;
 }
 
 //-----------------------------------------------------------------
@@ -573,4 +594,10 @@ void NewAlarmDialog::onKeyboardNotificationStateChanged(int value)
   {
     LogiLED::getInstance().unregisterItem("NewAlarm");
   }
+}
+
+//-----------------------------------------------------------------
+void NewAlarmDialog::onCloseNotificationStateChanged(Qt::CheckState value)
+{
+  m_closeSpinbox->setEnabled(value == Qt::Checked);
 }

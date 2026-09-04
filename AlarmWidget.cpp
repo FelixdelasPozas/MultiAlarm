@@ -343,13 +343,14 @@ void AlarmWidget::onAlarmTimeout()
   if(m_configuration.isTimer && !m_configuration.timerLoops)
     stop();
 
-  auto dialog = new QMessageBox(QMessageBox::Information,
+  auto dialog = new AutoCloseMessageBox(QMessageBox::Information,
                                 m_configuration.name,
                                 m_configuration.message,
                                 QMessageBox::Ok,
                                 this,
                                 Qt::Dialog|Qt::MSWindowsFixedSizeDialogHint|Qt::WindowStaysOnTopHint);
   dialog->setWindowIcon(QIcon(":MultiAlarm/2.ico"));
+  dialog->setCloseTime(m_configuration.closeSeconds);
 
   connect(dialog, SIGNAL(finished(int)),
           this,   SLOT(onDialogFinished()));
@@ -402,6 +403,7 @@ void AlarmWidget::onSettingsPressed()
   dialog.setShowInKeyboard(m_configuration.useLogiled);
   dialog.setDesktopWidgetPosition(m_configuration.widgetPosition);
   dialog.setWidgetOpacity(m_configuration.widgetOpacity);
+  dialog.setCloseSeconds(m_configuration.closeSeconds);
 
   dialog.exec();
 
@@ -430,6 +432,7 @@ void AlarmWidget::onSettingsPressed()
     conf.useLogiled       = dialog.showInKeyboard();
     conf.widgetPosition   = dialog.desktopWidgetPosition();
     conf.widgetOpacity    = dialog.widgetOpacity();
+    conf.closeSeconds     = dialog.closeSeconds();
 
     setConfiguration(conf);
   }

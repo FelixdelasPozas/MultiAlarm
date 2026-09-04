@@ -23,6 +23,7 @@
 // Qt
 #include <QPainter>
 #include <QPainterPath>
+#include <QApplication>
 
 //-----------------------------------------------------------------
 Utils::ClickableHoverLabel::ClickableHoverLabel(QWidget *parent, Qt::WindowFlags f)
@@ -103,4 +104,42 @@ void DrawFrame::paintEvent(QPaintEvent *p)
   painter.end();
 
   QFrame::paintEvent(p);
+}
+
+//----------------------------------------------------------------------------
+void AutoCloseMessageBox::showEvent(QShowEvent *event)
+{   
+  QMessageBox::showEvent(event);
+  QApplication::beep();
+  m_text = text();
+
+  m_currentTime = 0;
+  if (m_autoClose)
+    this->startTimer(1000); // counting is done in 'timerEvent'.
+}
+
+//----------------------------------------------------------------------------
+void AutoCloseMessageBox::timerEvent(QTimerEvent *event)
+{
+  m_currentTime++; // counting.
+
+  if(m_autoClose)
+  {
+    setText(m_text + QString("\nThe alarm will stop in %1 seconds.").arg(m_closeSeconds - m_currentTime));
+    if(m_currentTime >= m_closeSeconds)
+      this->done(0);
+  }
+}
+
+//----------------------------------------------------------------------------
+void AutoCloseMessageBox::setAutoClose(const bool value)
+{
+  m_autoClose = value;
+};
+
+//----------------------------------------------------------------------------
+void AutoCloseMessageBox::setCloseTime(const unsigned int seconds)
+{
+  m_autoClose = seconds >= 5;
+  m_closeSeconds = seconds;
 }

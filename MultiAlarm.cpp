@@ -53,6 +53,7 @@ const QString ALARM_USE_DESKTOP     = "UseDesktop";
 const QString ALARM_USE_LOGILED     = "UseLogiled";
 const QString ALARM_WIDGET_POSITION = "DesktopWidgetPosition";
 const QString ALARM_WIDGET_OPACITY  = "DesktopWidgetOpacity";
+const QString ALARM_CLOSE_SECONDS   = "AlarmCloseSeconds";
 
 const QString INI_FILENAME = "MultiAlarm.ini";
 
@@ -357,6 +358,7 @@ void MultiAlarm::saveSettings() const
       settings->setValue(ALARM_USE_LOGILED, conf.useLogiled);
       settings->setValue(ALARM_WIDGET_POSITION, conf.widgetPosition);
       settings->setValue(ALARM_WIDGET_OPACITY, conf.widgetOpacity);
+      settings->setValue(ALARM_CLOSE_SECONDS, conf.closeSeconds);
 
       settings->endGroup();
     }
@@ -423,6 +425,7 @@ AlarmWidget* MultiAlarm::createAlarmWidget(const NewAlarmDialog& dialog)
   conf.useLogiled       = dialog.showInKeyboard();
   conf.widgetPosition   = dialog.desktopWidgetPosition();
   conf.widgetOpacity    = dialog.widgetOpacity();
+  conf.closeSeconds     = dialog.closeSeconds();
 
   auto widget = new AlarmWidget(this);
   widget->setConfiguration(conf);
@@ -457,6 +460,7 @@ AlarmWidget* MultiAlarm::createAlarmWidget(QSettings &settings, const QString &n
   conf.useLogiled       = settings.value(ALARM_USE_LOGILED, false).toBool();
   conf.widgetPosition   = settings.value(ALARM_WIDGET_POSITION, QPoint{0,0}).toPoint();
   conf.widgetOpacity    = settings.value(ALARM_WIDGET_OPACITY, 60).toInt();
+  conf.closeSeconds     = settings.value(ALARM_CLOSE_SECONDS, 0).toInt();
 
   settings.endGroup();
 
