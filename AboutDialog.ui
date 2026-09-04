@@ -320,7 +320,10 @@ QGroupBox::title {
           <item>
            <widget class="QLabel" name="label_6">
             <property name="text">
-             <string>&lt;a href=&quot;https://www.logitechg.com/es-es/developers&quot;&gt;https://www.logitechg.com/es-es/developers&lt;/a&gt;</string>
+             <string>&lt;a href=&quot;https://www.logitechg.com/en-us/programs/partner-developer-lab&quot;&gt;https://www.logitechg.com/&lt;/a&gt;</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
             </property>
             <property name="openExternalLinks">
              <bool>true</bool>

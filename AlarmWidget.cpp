@@ -372,7 +372,7 @@ void AlarmWidget::onDialogFinished()
   m_sound = nullptr;
   m_soundFile = nullptr;
 
-  auto dialog = qobject_cast<QMessageBox *>(sender());
+  auto dialog = qobject_cast<AutoCloseMessageBox *>(sender());
   dialog->deleteLater();
 
   if(!m_configuration.isTimer)

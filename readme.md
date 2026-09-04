@@ -11,9 +11,11 @@ MultiAlarm
 # Description
 MultiAlarm is a tool to set multiple timer and clock alarms with system tray and desktop notification widgets. 
 
-Timer alarms can be set to loop, are limited to 24 hours and can be stopped, restarted and reconfigured. Timer alarms are permanently stored until deleted by the user. 
+Timer alarms can be set to loop, and can be stopped, restarted and reconfigured. Timer alarms are permanently stored until deleted by the user. 
 
 Clock alarms can't be stopped (obviously) and are deleted automatically once they expire, and can be set for any future date and time but not reconfigured. If a clock alarm hasn't expired it starts automatically on every program execution. 
+
+In the main dialog the alarm wigets can be dragged to set a specific order. It doesn't affect other than the look in the main dialog. 
 
 The tray icon, desktop widget and keyboard lights for notifications are optional for every alarm. The keyboard lights are only available for setups with Logitech RGB Gaming keyboards and only the first row of keys are used (F1 to Pause keys). When multiple alarms are active the lights of the keyboard will alternate with the state of each alarm. The desktop widget is always on top but it's transparent to user interaction (you can click through it to the windows below).
 
@@ -27,6 +29,7 @@ Several options can be configured:
 * multiple alarm sounds available with volume configuration.
 * the opacity of the desktop widget can be configured. 
 * the desktop widget can be dragged to any position on the screen, or can be placed in one of the preset positions (multiple monitors are supported). 
+* auto-close alarms.
 
 # Compilation requirements
 ## To build the tool:
@@ -41,10 +44,10 @@ The following libraries are required:
 # Install
 MultiAlarm is available for Windows 10 onwards. You can download the latest installer from the [releases page](https://github.com/FelixdelasPozas/MultiAlarm/releases). Neither the application or the installer are digitally signed so the system will ask for approval before running it the first time.
 
-The last version compatible with windows 7 and 8 is version 1.2.0, you can download it from [here](https://github.com/FelixdelasPozas/MultiAlarm/releases/tag/1.2.0).
+The last version compatible with windows 7 and 8 is version 1.2.0, you can download it from [here](https://github.com/FelixdelasPozas/MultiAlarm/releases/tag/1.2.0). Some features can be missing as previous versions are not being updated. 
 
 # Screenshots
-Main dialog with the alarm list. Each alarm has buttons to start, pause, delete and reconfigure it. Clock alarms can't be paused, stopped or reconfigured. When an alarm is running the background pattern of the alarm also fills according to its progression.
+Main dialog with the alarm list. Each alarm has buttons to start, pause, delete and reconfigure it. Clock alarms can't be paused, stopped or reconfigured. When an alarm is running the background pattern of the alarm also fills according to its progression. In here you can drag and drop alarms to put them in a specific order. 
 
 ![maindialog](https://github.com/user-attachments/assets/09759fed-07aa-472e-869d-f02e63ec105d)
 
@@ -52,7 +55,7 @@ The alarm creation and modification dialog. Keyboard lights option is only activ
 
 ![newalarmdialog](https://github.com/user-attachments/assets/483d8085-7c23-4148-8877-c7b881a5e261)
 
-Simple alarm completion dialog with the alarm message appears on top of other windows.
+Simple alarm completion dialog with the alarm message appears on top of other windows. In an automatic close alarm an additional message will appear with the remaining time before this dialog closes. 
 
 ![completed](https://github.com/user-attachments/assets/fb17be00-d9ab-4093-a3dc-53b0211582f4)
 
@@ -70,7 +73,7 @@ Keyboard notification for an alarm with red foreground and white background at 4
 
 # Repository information
 
-**Version**: 1.4.0
+**Version**: 1.5.0
 
 **Status**: finished
 
@@ -78,7 +81,7 @@ Keyboard notification for an alarm with red foreground and white background at 4
 
 | Language                     |files          |blank        |comment           |code  |
 |:-----------------------------|--------------:|------------:|-----------------:|-----:|
-| C++                          |   9           | 473         |   299            | 1696 |
-| C/C++ Header                 |   8           | 222         |   667            |  383 |
-| CMake                        |   1           |  18         |     8            |   68 |
-| **Total**                    | **18**        | **714**     | **974**          | **2147** |
+| C++                          |  11           | 536         |   366            | 2007 |
+| C/C++ Header                 |  10           | 264         |   720            |  489 |
+| CMake                        |   1           |  17         |     7            |   54 |
+| **Total**                    | **22**        | **817**     | **1093**          | **2550** |
