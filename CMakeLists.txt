@@ -33,14 +33,6 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
   set(CORE_EXTERNAL_LIBS ${CORE_EXTERNAL_LIBS} ${QT_QTTEST_LIBRARY})
 endif (CMAKE_BUILD_TYPE MATCHES Debug)
 
-if(DEFINED MINGW)
-  configure_file("${PROJECT_SOURCE_DIR}/resources.rc.in" "${PROJECT_BINARY_DIR}/resources.rc")
-  configure_file("${PROJECT_SOURCE_DIR}/installer/script.iss.in" "${PROJECT_BINARY_DIR}/script.iss")
-  set(CORE_SOURCES ${CORE_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/resources.rc)
-  set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> -O coff -o <OBJECT> -i <SOURCE>")
-  enable_language(RC)
-endif(DEFINED MINGW)
-
 include_directories(
   ${CMAKE_SOURCE_DIR}
   ${PROJECT_BINARY_DIR}
@@ -67,6 +59,14 @@ qt6_wrap_ui(CORE_UI
 
 file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/*.cpp")	
 set(CORE_SOURCES ${CORE_SOURCES} ${RESOURCES})
+
+if(DEFINED MINGW)
+  configure_file("${PROJECT_SOURCE_DIR}/resources.rc.in" "${PROJECT_BINARY_DIR}/resources.rc")
+  configure_file("${PROJECT_SOURCE_DIR}/installer/script.iss.in" "${PROJECT_BINARY_DIR}/script.iss")
+  set(CORE_SOURCES ${CORE_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/resources.rc)
+  set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> -O coff -o <OBJECT> -i <SOURCE>")
+  enable_language(RC)
+endif(DEFINED MINGW)
 
 set(CORE_EXTERNAL_LIBS
   ${LOGITECH_LIBRARY}

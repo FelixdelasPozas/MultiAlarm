@@ -32,6 +32,10 @@
 #include <QScrollBar>
 #include <QDir>
 
+// C++
+#include <functional>
+#include <wingdi.h>
+
 const int MAX_HEIGHT = 800;
 const int BAR_WIDTH  = 15;
 
@@ -60,9 +64,10 @@ const QString INI_FILENAME = "MultiAlarm.ini";
 //-----------------------------------------------------------------
 MultiAlarm::MultiAlarm(QWidget *parent, Qt::WindowFlags flags)
 : QMainWindow{parent, flags}
-, m_icon     {new QSystemTrayIcon(QIcon(":/MultiAlarm/application.ico"), this)}
 , m_needsExit{false}
 {
+  m_icon = new QSystemTrayIcon(appropiateTrayIcon());
+
   setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
 
   setupUi(this);
@@ -512,4 +517,73 @@ std::unique_ptr<QSettings> MultiAlarm::applicationSettings() const
   }
 
   return std::make_unique<QSettings>("Felix de las Pozas Alvarez", "MultiAlarm");
+}
+
+//-----------------------------------------------------------------
+QIcon MultiAlarm::appropiateTrayIcon() const
+{
+  // Returns the squared distance to avoid a slow square root function
+  std::function<double(const COLORREF&, const COLORREF&)> euclideanDistanceSquared = [](const COLORREF& c1,
+                                                                                        const COLORREF& c2) {
+    const int r1 = (int)GetRValue(c1);
+    const int g1 = (int)GetGValue(c1);
+    const int b1 = (int)GetBValue(c1);
+    const int r2 = (int)GetRValue(c2);
+    const int g2 = (int)GetGValue(c2);
+    const int b2 = (int)GetBValue(c2);
+
+    long long dr = r1 - r2;
+    long long dg = g1 - g2;
+    long long db = b1 - b2;
+    return dr * dr + dg * dg + db * db;
+  };
+
+  auto euclideanDistance = [&euclideanDistanceSquared](const COLORREF& c1, const COLORREF& c2) {
+      return std::sqrt(euclideanDistanceSquared(c1, c2));
+  };
+
+  // 1. Check if the taskbar uses the accent color
+  // ColorPrevalence = 1 means Accent Color is enabled on Start, Taskbar, and Action Center
+  DWORD colorPrevalence = 0;
+  ReadRegistryDword(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+                    L"ColorPrevalence", colorPrevalence);
+
+  // 2. Check if Apps use Light or Dark theme (for fallback)
+  DWORD appsUseLightTheme = 0;
+  ReadRegistryDword(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+                    L"AppsUseLightTheme", appsUseLightTheme);
+
+  COLORREF taskbarColor;
+
+  if (colorPrevalence == 1) {
+      // Read the actual Accent Color chosen by the user
+      DWORD accentColor = 0;
+      if (ReadRegistryDword(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Accent",
+                            L"AccentColorMenu", accentColor)) {
+          // AccentColorMenu is stored as ABGR. Convert to standard RGB or COLORREF
+          BYTE r = GetBValue(accentColor); // Windows swaps R and B in this registry layout
+          BYTE g = GetGValue(accentColor);
+          BYTE b = GetRValue(accentColor);
+          taskbarColor = RGB(r, g, b);
+      } else {
+          // Fallback if AccentColorMenu registry read fails
+          taskbarColor = RGB(0, 120, 215); // Default Windows Blue
+      }
+  } else {
+      // Fallback: Taskbar uses the default theme color (Dark or Light)
+      if (appsUseLightTheme == 1) {
+          taskbarColor = RGB(243, 243, 243); // Default Windows Light Taskbar Gray
+      } else {
+          taskbarColor = RGB(16, 16, 16); // Default Windows Dark Taskbar Black
+      }
+  }
+
+  const auto blackDistance = euclideanDistance(taskbarColor, RGB(0, 0, 0));
+  const auto whiteDistance = euclideanDistance(taskbarColor, RGB(255, 255, 255));
+
+  if (whiteDistance > blackDistance) {
+      return QIcon(":/MultiAlarm/application_w.svg");
+  }
+
+  return QIcon(":/MultiAlarm/application.svg");
 }

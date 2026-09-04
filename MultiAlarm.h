@@ -153,6 +153,10 @@ class MultiAlarm
      */
     std::unique_ptr<QSettings> applicationSettings() const;
 
+    /** \brief Helper method to return a tray icon appropiate for the user color scheme in tray.
+     */
+    QIcon appropiateTrayIcon() const;
+
   private:
     QSystemTrayIcon *m_icon;              /** application icon when minimized.       */
     QAction         *m_restoreMenuAction; /** restore application tray icon action.  */

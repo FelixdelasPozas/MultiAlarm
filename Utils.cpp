@@ -143,3 +143,19 @@ void AutoCloseMessageBox::setCloseTime(const unsigned int seconds)
   m_autoClose = seconds >= 5;
   m_closeSeconds = seconds;
 }
+
+//----------------------------------------------------------------------------
+bool ReadRegistryDword(HKEY root, const std::wstring& subKey, const std::wstring& valueName, DWORD& outValue)
+{
+    HKEY hKey;
+    if (RegOpenKeyExW(root, subKey.c_str(), 0, KEY_READ, &hKey) != ERROR_SUCCESS) {
+        return false;
+    }
+
+    DWORD dataSize = sizeof(DWORD);
+    LONG result =
+        RegQueryValueExW(hKey, valueName.c_str(), nullptr, nullptr, reinterpret_cast<LPBYTE>(&outValue), &dataSize);
+    RegCloseKey(hKey);
+
+    return (result == ERROR_SUCCESS);
+}

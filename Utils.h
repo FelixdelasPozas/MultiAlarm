@@ -27,6 +27,9 @@
 #include <QMessageBox>
 #include <QTimer>
 
+// C++
+#include <windows.h>
+
 namespace Utils
 {
   /** \class ClickableHoverLabel
@@ -170,5 +173,13 @@ class AutoCloseMessageBox : public QMessageBox
     unsigned int m_currentTime = 0; /** current time since showing the messagebox. */
     int m_timerId = 0;              /** current timer id. */
 };
+
+/** \brief Reads a registry word. Returns true on success.
+ * \param[in] root Registry root
+ * \param[in] subKey Subkey value
+ * \param[in] valueName Name of registry key.
+ * \param[out] outValue Key value. 
+ */
+bool ReadRegistryDword(HKEY root, const std::wstring& subKey, const std::wstring& valueName, DWORD& outValue);
 
 #endif // UTILS_H_
