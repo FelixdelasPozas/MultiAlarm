@@ -46,7 +46,7 @@ struct AlarmConfiguration
     QString   message;          /** message of the alarm to show on completion.                   */
     QString   color;            /** name of the color of the alarm.                               */
     bool      isTimer;          /** true if the alarm is a timer.                                 */
-    QTime     timerTime;        /** duration of the timer alarm.                                  */
+    uint64_t  timerTime;        /** duration of the timer alarm.                                  */
     bool      timerLoops;       /** true if the timer loops.                                      */
     QDateTime clockDateTime;    /** date and timer of the clock alarm.                            */
     int       sound;            /** sound used for the finished alarm notification.               */

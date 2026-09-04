@@ -64,24 +64,9 @@ qt6_wrap_ui(CORE_UI
   AboutDialog.ui
   AlarmWidget.ui
 )
-	
-set (CORE_SOURCES
-  # project files
-  ${CORE_SOURCES}
-  ${RESOURCES}
-  ${CORE_MOC}
-  ${CORE_UI}
-  Main.cpp
-  NewAlarmDialog.cpp
-  MultiAlarm.cpp
-  AboutDialog.cpp
-  AlarmWidget.cpp
-  Alarm.cpp
-  DesktopWidget.cpp
-  LogiLED.cpp
-  Utils.cpp
-  ScrollArea.cpp
-)
+
+file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/*.cpp")	
+set(CORE_SOURCES ${CORE_SOURCES} ${RESOURCES})
 
 set(CORE_EXTERNAL_LIBS
   ${LOGITECH_LIBRARY}

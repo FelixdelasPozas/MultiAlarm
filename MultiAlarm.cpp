@@ -444,7 +444,7 @@ AlarmWidget* MultiAlarm::createAlarmWidget(QSettings &settings, const QString &n
 
   if(conf.isTimer)
   {
-    conf.timerTime  = settings.value(ALARM_TIMER_TIME, QTime(0,1,0)).toTime();
+    conf.timerTime  = settings.value(ALARM_TIMER_TIME, 60).toULongLong();
     conf.timerLoops = settings.value(ALARM_TIMER_LOOP, false).toBool();
   }
   else

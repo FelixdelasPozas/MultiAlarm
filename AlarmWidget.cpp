@@ -472,7 +472,7 @@ void AlarmWidget::setConfiguration(const AlarmConfiguration &conf)
 
   if(conf.isTimer)
   {
-    Alarm::AlarmTime alarmTime(0, conf.timerTime.hour(), conf.timerTime.minute(), conf.timerTime.second());
+    Alarm::AlarmTime alarmTime(conf.timerTime);
     alarm = std::make_unique<Alarm>(alarmTime, conf.timerLoops);
   }
   else

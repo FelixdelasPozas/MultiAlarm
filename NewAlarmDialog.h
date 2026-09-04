@@ -86,15 +86,15 @@ class NewAlarmDialog
     void setIsTimer(bool value);
 
     /** \brief Sets the time of the timer alarm.
-     * \param[in] time QTime object.
+     * \param[in] time Timer duration in milliseconds.
      *
      */
-    void setTimerTime(const QTime &time);
+    void setTimerTime(const uint64_t &time);
 
-    /** \brief Returns the time of the timer alarm.
+    /** \brief Returns the time of the timer alarm in milliseconds.
      *
      */
-    const QTime timerTime() const;
+    const uint64_t timerTime() const;
 
     /** \brief Enables/disables the timer looping.
      * \param[in] value true to loop forever and false otherwise.

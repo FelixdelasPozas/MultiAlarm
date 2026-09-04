@@ -135,7 +135,6 @@ NewAlarmDialog::NewAlarmDialog(QStringList invalidNames, QStringList invalidColo
 
   loadSounds();
 
-  m_timer->setMinimumTime(QTime{0,1,0});
   m_clock->setMinimumTime(QTime{0,1,0});
 
   m_buttons->button(QDialogButtonBox::Ok)->setEnabled(false);
@@ -358,15 +357,15 @@ void NewAlarmDialog::setIsTimer(bool value)
 }
 
 //-----------------------------------------------------------------
-void NewAlarmDialog::setTimerTime(const QTime& time)
+void NewAlarmDialog::setTimerTime(const uint64_t& time)
 {
-  m_timer->setTime(time);
+  m_timer->setDurationInSeconds(time);
 }
 
 //-----------------------------------------------------------------
-const QTime NewAlarmDialog::timerTime() const
+const quint64 NewAlarmDialog::timerTime() const
 {
-  return m_timer->time();
+  return m_timer->durationInSeconds();
 }
 
 //-----------------------------------------------------------------

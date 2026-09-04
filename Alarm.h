@@ -38,12 +38,36 @@ class Alarm
      */
     struct AlarmTime
     {
-      int days;
-      int hours;
-      int minutes;
-      int seconds;
+        int days;    /** days number */
+        int hours;   /** hours number */
+        int minutes; /** minutes number. */
+        int seconds; /** seconds number. */
 
-      explicit AlarmTime(int d, int h, int m, int s): days{d}, hours{h}, minutes{m}, seconds{s} {};
+        /** \brief AlarmTime constructor. 
+         * \param[in] d days number.
+         * \param[in] h hours number.
+         * \param[in] m minutes number.
+         * \param[in] s seconds number. 
+         */
+        explicit AlarmTime(int d, int h, int m, int s) :
+            days{d},
+            hours{h},
+            minutes{m},
+            seconds{s} {};
+
+        /** \brief AlarmTime constructor. 
+         * \param[in] duration Total time in seconds. 
+         */
+        explicit AlarmTime(const uint64_t duration)
+        {
+            auto secs = duration;
+            days = (secs / 86400LL);
+            secs %= 86400LL;
+            hours = (secs / 3600LL);
+            secs %= 3600LL;
+            minutes = (secs / 60LL);
+            seconds = (secs % 60LL);
+        }
       QString text() const;
     };
 
