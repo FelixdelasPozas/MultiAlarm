@@ -73,7 +73,7 @@ Keyboard notification for an alarm with red foreground and white background at 4
 
 # Repository information
 
-**Version**: 1.5.0
+**Version**: 1.5.1
 
 **Status**: finished
 
@@ -81,7 +81,7 @@ Keyboard notification for an alarm with red foreground and white background at 4
 
 | Language                     |files          |blank        |comment           |code  |
 |:-----------------------------|--------------:|------------:|-----------------:|-----:|
-| C++                          |  11           | 551         |   377            | 2071 |
-| C/C++ Header                 |  10           | 264         |   729            |  492 |
+| C++                          |  11           | 556         |   379            | 2115 |
+| C/C++ Header                 |  10           | 269         |   733            |  495 |
 | CMake                        |   1           |  17         |     8            |   54 |
-| **Total**                    | **22**        | **835**     | **1114**          | **2617** |
+| **Total**                    | **22**        | **842**     | **1120**          | **2664** |

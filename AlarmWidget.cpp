@@ -38,6 +38,8 @@
 #include <QMouseEvent>
 #include <QMimeData>
 #include <QDrag>
+#include <QGraphicsOpacityEffect>
+#include <QApplication>
 
 const QString COLOR_QSTRING = "<font color='%1'>%2</font>";
 
@@ -65,6 +67,7 @@ AlarmWidget::AlarmWidget(MultiAlarm *parent, Qt::WindowFlags flags)
 , m_parent       {parent}
 {
   setupUi(this);
+  setAcceptDrops(true);
 
   connect(m_start, SIGNAL(clicked(bool)),
           this,    SLOT(onPlayPressed()));
@@ -206,12 +209,47 @@ void AlarmWidget::mousePressEvent(QMouseEvent* event)
         drag->setPixmap(this->grab());
         drag->setHotSpot(event->position().toPoint());
 
-        this->hide();
+        auto effect = new QGraphicsOpacityEffect(this);
+        effect->setOpacity(0.3);
+        setGraphicsEffect(effect);
 
-        if (drag->exec(Qt::MoveAction) == Qt::IgnoreAction) {
-            this->show();
-        }
+        connect(drag,&QDrag::targetChanged,[this, &drag](QObject *target)
+        {
+          if(target) return; // valid target
+          if(!parentWidget()->rect().contains(parentWidget()->mapFromGlobal(QCursor::pos())))
+              drag->cancel();
+        });        
+
+        const auto result = drag->exec(Qt::MoveAction);
+        const auto target = qobject_cast<QWidget*>(drag->target());
+        const auto obj = qobject_cast<QWidget*>(this);
+        setGraphicsEffect(nullptr); // deletes the effect
+        if(!target || result == Qt::IgnoreAction || target == obj)
+          return;
+
+        qobject_cast<ScrollArea*>(parent())->dropped(obj, target);
     }
+}
+
+//-----------------------------------------------------------------
+void AlarmWidget::dragEnterEvent(QDragEnterEvent* event)
+{
+  auto p = qobject_cast<ScrollArea*>(parent());
+  p->dragEnterEvent(event);
+}
+
+//-----------------------------------------------------------------
+void AlarmWidget::dragMoveEvent(QDragMoveEvent* event)
+{
+  auto p = qobject_cast<ScrollArea*>(parent());
+  p->dragMoveEvent(event);
+}
+
+//-----------------------------------------------------------------
+void AlarmWidget::dropEvent(QDropEvent* event)
+{
+  auto p = qobject_cast<ScrollArea*>(parent());
+  p->dropEvent(event);
 }
 
 //-----------------------------------------------------------------

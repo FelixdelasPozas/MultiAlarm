@@ -64,9 +64,9 @@ class DurationSpinBox : public QAbstractSpinBox
     void mousePressEvent(QMouseEvent* event) override;
 
   private:
-    enum Section /** sections of the input widgets, parts of the timer. */
+    enum class Section /** sections of the input widgets, parts of the timer. */
     {
-        None,
+        None = 0,
         Days,
         Hours,
         Minutes,

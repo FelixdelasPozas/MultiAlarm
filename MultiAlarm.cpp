@@ -66,7 +66,9 @@ MultiAlarm::MultiAlarm(QWidget *parent, Qt::WindowFlags flags)
 : QMainWindow{parent, flags}
 , m_needsExit{false}
 {
-  m_icon = new QSystemTrayIcon(appropiateTrayIcon());
+  const auto icon = appropiateTrayIcon();
+  m_icon = new QSystemTrayIcon(icon);
+  setWindowIcon(icon);
 
   setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
 
@@ -122,7 +124,7 @@ QStringList MultiAlarm::usedColors() const
 //-----------------------------------------------------------------
 void MultiAlarm::createNewAlarm()
 {
-  NewAlarmDialog dialog(usedNames(), usedColors(), this);
+  NewAlarmDialog dialog(usedNames(), usedColors(), m_scrollArea);
 
   dialog.exec();
 

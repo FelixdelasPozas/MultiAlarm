@@ -42,34 +42,34 @@ DurationSpinBox::Section DurationSpinBox::currentSection() const
 {
     int pos = lineEdit()->cursorPosition();
     if (pos >= 0 && pos <= 2) {
-        return Days;
+        return Section::Days;
     }
     if (pos >= 3 && pos <= 5) {
-        return Hours;
+        return Section::Hours;
     }
     if (pos >= 6 && pos <= 8) {
-        return Minutes;
+        return Section::Minutes;
     }
     if (pos >= 9 && pos <= 11) {
-        return Seconds;
+        return Section::Seconds;
     }
-    return None;
+    return Section::None;
 }
 
 //-----------------------------------------------------------------------------
 void DurationSpinBox::selectSection(Section sec)
 {
     switch (sec) {
-        case Days:
+        case Section::Days:
             lineEdit()->setSelection(0, 2);
             break;
-        case Hours:
+        case Section::Hours:
             lineEdit()->setSelection(3, 2);
             break;
-        case Minutes:
+        case Section::Minutes:
             lineEdit()->setSelection(6, 2);
             break;
-        case Seconds:
+        case Section::Seconds:
             lineEdit()->setSelection(9, 2);
             break;
         default:
@@ -84,16 +84,16 @@ void DurationSpinBox::stepBy(int steps)
     int64_t diff = 0; // can be negative
 
     switch (sec) {
-        case Days:
+        case Section::Days:
             diff = steps * 24 * 3600;
             break;
-        case Hours:
+        case Section::Hours:
             diff = steps * 3600;
             break;
-        case Minutes:
+        case Section::Minutes:
             diff = steps * 60;
             break;
-        case Seconds:
+        case Section::Seconds:
             diff = steps;
             break;
         default:
@@ -173,9 +173,24 @@ void DurationSpinBox::updateText()
 void DurationSpinBox::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Left || event->key() == Qt::Key_Right) {
-        // Allows you to move between logic blocks using the side arrows
-        QAbstractSpinBox::keyPressEvent(event);
-        selectSection(currentSection());
+        auto sec = currentSection();
+        if(event->key() == Qt::Key_Left)
+        {
+            if(sec != Section::Days)
+            {
+                auto secPos = static_cast<int>(sec);
+                selectSection(static_cast<Section>(--secPos));
+            }
+        }
+
+        if(event->key() == Qt::Key_Right)
+        {
+            if(sec != Section::Seconds)
+            {
+                auto secPos = static_cast<int>(sec);
+                selectSection(static_cast<Section>(++secPos));
+            }
+        }
         return;
     }
 

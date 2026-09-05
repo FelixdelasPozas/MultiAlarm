@@ -56,35 +56,31 @@ void ScrollArea::dragMoveEvent(QDragMoveEvent* event)
 //-----------------------------------------------------------------------------
 void ScrollArea::dropEvent(QDropEvent* event)
 {
-    bool ok;
-    quintptr widgetAddress = event->mimeData()->text().toULongLong(&ok);
-    if (!ok) {
-        return;
-    }
+    event->acceptProposedAction();
+}
 
-    QWidget* sourceWidget = reinterpret_cast<QWidget*>(widgetAddress);
-    if (!sourceWidget) {
-        return;
-    }
-
-    const int dropY = event->position().y();
-    int newIndex = 0;
-
-    // Calculate layout target position
+//-----------------------------------------------------------------------------
+void ScrollArea::dropped(QWidget* from, QWidget* to)
+{
+    int fromIndex = -1, toIndex = -1;
     auto vlayout = qobject_cast<QVBoxLayout*>(layout());
     for (int i = 0; i < vlayout->count(); ++i) {
         QWidget* widget = vlayout->itemAt(i)->widget();
-        if (widget && widget != sourceWidget) {
-            int widgetMiddle = widget->y() + widget->height() / 2;
-            if (dropY > widgetMiddle) {
-                newIndex = i;
+        if (widget) {
+            if (widget == from) {
+                fromIndex = i;
+                continue;
+            }
+
+            if (widget == to) {
+                toIndex = i;
             }
         }
     }
 
-    vlayout->removeWidget(sourceWidget);
-    vlayout->insertWidget(newIndex, sourceWidget);
-    sourceWidget->show();
-
-    event->acceptProposedAction();
+    if(fromIndex == -1 || toIndex == -1)
+        return;
+        
+    vlayout->removeWidget(from);
+    vlayout->insertWidget(toIndex, from);
 }

@@ -43,10 +43,15 @@ class ScrollArea: public QScrollArea
        */
       virtual ~ScrollArea() = default;
 
-    protected:
       virtual void dragEnterEvent(QDragEnterEvent* event) override;
       virtual void dragMoveEvent(QDragMoveEvent* event) override;
       virtual void dropEvent(QDropEvent* event) override;
+
+      /** \brief Helper method to handle the result of a drag & drop. 
+       * \param[in] from Initial drag object.
+       * \param[in] to Widget witch the initial object was dragged onto
+       */
+      void dropped(QWidget *from, QWidget* to);
 };
 
 #endif
