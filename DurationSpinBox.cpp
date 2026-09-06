@@ -172,31 +172,35 @@ void DurationSpinBox::updateText()
 //-----------------------------------------------------------------------------
 void DurationSpinBox::keyPressEvent(QKeyEvent* event)
 {
-    if (event->key() == Qt::Key_Left || event->key() == Qt::Key_Right) {
-        auto sec = currentSection();
-        if(event->key() == Qt::Key_Left)
-        {
-            if(sec != Section::Days)
-            {
+    const QSet<int> separators = {2,5,8};
+    const auto sec = currentSection();
+
+    switch (event->key()) {
+        case Qt::Key_Left:
+            if (sec != Section::Days) {
                 auto secPos = static_cast<int>(sec);
                 selectSection(static_cast<Section>(--secPos));
+                return;
             }
-        }
-
-        if(event->key() == Qt::Key_Right)
-        {
-            if(sec != Section::Seconds)
-            {
+            break;
+        case Qt::Key_Right:
+            if (sec != Section::Seconds) {
                 auto secPos = static_cast<int>(sec);
                 selectSection(static_cast<Section>(++secPos));
+                return;
             }
-        }
-        return;
+            break;
+        default:
+            break;
     }
 
     // If you try to write numbers directly, we process the logic in blocks of 2 digits
     if (event->text().contains(QRegularExpression("^\\d$"))) {
         int pos = lineEdit()->cursorPosition();
+        if (separators.contains(pos)) {
+            pos -= 2;
+        }
+
         QString currentText = lineEdit()->text();
 
         // We overwrite the character under the cursor instead of pushing the formatting to the right
@@ -209,7 +213,7 @@ void DurationSpinBox::keyPressEvent(QKeyEvent* event)
                 quint64 newSecs = parts[0].toULongLong() * 24 * 3600 + parts[1].toULongLong() * 3600 +
                                   parts[2].toULongLong() * 60 + parts[3].toULongLong();
 
-                if (parts[0].toUInt() <= 10 && parts[1].toUInt() < 24 && parts[2].toUInt() < 60 &&
+                if (parts[0].toUInt() <= 30 && parts[1].toUInt() < 24 && parts[2].toUInt() < 60 &&
                     parts[3].toUInt() < 60) {
                     quint64 oldSeconds = m_totalSeconds;
                     m_totalSeconds = std::clamp(newSecs, MIN_SECONDS, MAX_SECONDS);
@@ -227,7 +231,6 @@ void DurationSpinBox::keyPressEvent(QKeyEvent* event)
                 nextPos++; // Skip the separator ':'
             }
             lineEdit()->setCursorPosition(nextPos);
-            selectSection(currentSection());
             return;
         }
     }
