@@ -30,28 +30,31 @@ class QDropEvent;
 /** \class ScrollArea
  * \brief Implements a scroll area with draggable items. 
  */
-class ScrollArea: public QScrollArea
+class ScrollArea : public QScrollArea
 {
-  Q_OBJECT
-    public:
-      /** \brief ScrollArea class constructor.
-       * \param[in] parent Raw pointer of the widget parent of this one. 
-       */
-      ScrollArea(QWidget *parent = nullptr);
+    Q_OBJECT
+  public:
+    /** \brief ScrollArea class constructor.
+     * \param[in] parent Raw pointer of the widget parent of this one. 
+     */
+    ScrollArea(QWidget* parent = nullptr);
 
-      /** \brief ScrollArea class virtual destructor. 
-       */
-      virtual ~ScrollArea() = default;
+    /** \brief ScrollArea class virtual destructor. 
+     */
+    virtual ~ScrollArea() = default;
 
-      virtual void dragEnterEvent(QDragEnterEvent* event) override;
-      virtual void dragMoveEvent(QDragMoveEvent* event) override;
-      virtual void dropEvent(QDropEvent* event) override;
+    // NOTE: public to notify scroll area and move widgets...
+    virtual void dragEnterEvent(QDragEnterEvent* event) override;
+    virtual void dragMoveEvent(QDragMoveEvent* event) override;
+    virtual void dropEvent(QDropEvent* event) override;
 
-      /** \brief Helper method to handle the result of a drag & drop. 
-       * \param[in] from Initial drag object.
-       * \param[in] to Widget witch the initial object was dragged onto
-       */
-      void dropped(QWidget *from, QWidget* to);
+    /** \brief Cancels the drag event.
+     */
+    void cancelled();
+
+  private:
+    int m_dragPosition; /** position of the dragged item */
+    QWidget *m_dragWidget; /** dragged widget. */
 };
 
 #endif

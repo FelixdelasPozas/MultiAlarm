@@ -30,13 +30,11 @@
 
 //-----------------------------------------------------------------------------
 ScrollArea::ScrollArea(QWidget* parent) :
-    QScrollArea{parent}
+    QScrollArea{parent},
+    m_dragPosition{-1},
+    m_dragWidget{nullptr}
 {
     setAcceptDrops(true);
-
-    setLayout(new QVBoxLayout(this));
-    layout()->setSpacing(1);
-    layout()->setContentsMargins(0,0,0,0);
 }
 
 //-----------------------------------------------------------------------------
@@ -44,6 +42,19 @@ void ScrollArea::dragEnterEvent(QDragEnterEvent* event)
 {
     if (event->mimeData()->hasText()) {
         event->acceptProposedAction();
+        const auto pos = this->mapFromGlobal(QCursor::pos()).y();
+        const auto h = this->widget()->layout()->itemAt(0)->widget()->height();
+        const auto dragPos = pos/h;
+
+        auto vlayout = qobject_cast<QVBoxLayout*>(widget()->layout());
+        if(dragPos > vlayout->count() - 1) return;
+        if(m_dragPosition != -1 && dragPos != m_dragPosition)
+        {
+            vlayout->removeWidget(m_dragWidget);
+            vlayout->insertWidget(dragPos, m_dragWidget);
+        }
+        m_dragPosition = dragPos;
+        m_dragWidget = widget()->layout()->itemAt(m_dragPosition)->widget();
     }
 }
 
@@ -51,36 +62,30 @@ void ScrollArea::dragEnterEvent(QDragEnterEvent* event)
 void ScrollArea::dragMoveEvent(QDragMoveEvent* event)
 {
     event->acceptProposedAction();
+    const auto pos = this->mapFromGlobal(QCursor::pos()).y();
+    const auto h = this->widget()->layout()->itemAt(0)->widget()->height();
+    const auto dragPos = pos / h;
+    auto vlayout = qobject_cast<QVBoxLayout*>(widget()->layout());
+    if(dragPos > vlayout->count() - 1) return;
+
+    if (m_dragPosition != dragPos) {
+        vlayout->removeWidget(m_dragWidget);
+        vlayout->insertWidget(dragPos, m_dragWidget);
+        m_dragPosition = dragPos;
+    }
 }
 
 //-----------------------------------------------------------------------------
 void ScrollArea::dropEvent(QDropEvent* event)
 {
     event->acceptProposedAction();
+    cancelled();
+    repaint();
 }
 
 //-----------------------------------------------------------------------------
-void ScrollArea::dropped(QWidget* from, QWidget* to)
+void ScrollArea::cancelled()
 {
-    int fromIndex = -1, toIndex = -1;
-    auto vlayout = qobject_cast<QVBoxLayout*>(layout());
-    for (int i = 0; i < vlayout->count(); ++i) {
-        QWidget* widget = vlayout->itemAt(i)->widget();
-        if (widget) {
-            if (widget == from) {
-                fromIndex = i;
-                continue;
-            }
-
-            if (widget == to) {
-                toIndex = i;
-            }
-        }
-    }
-
-    if(fromIndex == -1 || toIndex == -1)
-        return;
-        
-    vlayout->removeWidget(from);
-    vlayout->insertWidget(toIndex, from);
+    m_dragPosition = -1;
+    m_dragWidget = nullptr;
 }

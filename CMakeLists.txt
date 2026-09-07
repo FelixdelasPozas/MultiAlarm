@@ -9,7 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Version Number
 set (MULTIALARM_VERSION_MAJOR 1)
 set (MULTIALARM_VERSION_MINOR 5)
-set (MULTIALARM_VERSION_PATCH 1)
+set (MULTIALARM_VERSION_PATCH 2)
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

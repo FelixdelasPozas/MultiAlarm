@@ -209,46 +209,46 @@ void AlarmWidget::mousePressEvent(QMouseEvent* event)
         drag->setPixmap(this->grab());
         drag->setHotSpot(event->position().toPoint());
 
-        auto effect = new QGraphicsOpacityEffect(this);
-        effect->setOpacity(0.3);
+        auto effect = new QGraphicsBlurEffect(this);
+        effect->setBlurRadius(5);
+        effect->setBlurHints(QGraphicsBlurEffect::BlurHint::AnimationHint|QGraphicsBlurEffect::BlurHint::QualityHint);
         setGraphicsEffect(effect);
 
         connect(drag,&QDrag::targetChanged,[this, &drag](QObject *target)
         {
           if(target) return; // valid target
           if(!parentWidget()->rect().contains(parentWidget()->mapFromGlobal(QCursor::pos())))
+          {
               drag->cancel();
+              qobject_cast<ScrollArea*>(parent()->parent()->parent())->cancelled();
+          }
         });        
 
-        const auto result = drag->exec(Qt::MoveAction);
-        const auto target = qobject_cast<QWidget*>(drag->target());
-        const auto obj = qobject_cast<QWidget*>(this);
+        drag->exec(Qt::MoveAction);
         setGraphicsEffect(nullptr); // deletes the effect
-        if(!target || result == Qt::IgnoreAction || target == obj)
-          return;
 
-        qobject_cast<ScrollArea*>(parent())->dropped(obj, target);
+        
     }
 }
 
 //-----------------------------------------------------------------
 void AlarmWidget::dragEnterEvent(QDragEnterEvent* event)
 {
-  auto p = qobject_cast<ScrollArea*>(parent());
+  auto p = qobject_cast<ScrollArea*>(parent()->parent()->parent());
   p->dragEnterEvent(event);
 }
 
 //-----------------------------------------------------------------
 void AlarmWidget::dragMoveEvent(QDragMoveEvent* event)
 {
-  auto p = qobject_cast<ScrollArea*>(parent());
+  auto p = qobject_cast<ScrollArea*>(parent()->parent()->parent());
   p->dragMoveEvent(event);
 }
 
 //-----------------------------------------------------------------
 void AlarmWidget::dropEvent(QDropEvent* event)
 {
-  auto p = qobject_cast<ScrollArea*>(parent());
+  auto p = qobject_cast<ScrollArea*>(parent()->parent()->parent());
   p->dropEvent(event);
 }
 

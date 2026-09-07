@@ -247,7 +247,7 @@ void MultiAlarm::addAlarmWidget(AlarmWidget *widget)
   connect(widget, SIGNAL(deleteAlarm()),
           this,   SLOT(onAlarmDeleted()));
 
-  auto layout = qobject_cast<QVBoxLayout*>(m_scrollArea->layout());
+  auto layout = qobject_cast<QVBoxLayout*>(m_scrollArea->widget()->layout());
   layout->insertWidget(layout->count(), widget);
 
   auto height = currentHeight();
@@ -337,9 +337,10 @@ void MultiAlarm::saveSettings() const
 
   if(!m_alarms.empty())
   {
-    for(auto i = 0; i < m_scrollArea->layout()->count(); ++i)
+    auto layout = m_scrollArea->widget()->layout();
+    for(auto i = 0; i < layout->count(); ++i)
     {
-      auto item = m_scrollArea->layout()->itemAt(i);
+      auto item = layout->itemAt(i);
       auto widget = qobject_cast<AlarmWidget*>(item->widget());
       auto conf = widget->alarmConfiguration();
 
