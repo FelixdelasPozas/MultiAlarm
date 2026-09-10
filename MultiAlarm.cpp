@@ -21,6 +21,7 @@
 #include <MultiAlarm.h>
 #include <AboutDialog.h>
 #include <NewAlarmDialog.h>
+#include <SettingsDialog.h>
 #include <LogiLED.h>
 #include <Alarm.h>
 
@@ -31,17 +32,27 @@
 #include <QMessageBox>
 #include <QScrollBar>
 #include <QDir>
+#include <QUrl>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QNetworkReply>
 
 // C++
 #include <functional>
 #include <wingdi.h>
+#include <memory>
 
 const int MAX_HEIGHT = 800;
 const int BAR_WIDTH  = 15;
 
-const QString STATE    = "State";
-const QString GEOMETRY = "Geometry";
-const QString ALARMS   = "Alarms";
+const QString STATE           = "State";
+const QString GEOMETRY        = "Geometry";
+const QString ALARMS          = "Alarms";
+const QString UPDATES         = "Update check frequency";
+const QString LAST_CHECK      = "Last update check";
+const QString CLOSE_IS_EXIT   = "Close is exit";
+const QString RAISE_ON_FINISH = "Show main dialog on finish";
 
 const QString ALARM_POSITION        = "Position";
 const QString ALARM_MESSAGE         = "Message";
@@ -61,10 +72,14 @@ const QString ALARM_CLOSE_SECONDS   = "AlarmCloseSeconds";
 
 const QString INI_FILENAME = "MultiAlarm.ini";
 
+const QString RELEASES_DATA = "https://api.github.com/repos/FelixdelasPozas/MultiAlarm/releases";
+const QString RELEASES_ADDRESS = "https://github.com/FelixdelasPozas/MultiAlarm/releases";
+
 //-----------------------------------------------------------------
 MultiAlarm::MultiAlarm(QWidget *parent, Qt::WindowFlags flags)
 : QMainWindow{parent, flags}
 , m_needsExit{false}
+, m_netManager{std::make_unique<QNetworkAccessManager>(this)}
 {
   const auto icon = appropiateTrayIcon();
   m_icon = new QSystemTrayIcon(icon);
@@ -91,12 +106,15 @@ MultiAlarm::MultiAlarm(QWidget *parent, Qt::WindowFlags flags)
   LogiLED::getInstance();
 
   connectSignals();
+
+  checkForUpdates();
 }
 
 //-----------------------------------------------------------------
 MultiAlarm::~MultiAlarm()
 {
   saveSettings();
+  m_updatesTimer.stop();
 }
 
 //-----------------------------------------------------------------
@@ -144,6 +162,13 @@ void MultiAlarm::aboutDialog()
 }
 
 //-----------------------------------------------------------------
+void MultiAlarm::settingsDialog()
+{
+  SettingsDialog dialog(m_configuration, this);
+  dialog.exec();
+}
+
+//-----------------------------------------------------------------
 void MultiAlarm::changeEvent(QEvent* e)
 {
   if (e->type() == QEvent::WindowStateChange)
@@ -156,23 +181,27 @@ void MultiAlarm::changeEvent(QEvent* e)
       e->ignore();
     }
   }
+
+  QMainWindow::changeEvent(e);
 }
 
 //-----------------------------------------------------------------
 void MultiAlarm::closeEvent(QCloseEvent *e)
 {
-  if(!m_needsExit)
-  {
-    hide();
-    m_icon->show();
+    if (m_configuration.closeIsExit) {
+        m_needsExit = true;
+    }
 
-    e->accept();
-  }
-  else
-  {
-    if(e) QMainWindow::closeEvent(e);
-    QApplication::exit(0);
-  }
+    if (!m_needsExit) {
+        hide();
+        m_icon->show();
+
+        e->accept();
+    } else {
+        if (e)
+            QMainWindow::closeEvent(e);
+        QApplication::exit(0);
+    }
 }
 
 //-----------------------------------------------------------------
@@ -247,6 +276,9 @@ void MultiAlarm::addAlarmWidget(AlarmWidget *widget)
   connect(widget, SIGNAL(deleteAlarm()),
           this,   SLOT(onAlarmDeleted()));
 
+  connect(widget, SIGNAL(finished()), 
+          this, SLOT(onAlarmFinished()));
+
   auto layout = qobject_cast<QVBoxLayout*>(m_scrollArea->widget()->layout());
   layout->insertWidget(layout->count(), widget);
 
@@ -281,6 +313,11 @@ void MultiAlarm::restoreSettings()
     auto geometry = settings->value(GEOMETRY).toByteArray();
     restoreGeometry(geometry);
   }
+
+  m_configuration.closeIsExit = settings->value(CLOSE_IS_EXIT, false).toBool();
+  m_configuration.update = static_cast<Update>(settings->value(UPDATES, 0).toInt());
+  m_configuration.raiseOnFinish = settings->value(RAISE_ON_FINISH, false).toBool();
+  m_configuration.lastCheck = settings->value(LAST_CHECK, QDateTime()).toDateTime();
 
   QStringList expired;
 
@@ -328,12 +365,17 @@ void MultiAlarm::restoreSettings()
 void MultiAlarm::saveSettings() const
 {
   auto settings = applicationSettings();
+  settings->clear();
 
   settings->setValue(STATE, saveState());
   settings->setValue(GEOMETRY, saveGeometry());
 
+  settings->setValue(CLOSE_IS_EXIT, m_configuration.closeIsExit);
+  settings->setValue(UPDATES, static_cast<int>(m_configuration.update));
+  settings->setValue(RAISE_ON_FINISH, m_configuration.raiseOnFinish);
+  settings->setValue(LAST_CHECK, m_configuration.lastCheck);
+
   settings->beginGroup(ALARMS);
-  settings->clear();
 
   if(!m_alarms.empty())
   {
@@ -407,6 +449,15 @@ void MultiAlarm::onAlarmDeleted()
 
   if(m_alarms.empty())
     m_scrollArea->hide();
+}
+
+//-----------------------------------------------------------------
+void MultiAlarm::onAlarmFinished()
+{
+  if(m_configuration.raiseOnFinish && (isMinimized() || m_icon->isVisible()))
+  {
+    onRestoreActionActivated();
+  }
 }
 
 //-----------------------------------------------------------------
@@ -504,8 +555,14 @@ void MultiAlarm::connectSignals()
   connect(m_aboutAction, SIGNAL(triggered()),
           this,          SLOT(aboutDialog()));
 
+  connect(m_settingsAction, SIGNAL(triggered()),
+          this,             SLOT(settingsDialog()));
+
   connect(m_icon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
           this,   SLOT(onTrayIconActivated(QSystemTrayIcon::ActivationReason)));
+
+  connect(m_netManager.get(), SIGNAL(finished(QNetworkReply*)),
+          this,               SLOT(replyFinished(QNetworkReply*)));
 }
 
 //-----------------------------------------------------------------
@@ -515,8 +572,9 @@ std::unique_ptr<QSettings> MultiAlarm::applicationSettings() const
   if(applicationDir.exists(INI_FILENAME))
   {
     const auto fInfo = QFileInfo(applicationDir.absoluteFilePath(INI_FILENAME));
-    if(fInfo.isWritable())
+    if(fInfo.isWritable()) {
       return std::make_unique<QSettings>(INI_FILENAME, QSettings::IniFormat);
+    }
   }
 
   return std::make_unique<QSettings>("Felix de las Pozas Alvarez", "MultiAlarm");
@@ -589,4 +647,125 @@ QIcon MultiAlarm::appropiateTrayIcon() const
   }
 
   return QIcon(":/MultiAlarm/application.svg");
+}
+
+//--------------------------------------------------------------------
+void MultiAlarm::checkForUpdates()
+{
+  m_updatesTimer.stop();
+
+  auto last = m_configuration.lastCheck;
+
+  switch(m_configuration.update)
+  {
+    case Update::MONTHLY:
+      if(last.isValid())
+        last = last.addMonths(1);
+      break;
+    case Update::WEEKLY:
+      if(last.isValid())
+        last = last.addDays(7);
+      break;
+    case Update::DAILY:
+      if(last.isValid())
+        last = last.addDays(1);
+      break;
+    default:
+    case Update::NEVER:
+      return;
+      break;
+  }
+
+  const auto now = QDateTime::currentDateTime();
+  if(last.isValid() && last > now)
+  {
+    if(m_updatesTimer.isActive()) m_updatesTimer.stop();
+    auto msec = now.msecsTo(last);
+    m_updatesTimer.singleShot(msec, SLOT(checkForUpdates));
+  }
+  else
+  {
+    m_netManager->get(QNetworkRequest{QUrl{RELEASES_DATA}});
+
+    m_configuration.lastCheck = now;
+    checkForUpdates();
+  }
+}
+
+//--------------------------------------------------------------------
+void MultiAlarm::replyFinished(QNetworkReply *reply)
+{
+  const auto originUrl = reply->request().url().toString();
+
+  if(originUrl.contains("github", Qt::CaseInsensitive))
+  {
+    if(reply->error() == QNetworkReply::NoError)
+    {
+      const auto contents = reply->readAll();
+      processGithubData(contents);
+    }
+    else
+    {
+      showMessageBox(QMessageBox::Critical, tr("Unable to download update file."), reply->errorString(), tr("MultiAlarm updates"));
+    }
+  }
+
+  reply->deleteLater();
+}
+
+//--------------------------------------------------------------------
+void MultiAlarm::processGithubData(const QByteArray &data)
+{
+  const auto jsonDocument = QJsonDocument::fromJson(data);
+
+  int currentNumbers[3], lastNumbers[3];
+  const auto currentVersion = AboutDialog::VERSION.split(".");
+
+  // Github parse tag of last release.
+  auto jsonObj = jsonDocument.array();
+  auto lastRelease = jsonObj.at(0).toObject();
+  const auto version = lastRelease.value("tag_name").toString();
+  const auto lastVersion = version.split(".");
+  const auto body = lastRelease.value("body").toString();
+  bool hasError = false;
+
+qDebug() << lastVersion << body;
+  if(lastVersion.size() != 3 || body.isEmpty())
+  {
+    hasError = true;
+  }
+  else
+  {
+    bool ok = false;
+    for(int i: {0,1,2})
+    {
+      currentNumbers[i] = currentVersion.at(i).toInt(&ok);
+      if(!ok) hasError = true;
+      lastNumbers[i] = lastVersion.at(i).toInt(&ok);
+      if(!ok) hasError = true;
+      if(hasError) break;
+    }
+  }
+
+  if(!hasError)
+  {
+    if((currentNumbers[0] < lastNumbers[0]) ||
+      ((currentNumbers[0] == lastNumbers[0]) && (currentNumbers[1] < lastNumbers[1])) ||
+      ((currentNumbers[0] == lastNumbers[0]) && (currentNumbers[1] == lastNumbers[1]) && currentNumbers[2] < lastNumbers[2]))
+    {
+      const auto message = tr("There is a new release of <b>MultiAlarm</b> at the <a href=\"https://github.com/FelixdelasPozas/MultiAlarm/releases\">github website</a>!");
+      const auto informative = tr("<center><b>Version %1</b> has been released!</center>").arg(version);
+      const auto details = tr("Release notes:\n%1").arg(body);
+      const auto title = tr("MultiAlarm updated to version %1").arg(version);
+
+      QMessageBox msgBox;
+      msgBox.setWindowTitle(title);
+      msgBox.setText(message);
+      msgBox.setInformativeText(informative);
+      msgBox.setDetailedText(details);
+      msgBox.setWindowIcon(QIcon(":/MultiAlarm/application.svg"));
+      msgBox.setIconPixmap(QIcon(":/MultiAlarm/application.svg").pixmap(QSize{64,64}));
+      msgBox.exec();
+    }
+  }
 }

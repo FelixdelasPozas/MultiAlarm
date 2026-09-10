@@ -18,7 +18,7 @@
  */
 
 // Project
-#include "ScrollArea.h"
+#include <ScrollArea.h>
 
 // Qt
 #include <QDragEnterEvent>

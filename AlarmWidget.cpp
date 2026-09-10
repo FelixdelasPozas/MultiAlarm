@@ -226,8 +226,6 @@ void AlarmWidget::mousePressEvent(QMouseEvent* event)
 
         drag->exec(Qt::MoveAction);
         setGraphicsEffect(nullptr); // deletes the effect
-
-        
     }
 }
 
@@ -415,6 +413,8 @@ void AlarmWidget::onDialogFinished()
 
   if(!m_configuration.isTimer)
     emit deleteAlarm();
+
+  emit finished();
 }
 
 //-----------------------------------------------------------------

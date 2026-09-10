@@ -23,12 +23,14 @@
 // Project
 #include <AlarmWidget.h>
 #include <NewAlarmDialog.h>
+#include <Utils.h>
 #include <ui_MainWindow.h>
 
 // Qt
 #include <QMainWindow>
 #include <QSystemTrayIcon>
 #include <QSettings>
+#include <QNetworkAccessManager>
 
 // C++
 #include <memory>
@@ -36,10 +38,10 @@
 class QEvent;
 class QCloseEvent;
 class QSettings;
+class QNetworkReply;
 
 /** \class MultiAlarm
  * \brief Application main window.
- *
  */
 class MultiAlarm
 : public QMainWindow
@@ -48,108 +50,102 @@ class MultiAlarm
     Q_OBJECT
   public:
     /** \brief MultiAlarm class constructor.
-     *
      */
     MultiAlarm(QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags());
 
     /** \brief MultiAlarm class virtual destructor.
-     *
      */
     virtual ~MultiAlarm();
 
     /** \brief Return the list of used alarm names.
-     *
      */
     QStringList usedNames() const;
 
     /** \brief Returns the list of used colors.
-     *
      */
     QStringList usedColors() const;
 
   private slots:
     /** \brief Launches the alarm creation dialog.
-     *
      */
     void createNewAlarm();
 
     /** \brief Launches the about dialog.
-     *
      */
     void aboutDialog();
 
+    /** \brief Launches the settings dialog.
+     */
+    void settingsDialog();
+
     /** \brief Handles the icon tray activation.
      * \param[in] reason reason for activation.
-     *
      */
     void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
     /** \brief Restores the main dialog and hides the tray icon.
-     *
      */
     void onRestoreActionActivated();
 
     /** \brief Cancels all alarms and exits the application.
-     *
      */
     void onQuitActionActivated();
 
     /** \brief Deletes the alarm and widget.
-     *
      */
     void onAlarmDeleted();
 
+    /** \brief Shows the main dialog if configured to do so.
+     */
+    void onAlarmFinished();
+    
+    /** \brief Handles network replies.
+     * \param[in] reply network reply object pointer.
+     */
+    void replyFinished(QNetworkReply *reply);
+
   private:
-    virtual void changeEvent(QEvent *e);
-    virtual void closeEvent(QCloseEvent *e);
+    virtual void changeEvent(QEvent *e) override;
+    virtual void closeEvent(QCloseEvent *e) override;
 
     /** \brief Creates a widget using the data from the dialog.
      * \param[in] settings settings object containinf the alarm properties.
      * \param[in] name alarm identificator.
-     *
      */
     AlarmWidget *createAlarmWidget(QSettings &settings, const QString &name);
 
     /** \brief Creates a widget using the data from the dialog.
      * \param[in] dialog finished dialog with the alarm properties.
-     *
      */
     AlarmWidget *createAlarmWidget(const NewAlarmDialog &dialog);
 
     /** \brief Restores application settings from ini file.
-     *
      */
     void restoreSettings();
 
     /** \brief Saves application settings to ini file.
-     *
      */
     void saveSettings() const;
 
     /** \brief Helper method to setup the tray icon.
-     *
      */
     void setupTrayIcon();
 
     /** \brief Makes all the connections between QObjects.
-     *
      */
     void connectSignals();
 
     /** \brief Adds an alarm to the list of alarms and configures the signals and UI.
      * \param[in] widget widget to add.
-     *
      */
     void addAlarmWidget(AlarmWidget *widget);
 
     /** \brief Returns the current height of the main window.
-     *
      */
     int currentHeight() const;
 
     /** \brief Returns the application settings. From INI file if exists or the registry if not.
      *         Needs to be a pointer because QSettings is not copyable.
-     *
      */
     std::unique_ptr<QSettings> applicationSettings() const;
 
@@ -157,13 +153,26 @@ class MultiAlarm
      */
     QIcon appropiateTrayIcon() const;
 
-  private:
-    QSystemTrayIcon *m_icon;              /** application icon when minimized.       */
-    QAction         *m_restoreMenuAction; /** restore application tray icon action.  */
-    QAction         *m_quitMenuAction;    /** quit application tray icon action.     */
-    bool             m_needsExit;         /** true to exit the application on close. */
+    /** \brief Helper method that checks for application updates.
+     */
+    void checkForUpdates();
 
-    QList<AlarmWidget *> m_alarms;        /** alarms widgets.                        */
+    /** \brief Parses Gihub reply data.
+     * \param[in] data Github reply data.
+     */
+    void processGithubData(const QByteArray &data);
+
+  private:
+    QSystemTrayIcon *m_icon;              /** application icon when minimized.        */
+    QAction         *m_restoreMenuAction; /** restore application tray icon action.   */
+    QAction         *m_quitMenuAction;    /** quit application tray icon action.      */
+    bool             m_needsExit;         /** true to exit the application on close.  */
+    QTimer           m_updatesTimer;      /** timer to check for application updates. */
+    Configuration    m_configuration;     /** application configuration data.         */
+
+    QList<AlarmWidget *> m_alarms;        /** alarms widgets.                         */
+
+    std::unique_ptr<QNetworkAccessManager> m_netManager;   /** network manager.       */
 };
 
 #endif // MULTIALARM_H_

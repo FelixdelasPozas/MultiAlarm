@@ -171,6 +171,8 @@
     </property>
     <addaction name="m_newAction"/>
     <addaction name="separator"/>
+    <addaction name="m_settingsAction"/>
+    <addaction name="separator"/>
     <addaction name="m_quitAction"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
@@ -190,6 +192,9 @@
    <property name="text">
     <string>&amp;New Alarm...</string>
    </property>
+   <property name="toolTip">
+    <string>Add a new alarm</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
    </property>
@@ -202,8 +207,14 @@
    <property name="text">
     <string>&amp;Quit</string>
    </property>
+   <property name="toolTip">
+    <string>Quits MultiAlarm</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::QuitRole</enum>
    </property>
   </action>
   <action name="m_aboutAction">
@@ -214,8 +225,29 @@
    <property name="text">
     <string>About &amp;MultiAlarm...</string>
    </property>
+   <property name="toolTip">
+    <string>Information about MultiAlarm</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::AboutRole</enum>
+   </property>
+  </action>
+  <action name="m_settingsAction">
+   <property name="icon">
+    <iconset resource="rsc/resources.qrc">
+     <normaloff>:/MultiAlarm/settings.svg</normaloff>:/MultiAlarm/settings.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Settings...</string>
+   </property>
+   <property name="toolTip">
+    <string>Configures MultiAlarm settings.</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::PreferencesRole</enum>
    </property>
   </action>
  </widget>

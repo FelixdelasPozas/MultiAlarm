@@ -71,7 +71,7 @@ class AlarmWidget
     Q_OBJECT
   public:
     /** \brief AlarmWidget class constructor.
-     * \param[in] parent Main dialog pointer.
+     * \param[in] parent Raw pointer of the widget parent of this one. 
      * \param[in] flags window flags.
      *
      */
@@ -105,6 +105,7 @@ class AlarmWidget
 
   signals:
     void deleteAlarm();
+    void finished();
 
   private: 
     virtual void mousePressEvent(QMouseEvent *event) override;

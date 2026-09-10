@@ -49,7 +49,6 @@ class AboutDialog
     virtual ~AboutDialog()
     {};
 
-  private:
     static const QString VERSION; /** application version string. */
 };
 

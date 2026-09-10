@@ -8,8 +8,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Version Number
 set (MULTIALARM_VERSION_MAJOR 1)
-set (MULTIALARM_VERSION_MINOR 5)
-set (MULTIALARM_VERSION_PATCH 2)
+set (MULTIALARM_VERSION_MINOR 6)
+set (MULTIALARM_VERSION_PATCH 0)
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -47,6 +47,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-deprecated -std=c++11 -mwindo
 # Add Qt Resource files
 qt6_add_resources(RESOURCES
   rsc/resources.qrc
+  rsc/darktheme/style.qrc
 )
 
 qt6_wrap_ui(CORE_UI

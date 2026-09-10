@@ -53,6 +53,10 @@ Main dialog with the alarm list. Each alarm has buttons to start, pause, delete 
 
 The alarm creation and modification dialog. Keyboard lights option is only active once a Logitech keyboard has been detected.
 
+![settings](https://github.com/user-attachments/assets/6dab5b71-d027-40e3-8de6-466d683df3dd)
+
+Settings dialog.
+
 ![newalarmdialog](https://github.com/user-attachments/assets/6e6e086c-9690-4a8b-a0be-3df4a9914310)
 
 Simple alarm completion dialog with the alarm message appears on top of other windows. In an automatic close alarm an additional message will appear with the remaining time before this dialog closes. 
@@ -73,7 +77,7 @@ Keyboard notification for an alarm with red foreground and white background at 4
 
 # Repository information
 
-**Version**: 1.5.2
+**Version**: 1.6.0
 
 **Status**: finished
 
@@ -81,7 +85,7 @@ Keyboard notification for an alarm with red foreground and white background at 4
 
 | Language                     |files          |blank        |comment           |code  |
 |:-----------------------------|--------------:|------------:|-----------------:|-----:|
-| C++                          |  11           | 556         |   379            | 2124 |
-| C/C++ Header                 |  10           | 269         |   732            |  498 |
-| CMake                        |   1           |  17         |     7            |   54 |
-| **Total**                    | **22**        | **842**     | **1118**          | **2676** |
+| C++                          |  12           | 605         |   406            | 2356 |
+| C/C++ Header                 |  11           | 296         |   768            |  547 |
+| CMake                        |   1           |  17         |     8            |   55 |
+| **Total**                    | **24**        | **918**     | **1182**          | **2958** |

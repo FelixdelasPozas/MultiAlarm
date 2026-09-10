@@ -26,6 +26,7 @@
 #include <QColor>
 #include <QMessageBox>
 #include <QTimer>
+#include <QDateTime>
 
 // C++
 #include <windows.h>
@@ -174,6 +175,27 @@ class AutoCloseMessageBox : public QMessageBox
     int m_timerId = 0;              /** current timer id. */
 };
 
+enum class Update: char { NEVER = 0, DAILY, WEEKLY, MONTHLY };
+
+/** \struct Configuration
+ * \brief Holds the application configuration data. 
+ */
+struct Configuration
+{
+    QDateTime lastCheck; /** Time of last update check. */
+    Update update;       /** Frequency of update checks. */
+    bool raiseOnFinish;  /** True to show the main window when an alarm finishes, false otherwise. */
+    bool closeIsExit;    /** Exit application when close button is pressed, false otherwise. */
+
+    operator QString() const
+    {
+      QString result = "Last check " + lastCheck.toString() + " update " + QString::number(static_cast<int>(update)) + " raise " + (raiseOnFinish ? "yes":"no") + " close " + (closeIsExit? "yes":"no");
+      return result;
+    }
+};
+
+
+
 /** \brief Reads a registry word. Returns true on success.
  * \param[in] root Registry root
  * \param[in] subKey Subkey value
@@ -181,5 +203,18 @@ class AutoCloseMessageBox : public QMessageBox
  * \param[out] outValue Key value. 
  */
 bool ReadRegistryDword(HKEY root, const std::wstring& subKey, const std::wstring& valueName, DWORD& outValue);
+
+/** \brief Centers a dialog over the parent with a given width.
+ * \param[in] dialog Dialog to center.
+ * \param[in] minimumWidth Minimum width of the dialog to show.
+ */
+void centerDialog(QDialog* dialog, const unsigned int minimumWidth);
+
+/** \brief Shows a message dialog.
+ * \param[in] icon Dialog icon.
+ * \param[in] msg Message to show.
+ * \param[in] details Message details, optional.
+ */
+void showMessageBox(const QMessageBox::Icon& icon, const QString& msg, const QString& details, const QString& title);
 
 #endif // UTILS_H_

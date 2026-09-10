@@ -18,7 +18,7 @@
  */
 
 // Project
-#include "DurationSpinBox.h"
+#include <DurationSpinBox.h>
 
 // Qt
 #include <QLineEdit>
@@ -34,6 +34,7 @@ DurationSpinBox::DurationSpinBox(QWidget* parent) :
     m_totalSeconds(60)
 {
     lineEdit()->setAlignment(Qt::AlignLeft);
+    lineEdit()->setInputMethodHints(Qt::InputMethodHint::ImhDigitsOnly);
     updateText();
 }
 
@@ -174,12 +175,14 @@ void DurationSpinBox::keyPressEvent(QKeyEvent* event)
 {
     const QSet<int> separators = {2,5,8};
     const auto sec = currentSection();
+    static int keysPressed[4] = {0,0,0,0};
 
     switch (event->key()) {
         case Qt::Key_Left:
             if (sec != Section::Days) {
                 auto secPos = static_cast<int>(sec);
                 selectSection(static_cast<Section>(--secPos));
+                memset(keysPressed, 0, 4*sizeof(int));
                 return;
             }
             break;
@@ -187,6 +190,7 @@ void DurationSpinBox::keyPressEvent(QKeyEvent* event)
             if (sec != Section::Seconds) {
                 auto secPos = static_cast<int>(sec);
                 selectSection(static_cast<Section>(++secPos));
+                memset(keysPressed, 0, 4*sizeof(int));
                 return;
             }
             break;
@@ -195,44 +199,69 @@ void DurationSpinBox::keyPressEvent(QKeyEvent* event)
     }
 
     // If you try to write numbers directly, we process the logic in blocks of 2 digits
-    if (event->text().contains(QRegularExpression("^\\d$"))) {
-        int pos = lineEdit()->cursorPosition();
-        if (separators.contains(pos)) {
-            pos -= 2;
-        }
-
+    if (event->text().contains(QRegularExpression("^\\d$")) || event->key() == Qt::Key_Backspace) {
         QString currentText = lineEdit()->text();
-
-        // We overwrite the character under the cursor instead of pushing the formatting to the right
-        if (pos < currentText.length() && currentText[pos] != ':') {
-            currentText[pos] = event->text()[0];
-
-            // We evaluate if the new temporary string is transformed into valid seconds
-            QStringList parts = currentText.split(':');
-            if (parts.size() == 4) {
-                quint64 newSecs = parts[0].toULongLong() * 24 * 3600 + parts[1].toULongLong() * 3600 +
-                                  parts[2].toULongLong() * 60 + parts[3].toULongLong();
-
-                if (parts[0].toUInt() <= 30 && parts[1].toUInt() < 24 && parts[2].toUInt() < 60 &&
-                    parts[3].toUInt() < 60) {
-                    quint64 oldSeconds = m_totalSeconds;
-                    m_totalSeconds = std::clamp(newSecs, MIN_SECONDS, MAX_SECONDS);
-
-                    if (oldSeconds != m_totalSeconds) {
-                        emit durationChanged(m_totalSeconds);
-                    }
-                }
-            }
-            updateText();
-
-            // Move the cursor smoothly
-            int nextPos = pos + 1;
-            if (nextPos < currentText.length() && lineEdit()->text()[nextPos] == ':') {
-                nextPos++; // Skip the separator ':'
-            }
-            lineEdit()->setCursorPosition(nextPos);
+        QStringList parts = currentText.split(':');
+        
+        if (parts.size() != 4) {
+            QAbstractSpinBox::keyPressEvent(event);
             return;
         }
+
+        int sectionIndex = static_cast<int>(currentSection()) - 1;
+        QString activePart = parts[sectionIndex]; // 0 is none
+
+        if(event->key() == Qt::Key_Backspace)
+        {
+          activePart = "0" + activePart.mid(0,1);
+          keysPressed[sectionIndex] = std::max(0, keysPressed[sectionIndex] - 1);
+        }
+        else
+        {
+          activePart = activePart.mid(1,1) + event->text();
+          ++keysPressed[sectionIndex];
+        }
+
+        parts[sectionIndex] = activePart;
+        
+        currentText = parts.join(':');
+
+        quint64 newSecs = parts[0].toULongLong() * 24 * 3600 + 
+                          parts[1].toULongLong() * 3600 +
+                          parts[2].toULongLong() * 60 + 
+                          parts[3].toULongLong();
+
+        if (parts[0].toUInt() <= 30 && parts[1].toUInt() < 24 && 
+            parts[2].toUInt() < 60 && parts[3].toUInt() < 60) {
+            
+            if (newSecs < 60) {
+                newSecs = 60; 
+            }
+
+            quint64 oldSeconds = m_totalSeconds;
+            m_totalSeconds = std::clamp(newSecs, static_cast<quint64>(60), MAX_SECONDS);
+
+            if (oldSeconds != m_totalSeconds) {
+                emit durationChanged(m_totalSeconds);
+            }
+        }
+        
+        updateText();
+
+        int targetCursorPos = 0;
+        if (sectionIndex == 0) targetCursorPos = 2;
+        if (sectionIndex == 1) targetCursorPos = 5;
+        if (sectionIndex == 2) targetCursorPos = 8;
+        if (sectionIndex == 3) targetCursorPos = 11;
+
+        if(keysPressed[sectionIndex] == 2)
+        {
+          keysPressed[sectionIndex] = 0;
+          if(sectionIndex != 3) targetCursorPos += 3;
+        }
+        
+        lineEdit()->setCursorPosition(targetCursorPos);
+        return;
     }
 
     QAbstractSpinBox::keyPressEvent(event);
