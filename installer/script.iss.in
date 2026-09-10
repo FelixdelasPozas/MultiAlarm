@@ -32,9 +32,10 @@ Source: "*.dll"; DestDir: "{app}";
 Source: "iconengines/*.*"; DestDir: "{app}/iconengines/";
 Source: "imageformats/*.*"; DestDir: "{app}/imageformats/";
 Source: "platforms/*.*"; DestDir: "{app}/platforms/";
-Source: "multimedia/*.*"; DestDir: "{app}/platforms/";
-Source: "styles/*.*"; DestDir: "{app}/platforms/";
-Source: "networkinformation/*.*"; DestDir: "{app}/platforms/";
+Source: "multimedia/*.*"; DestDir: "{app}/multimedia/";
+Source: "styles/*.*"; DestDir: "{app}/styles/";
+Source: "networkinformation/*.*"; DestDir: "{app}/networkinformation/";
+Source: "tls/*.*"; DestDir: "{app}/tls/";
 ; Source: "C:/WINDOWS/SYSTEM32/MSVCR120.dll"; DestDir: "{app}";
 
 [Run]

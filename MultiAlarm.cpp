@@ -24,6 +24,7 @@
 #include <SettingsDialog.h>
 #include <LogiLED.h>
 #include <Alarm.h>
+#include <QSslSocket>
 
 // Qt
 #include <QCloseEvent>
@@ -729,7 +730,6 @@ void MultiAlarm::processGithubData(const QByteArray &data)
   const auto body = lastRelease.value("body").toString();
   bool hasError = false;
 
-qDebug() << lastVersion << body;
   if(lastVersion.size() != 3 || body.isEmpty())
   {
     hasError = true;
